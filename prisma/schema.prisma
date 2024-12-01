@@ -12,3 +12,39 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model building {
+  BuildingID   String       @id @db.VarChar(10)
+  BuildingName String?      @db.VarChar(50)
+  BuildingCode String?      @db.VarChar(10)
+  department   department[]
+}
+
+model department {
+  DepartmentID   String       @id @db.VarChar(10)
+  DepartmentName String?      @db.VarChar(50)
+  BuildingID     String?      @db.VarChar(10)
+  course         course[]
+  building       building?    @relation(fields: [BuildingID], references: [BuildingID], map: "DEPARTMENT_BuildingID_fkey")
+  instructor     instructor[]
+  student        student[]
+
+  @@index([BuildingID], map: "DEPARTMENT_BuildingID_fkey")
+}
+model instructor {
+  InstructorID            String             @id @db.VarChar(10)
+  InstructorFirstName     String?            @db.VarChar(20)
+  InstructorLastName      String?            @db.VarChar(20)
+  InstructorFullName      String?            @db.VarChar(60)
+  InstructorEmail         String?            @db.VarChar(50)
+  InstructorPersonalEmail String?            @db.VarChar(50)
+  InstructorPhoto         Bytes?
+  WebsiteLink             String?            @db.VarChar(100)
+  InstructorLocation      String?            @db.VarChar(50)
+  InstructorPhoneNum      String?            @db.VarChar(15)
+  DepartmentID            String?            @db.VarChar(10)
+  course_schedules        course_schedules[]
+  department              department?        @relation(fields: [DepartmentID], references: [DepartmentID], map: "INSTRUCTOR_DepartmentID_fkey")
+
+  @@index([DepartmentID], map: "INSTRUCTOR_DepartmentID_fkey")
+}
