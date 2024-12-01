@@ -31,6 +31,7 @@ model department {
 
   @@index([BuildingID], map: "DEPARTMENT_BuildingID_fkey")
 }
+
 model instructor {
   InstructorID            String             @id @db.VarChar(10)
   InstructorFirstName     String?            @db.VarChar(20)
@@ -47,4 +48,90 @@ model instructor {
   department              department?        @relation(fields: [DepartmentID], references: [DepartmentID], map: "INSTRUCTOR_DepartmentID_fkey")
 
   @@index([DepartmentID], map: "INSTRUCTOR_DepartmentID_fkey")
+}
+
+model course {
+  CourseCode        String             @id @db.VarChar(10)
+  CourseTitle       String?            @db.VarChar(50)
+  DepartmentID      String?            @db.VarChar(10)
+  Credits           Decimal?           @db.Decimal(2, 1)
+  CourseDescription String?
+  department        department?        @relation(fields: [DepartmentID], references: [DepartmentID], map: "COURSE_DepartmentID_fkey")
+  course_schedules  course_schedules[]
+
+  @@index([DepartmentID], map: "COURSE_DepartmentID_fkey")
+}
+
+model course_schedules {
+  CRN                String                           @id @db.VarChar(10)
+  CourseCode         String?                          @db.VarChar(10)
+  Day                course_schedules_Day?
+  ClassStartTime     DateTime?
+  ClassEndTime       DateTime?
+  InstructorID       String?                          @db.VarChar(10)
+  Term               String?                          @db.VarChar(10)
+  Year               Int?
+  TeachingMethod     course_schedules_TeachingMethod?
+  Capacity           Int?
+  Enrolled           Int?
+  attendance         attendance[]
+  course             course?                          @relation(fields: [CourseCode], references: [CourseCode], map: "COURSE_SCHEDULES_CourseCode_fkey")
+  instructor         instructor?                      @relation(fields: [InstructorID], references: [InstructorID], map: "COURSE_SCHEDULES_InstructorID_fkey")
+  end_of_term_grades end_of_term_grades[]
+  enrollment         enrollment[]
+  exams              exams[]
+  in_term_grades     in_term_grades[]
+
+  @@index([CourseCode], map: "COURSE_SCHEDULES_CourseCode_fkey")
+  @@index([InstructorID], map: "COURSE_SCHEDULES_InstructorID_fkey")
+}
+
+model student {
+  StudentID            String               @id @db.VarChar(10)
+  StudentFirstName     String?              @db.VarChar(20)
+  StudentLastName      String?              @db.VarChar(20)
+  StudentFullName      String?              @db.VarChar(60)
+  StudentEmail         String?              @db.VarChar(50)
+  StudentPersonalEmail String?              @db.VarChar(50)
+  DepartmentID         String?              @db.VarChar(10)
+  TotalCredits         Decimal?             @db.Decimal(4, 1)
+  GPA                  Decimal?             @db.Decimal(3, 2)
+  StudentPhoto         Bytes?
+  StudentPhoneNumber   String?              @db.VarChar(15)
+  Advisor              String?              @db.VarChar(10)
+  attendance           attendance[]
+  end_of_term_grades   end_of_term_grades[]
+  enrollment           enrollment[]
+  in_term_grades       in_term_grades[]
+  department           department?          @relation(fields: [DepartmentID], references: [DepartmentID], map: "STUDENT_DepartmentID_fkey")
+
+  @@index([DepartmentID], map: "STUDENT_DepartmentID_fkey")
+}
+
+model enrollment {
+  StudentID              String           @db.VarChar(10)
+  CRN                    String           @db.VarChar(10)
+  EnrollmentDate         DateTime?
+  EnrollmentApprovalDate DateTime?
+  course_schedules       course_schedules @relation(fields: [CRN], references: [CRN], map: "ENROLLMENT_CRN_fkey")
+  student                student          @relation(fields: [StudentID], references: [StudentID], map: "ENROLLMENT_StudentID_fkey")
+
+  @@id([StudentID, CRN])
+  @@index([CRN], map: "ENROLLMENT_CRN_fkey")
+}
+
+enum course_schedules_Day {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+}
+
+enum course_schedules_TeachingMethod {
+  Online
+  InPerson
+  Hybrid
 }
