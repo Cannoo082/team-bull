@@ -120,6 +120,54 @@ model enrollment {
   @@index([CRN], map: "ENROLLMENT_CRN_fkey")
 }
 
+model attendance {
+  StudentID        String             @db.VarChar(10)
+  CRN              String             @db.VarChar(10)
+  Date             DateTime
+  Status           attendance_Status?
+  course_schedules course_schedules   @relation(fields: [CRN], references: [CRN], map: "ATTENDANCE_CRN_fkey")
+  student          student            @relation(fields: [StudentID], references: [StudentID], map: "ATTENDANCE_StudentID_fkey")
+
+  @@id([StudentID, CRN, Date])
+  @@index([CRN], map: "ATTENDANCE_CRN_fkey")
+}
+
+model exams {
+  ExamID           Int               @id @default(autoincrement())
+  CRN              String?           @db.VarChar(10)
+  ExamStartTime    DateTime?
+  ExamEndTime      DateTime?
+  ExamLocation     String?           @db.VarChar(50)
+  course_schedules course_schedules? @relation(fields: [CRN], references: [CRN], map: "EXAMS_CRN_fkey")
+
+  @@index([CRN], map: "EXAMS_CRN_fkey")
+}
+
+model in_term_grades {
+  StudentID        String           @db.VarChar(10)
+  CRN              String           @db.VarChar(10)
+  GradeName        String?          @db.VarChar(50)
+  GradePercentage  Decimal?         @db.Decimal(5, 2)
+  GradeDescription String?
+  course_schedules course_schedules @relation(fields: [CRN], references: [CRN], map: "IN_TERM_GRADES_CRN_fkey")
+  student          student          @relation(fields: [StudentID], references: [StudentID], map: "IN_TERM_GRADES_StudentID_fkey")
+
+  @@id([StudentID, CRN])
+  @@index([CRN], map: "IN_TERM_GRADES_CRN_fkey")
+}
+
+model end_of_term_grades {
+  StudentID        String           @db.VarChar(10)
+  CRN              String           @db.VarChar(10)
+  LetterGrade      String?          @db.VarChar(10)
+  GradeOutOf100    Decimal?         @db.Decimal(5, 2)
+  course_schedules course_schedules @relation(fields: [CRN], references: [CRN], map: "END_OF_TERM_GRADES_CRN_fkey")
+  student          student          @relation(fields: [StudentID], references: [StudentID], map: "END_OF_TERM_GRADES_StudentID_fkey")
+
+  @@id([StudentID, CRN])
+  @@index([CRN], map: "END_OF_TERM_GRADES_CRN_fkey")
+}
+
 enum course_schedules_Day {
   Monday
   Tuesday
@@ -134,4 +182,10 @@ enum course_schedules_TeachingMethod {
   Online
   InPerson
   Hybrid
+}
+
+enum attendance_Status {
+  Present
+  Absent
+  Late
 }

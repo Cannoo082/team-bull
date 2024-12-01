@@ -143,6 +143,65 @@ async function main() {
       }
     }
   }
+  // Dummy data for ATTENDANCE
+  for (let i = 0; i < 10; i++) {
+    await prisma.attendance.create({
+      data: {
+        StudentID: faker.helpers.arrayElement(studentIDs),
+        CRN: faker.helpers.arrayElement(courseScheduleCRNs),
+        Date: faker.date.past(),
+        Status: faker.helpers.arrayElement(["Present", "Absent", "Late"]),
+      },
+    });
+  }
+  // Dummy data for EXAMS
+  for (let i = 1; i <= 5; i++) {
+    await prisma.exams.create({
+      data: {
+        CRN: faker.helpers.arrayElement(courseScheduleCRNs), 
+        ExamStartTime: faker.date.soon(),
+        ExamEndTime: faker.date.soon(),
+        ExamLocation: `Room ${faker.number.int({ min: 100, max: 500 })}`,
+      },
+    });
+  }
+
+  // Dummy data for IN_TERM_GRADES
+  const usedStudentCRNCombinations = new Set();
+  for (let i = 1; i <= 10; i++) {
+    let uniqueCombination = false;
+    while (!uniqueCombination) {
+      const studentID = faker.helpers.arrayElement(studentIDs);
+      const crn = faker.helpers.arrayElement(courseScheduleCRNs);
+      const combinationKey = `${studentID}-${crn}`;
+
+      if (!usedStudentCRNCombinations.has(combinationKey)) {
+        await prisma.in_term_grades.create({
+          data: {
+            StudentID: studentID,
+            CRN: crn,
+            GradeName: faker.lorem.words(2),
+            GradePercentage: faker.number.float({ min: 0, max: 100, precision: 0.01 }),
+            GradeDescription: faker.lorem.sentence(),
+          },
+        });
+        usedStudentCRNCombinations.add(combinationKey);
+        uniqueCombination = true;
+      }
+    }
+  }
+  for (let i = 1; i <= 10; i++) {
+    await prisma.end_of_term_grades.create({
+      data: {
+        StudentID: faker.helpers.arrayElement(studentIDs), 
+        CRN: faker.helpers.arrayElement(courseScheduleCRNs),
+        LetterGrade: faker.helpers.arrayElement(['A', 'B', 'C', 'D', 'F']),
+        GradeOutOf100: faker.number.float({ min: 0, max: 100, precision: 0.01 }),
+      },
+    });
+  }
+
+  console.log("Dummy data successfully added!");
 }
 
 main()
