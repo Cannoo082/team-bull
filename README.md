@@ -1,5 +1,54 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Database Setup with Prisma
+
+The project uses Prisma as the ORM (Object-Relational Mapping) for database management.  It provides type-safe database queries, automated migrations, and an intuitive query API. Prisma consists of three main components:
+
+- **Prisma Client:** A query builder used in your application code to interact with the database.
+- **Prisma Migrate:** A tool for managing database schema changes.
+- **Prisma Studio:** A GUI for managing and inspecting your database. 
+
+The database schema is defined in the prisma/schema.prisma file, and the data seeding script is located in prisma/seed.js.
+
+### Setting up Prisma
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Update your prisma/schema.prisma file to define your database schema.
+
+3. Set your database URL in the .env file:
+
+```bash
+DATABASE_URL="mysql://<username>:<password>@<host>:<port>/<database_name>"
+```
+
+4. Run Prisma migrations to apply the schema:
+```bash
+npx prisma migrate dev --name init
+```
+
+5. Generate the Prisma Client:
+Run the following command to generate the Prisma Client:
+
+```bash
+npx prisma generate
+```
+This command reads your schema file and creates a node_modules/.prisma directory containing the generated client code.
+
+### Creating Dummy Data with Prisma
+
+To populate your database with dummy data:
+
+- **Run the Seed Script**
+
+   To execute the seed script and populate your database, use the following command:
+
+   ```bash
+   npm run prisma:seed
+
 ## Getting Started
 
 First, run the development server:
@@ -28,6 +77,8 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+For further information about Prisma, check official [Prisma](https://www.prisma.io/nextjs) documentation.
 
 ## Deploy on Vercel
 
