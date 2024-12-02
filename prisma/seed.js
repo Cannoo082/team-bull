@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
   // Dummy data for BUILDING
   const buildingIDs = [];
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 1; i <= 50; i++) {
     const building = await prisma.building.create({
       data: {
         BuildingID: `B0${i}`,
@@ -53,7 +53,7 @@ async function main() {
 
   // Dummy data for COURSE
   const courseCodes = [];
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 50; i++) {
     const course = await prisma.course.create({
       data: {
         CourseCode: `C00${i}`,
@@ -68,7 +68,7 @@ async function main() {
 
   // Dummy data for COURSE_SCHEDULES
   const courseScheduleCRNs = [];
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 50; i++) {
     const courseSchedule = await prisma.course_schedules.create({
       data: {
         CRN: `CRN00${i}`,
@@ -99,7 +99,7 @@ async function main() {
 
   // Dummy data for STUDENT
   const studentIDs = [];
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= 50; i++) {
     const student = await prisma.student.create({
       data: {
         StudentID: `S00${i}`,
@@ -121,7 +121,7 @@ async function main() {
 
   // Dummy data for ENROLLMENT
   const usedEnrollmentCombinations = new Set();
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 50; i++) {
     let uniqueCombination = false;
 
     while (!uniqueCombination) {
@@ -144,7 +144,7 @@ async function main() {
     }
   }
   // Dummy data for ATTENDANCE
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 50; i++) {
     await prisma.attendance.create({
       data: {
         StudentID: faker.helpers.arrayElement(studentIDs),
@@ -155,7 +155,7 @@ async function main() {
     });
   }
   // Dummy data for EXAMS
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 50; i++) {
     await prisma.exams.create({
       data: {
         CRN: faker.helpers.arrayElement(courseScheduleCRNs), 
@@ -168,7 +168,7 @@ async function main() {
 
   // Dummy data for IN_TERM_GRADES
   const usedStudentCRNCombinations = new Set();
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= 50; i++) {
     let uniqueCombination = false;
     while (!uniqueCombination) {
       const studentID = faker.helpers.arrayElement(studentIDs);
@@ -190,13 +190,28 @@ async function main() {
       }
     }
   }
-  for (let i = 1; i <= 10; i++) {
+  const createdStudentCRNs = new Set(); 
+
+  for (let i = 1; i <= 50; i++) {
+    let uniqueCombinationFound = false;
+    let studentID, crn;
+
+    while (!uniqueCombinationFound) {
+      studentID = faker.helpers.arrayElement(studentIDs); 
+      crn = faker.helpers.arrayElement(courseScheduleCRNs); 
+      const combination = `${studentID}-${crn}`;
+
+      if (!createdStudentCRNs.has(combination)) {
+        createdStudentCRNs.add(combination); 
+        uniqueCombinationFound = true;
+      }
+    }
     await prisma.end_of_term_grades.create({
       data: {
-        StudentID: faker.helpers.arrayElement(studentIDs), 
-        CRN: faker.helpers.arrayElement(courseScheduleCRNs),
-        LetterGrade: faker.helpers.arrayElement(['A', 'B', 'C', 'D', 'F']),
-        GradeOutOf100: faker.number.float({ min: 0, max: 100, precision: 0.01 }),
+        StudentID: studentID,
+        CRN: crn,
+        LetterGrade: faker.helpers.arrayElement(["A", "B", "C", "D", "F"]),
+        GradeOutOf100: faker.number.float({ min: 50, max: 100, precision: 0.1 }),
       },
     });
   }
