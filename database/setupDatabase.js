@@ -40,8 +40,10 @@ require('dotenv').config();
         DROP TABLE IF EXISTS student;
         DROP TABLE IF EXISTS department;
         DROP TABLE IF EXISTS building;
-        DROP TABLE IF EXISTS User;
-        DROP TABLE IF EXISTS Notifications;
+        DROP TABLE IF EXISTS user;
+        DROP TABLE IF EXISTS admin;
+        DROP TABLE IF EXISTS notification;
+        DROP TABLE IF EXISTS user_notification;
     `;
     const fullScript = dropStatements + schema;
 
