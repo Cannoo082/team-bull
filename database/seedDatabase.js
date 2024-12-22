@@ -1,7 +1,6 @@
-const mysql = require('mysql2/promise');
+const pool = require('../src/lib/db');
 const faker = require('@faker-js/faker').faker;
 const bcrypt = require('bcrypt');
-require('dotenv').config();
 
 const buildings = [
   { id: 'B001', name: 'Engineering Building', abbreviation: 'ENG' },
@@ -64,20 +63,9 @@ const coursesByDepartment = {
 };
 
 (async function seedDatabase() {
-  const dbConfig = {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT || 3306,
-  };
-
   try {
-    const connection = await mysql.createConnection(dbConfig);
-    console.log('Connected to the database.');
-
     const executeQuery = async (query, values = []) => {
-      const [rows] = await connection.query(query, values);
+      const [rows] = await pool.query(query, values);
       return rows;
     };
 
@@ -435,8 +423,9 @@ const coursesByDepartment = {
     }
 
     console.log('Seeding complete!');
-    await connection.end();
   } catch (error) {
     console.error('An error occurred during seeding:', error.message || error);
+  } finally {
+    await pool.end();
   }
 })();
