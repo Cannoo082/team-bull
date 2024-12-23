@@ -11,10 +11,15 @@ require('dotenv').config();
 
     await pool.query(`USE \`${databaseName}\``);
 
+    await pool.query(`SET FOREIGN_KEY_CHECKS = 0;`);
+
     const schemaPath = path.join(__dirname, 'schema.sql');
     const schema = fs.readFileSync(schemaPath, 'utf8');
 
     const dropStatements = `
+        DROP TABLE IF EXISTS user_notification;
+        DROP TABLE IF EXISTS notification;
+        DROP TABLE IF EXISTS user;
         DROP TABLE IF EXISTS attendance;
         DROP TABLE IF EXISTS enrollment;
         DROP TABLE IF EXISTS end_of_term_grades;
@@ -22,18 +27,18 @@ require('dotenv').config();
         DROP TABLE IF EXISTS exams;
         DROP TABLE IF EXISTS course_schedules;
         DROP TABLE IF EXISTS course;
-        DROP TABLE IF EXISTS user_notification;
-        DROP TABLE IF EXISTS user;
         DROP TABLE IF EXISTS student;
         DROP TABLE IF EXISTS instructor;
         DROP TABLE IF EXISTS department;
         DROP TABLE IF EXISTS building;
         DROP TABLE IF EXISTS admin;
-        DROP TABLE IF EXISTS notification;
     `;
     const fullScript = dropStatements + schema;
 
     await pool.query(fullScript);
+
+    await pool.query(`SET FOREIGN_KEY_CHECKS = 1;`);
+    
     console.log('Database schema initialized successfully.');
   } catch (error) {
     console.error('An error occurred during database initialization:', error.message || error);

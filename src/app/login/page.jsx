@@ -1,8 +1,10 @@
 "use client";
 import styles from "@/styles/pages/LoginPage.module.css";
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useRouter } from "next/navigation";
+import { setCookie, getCookie } from "cookies-next";
+import * as cookies from "@/helpers/constants/cookie_keys.js";
 import { sendRequestLogin } from "@/helpers/functions/http";
 import TextField from "@mui/material/TextField";
 import { IconButton, InputAdornment } from "@mui/material";
@@ -10,9 +12,11 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Button from "@/components/UI/Button";
 import PersonIcon from "@mui/icons-material/Person";
 import KeyIcon from "@mui/icons-material/Key";
+import { AuthContext } from "@/context/AuthContext";
 import { error as errMsg } from "@/helpers/constants/messages";
 export default function LoginPage() {
   const router = useRouter();
+  const authCtx = useContext(AuthContext);
   const [input, setInput] = useState({
     email: "",
     password: "",
@@ -33,6 +37,18 @@ export default function LoginPage() {
 
     if (response.error) {
       return alert(response.message);
+    }
+    const { userId, email, role } = response;
+    authCtx.handleUserSignIn(userId, email, role);
+    const cookie = getCookie(cookies.user);
+    if (cookie === undefined) {
+      const newCookie = {
+        is_signed_in: true,
+        user_id: response.userId,
+        email: response.email,
+        role: response.role,
+      };
+      setCookie(cookies.user, JSON.stringify(newCookie));
     }
     router.replace("/");
   }
