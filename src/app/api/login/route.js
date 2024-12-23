@@ -15,5 +15,11 @@ export async function POST(request) {
     );
   }
 
-  return Response.json({ message: "ok" }, {status: 201}); 
+  const studentInfo = {
+    userId: 1,
+    email: email,
+    role: "student",
+  };
+
+  return Response.json(studentInfo, { status: 201 });
 }
