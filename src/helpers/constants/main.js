@@ -28,7 +28,7 @@ export const routeOptions = {
     },
     exams: {
       name: "Schedule Exam",
-      path: "/exams",
+      path: "/exams-academic",
     },
     attendance: {
       name: "Enter Attendance",
