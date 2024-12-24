@@ -60,3 +60,8 @@ export async function sendRequestGetGrades(userId, courseId) {
   const endpoint = `${endpoints.grades}?userId=${userId}&courseId=${courseId}`; 
   return await sendRequest(endpoint); 
 } 
+
+export async function sendRequestGetExams(userId, courseId) {
+  const endpoint = `${endpoints.exams}?userId=${userId}&courseId=${courseId}`; 
+  return await sendRequest(endpoint); 
+}
