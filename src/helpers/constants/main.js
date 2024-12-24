@@ -6,7 +6,7 @@ export const routeOptions = {
     },
     grades: {
       name: "Grades",
-      path: "/grades",
+      path: "/grades-student",
     },
     exams: {
       name: "Exams",
@@ -24,7 +24,7 @@ export const routeOptions = {
     },
     grades: {
       name: "Enter Grades",
-      path: "/grades",
+      path: "/grades-academic",
     },
     exams: {
       name: "Exams",
