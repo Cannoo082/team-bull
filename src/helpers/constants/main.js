@@ -10,7 +10,7 @@ export const routeOptions = {
     },
     exams: {
       name: "Exams",
-      path: "/exams",
+      path: "/exams-student",
     },
     attendance: {
       name: "Attendance",
@@ -27,11 +27,11 @@ export const routeOptions = {
       path: "/grades-academic",
     },
     exams: {
-      name: "Exams",
+      name: "Schedule Exam",
       path: "/exams",
     },
     attendance: {
-      name: "Attendance",
+      name: "Enter Attendance",
       path: "/attendance",
     },
   },
