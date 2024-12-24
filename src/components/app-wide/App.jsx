@@ -24,9 +24,9 @@ export default function App({ children }) {
     }
 
     authCtx.handleUserSignIn(
-      cookieUser["user_id"],
-      cookieUser["email"],
-      cookieUser["role"]
+      cookieUser["user_id"] ?? null,
+      cookieUser["email"] ?? null,
+      cookieUser["role"] ?? null
     );
   }
 
