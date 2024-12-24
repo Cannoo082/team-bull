@@ -1,4 +1,4 @@
-const pool = require('../src/lib/db');
+const { pool } = require('../src/lib/db');
 const faker = require('@faker-js/faker').faker;
 const bcrypt = require('bcrypt');
 
