@@ -50,3 +50,13 @@ export async function sendRequestLogin(email, password) {
 
   return await sendRequest(endpoint, options);
 }
+
+export async function sendRequestGetCourses(userId) { 
+  const endpoint = `${endpoints.courses}?userId=${userId}`;          
+  return await sendRequest(endpoint); 
+} 
+
+export async function sendRequestGetGrades(userId, courseId) {
+  const endpoint = `${endpoints.grades}?userId=${userId}&courseId=${courseId}`; 
+  return await sendRequest(endpoint); 
+} 
