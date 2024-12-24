@@ -65,7 +65,7 @@ export default function GradesStudentPage() {
         <>
           <h2>Courses</h2>
           <Dropdown
-            sx={{ maxWidth: 180 }}
+            sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
             options={courses}
             label="Course"
             onChange={handleCourseChange}
@@ -79,19 +79,16 @@ export default function GradesStudentPage() {
       {!grades ? null : !grades.length ? (
         <p>No grades found</p>
       ) : (
-        <>
-          <h2>Grades</h2>
-          <Table
-            columns={["name", "type", "weight", "grade"]}
-            rows={grades.map((grade) => ({
-              ...grade,
-              weight: "%" + grade.weight,
-            }))}
-            rowKey="name"
-            emptyValue="-"
-            handleColumnFormat={(word) => formatString(word, ["_"])}
-          />
-        </>
+        <Table
+          columns={["name", "type", "weight", "grade"]}
+          rows={grades.map((grade) => ({
+            ...grade,
+            weight: "%" + grade.weight,
+          }))}
+          rowKey="name"
+          emptyValue="-"
+          handleColumnFormat={(word) => formatString(word, ["_"])}
+        />
       )}
     </div>
   );
