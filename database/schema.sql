@@ -1,21 +1,22 @@
 CREATE TABLE `building` (
-    `BuildingID` VARCHAR(10) NOT NULL,
+    `BuildingID` INT NOT NULL AUTO_INCREMENT,
+    `BuildingCode` VARCHAR(10) NOT NULL UNIQUE,
     `BuildingName` VARCHAR(50) NULL,
-    `BuildingCode` VARCHAR(10) NULL,
     PRIMARY KEY (`BuildingID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `department` (
-    `DepartmentID` VARCHAR(10) NOT NULL,
+    `DepartmentID` INT NOT NULL AUTO_INCREMENT,
+    `DepartmentCode` VARCHAR(50) NOT NULL UNIQUE,
     `DepartmentName` VARCHAR(50) NULL,
-    `BuildingID` VARCHAR(10) NULL,
+    `BuildingID` INT NULL,
     `Abbreviation` VARCHAR(10) NULL,
     INDEX `DEPARTMENT_BuildingID_fkey`(`BuildingID`),
     PRIMARY KEY (`DepartmentID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `instructor` (
-    `InstructorID` VARCHAR(10) NOT NULL,
+    `InstructorID` INT NOT NULL AUTO_INCREMENT,
     `InstructorFirstName` VARCHAR(20) NULL,
     `InstructorLastName` VARCHAR(20) NULL,
     `InstructorFullName` VARCHAR(60) NULL,
@@ -25,59 +26,61 @@ CREATE TABLE `instructor` (
     `WebsiteLink` VARCHAR(100) NULL,
     `InstructorLocation` VARCHAR(50) NULL,
     `InstructorPhoneNum` VARCHAR(15) NULL,
-    `DepartmentID` VARCHAR(10) NULL,
+    `DepartmentID` INT NULL,
     INDEX `INSTRUCTOR_DepartmentID_fkey`(`DepartmentID`),
     PRIMARY KEY (`InstructorID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `course` (
-    `CourseCode` VARCHAR(10) NOT NULL,
+    `CourseID` INT NOT NULL AUTO_INCREMENT,
+    `CourseCode` VARCHAR(10) NOT NULL UNIQUE,
     `CourseTitle` VARCHAR(50) NULL,
-    `DepartmentID` VARCHAR(10) NULL,
+    `DepartmentID` INT NULL,
     `Credits` DECIMAL(2, 1) NULL,
     `CourseDescription` VARCHAR(191) NULL,
     INDEX `COURSE_DepartmentID_fkey`(`DepartmentID`),
-    PRIMARY KEY (`CourseCode`)
+    PRIMARY KEY (`CourseID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `course_schedules` (
     `CRN` VARCHAR(10) NOT NULL,
-    `CourseCode` VARCHAR(10) NULL,
+    `CourseID` INT NULL,
     `Day` ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NULL,
-    `ClassStartTime` DATETIME(3) NULL,
-    `ClassEndTime` DATETIME(3) NULL,
-    `InstructorID` VARCHAR(10) NULL,
+    `ClassStartTime` TIME NULL,
+    `ClassEndTime` TIME NULL,
+    `InstructorID` INT NULL,
     `Term` VARCHAR(10) NULL,
     `Year` INTEGER NULL,
     `TeachingMethod` ENUM('Online', 'InPerson', 'Hybrid') NULL,
     `Capacity` INTEGER NULL,
     `Enrolled` INTEGER NULL,
-    INDEX `COURSE_SCHEDULES_CourseCode_fkey`(`CourseCode`),
+    `Location` VARCHAR(50) NULL,
+    INDEX `COURSE_SCHEDULES_CourseID_fkey`(`CourseID`),
     INDEX `COURSE_SCHEDULES_InstructorID_fkey`(`InstructorID`),
     PRIMARY KEY (`CRN`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `student` (
-    `StudentID` VARCHAR(10) NOT NULL,
+    `StudentID` INT NOT NULL AUTO_INCREMENT,
     `StudentFirstName` VARCHAR(20) NULL,
     `StudentLastName` VARCHAR(20) NULL,
     `StudentFullName` VARCHAR(60) NULL,
     `StudentEmail` VARCHAR(50) NULL,
     `StudentPersonalEmail` VARCHAR(50) NULL,
-    `DepartmentID` VARCHAR(10) NULL,
+    `DepartmentID` INT NULL,
     `Grade` ENUM('1', '2', '3', '4') DEFAULT '1',
     `TotalCredits` DECIMAL(4, 1) DEFAULT 0.0,
     `GPA` DECIMAL(3, 2) DEFAULT 0.0,
     `StudentPhoto` LONGBLOB NULL,
     `StudentPhoneNumber` VARCHAR(15) NULL,
-    `Advisor` VARCHAR(10) NULL,
+    `Advisor` INT NULL,
     INDEX `STUDENT_DepartmentID_fkey`(`DepartmentID`),
     INDEX `STUDENT_Advisor_fkey`(`Advisor`),
     PRIMARY KEY (`StudentID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `admin` (
-    `AdminID` VARCHAR(10) NOT NULL,
+    `AdminID` INT NOT NULL AUTO_INCREMENT,
     `AdminFirstName` VARCHAR(20) NOT NULL,
     `AdminLastName` VARCHAR(20) NOT NULL,
     `AdminFullName` VARCHAR(60) NOT NULL,
@@ -93,9 +96,9 @@ CREATE TABLE `user` (
     `Password` VARCHAR(191) NOT NULL,
     `Role` ENUM('STUDENT', 'INSTRUCTOR', 'ADMIN') NOT NULL,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `StudentID` VARCHAR(10) NULL,
-    `InstructorID` VARCHAR(10) NULL,
-    `AdminID` VARCHAR(10) NULL,
+    `StudentID` INT NULL,
+    `InstructorID` INT NULL,
+    `AdminID` INT NULL,
     UNIQUE INDEX `USER_Email_key`(`Email`),
     UNIQUE INDEX `USER_StudentID_fkey`(`StudentID`),
     UNIQUE INDEX `USER_InstructorID_fkey`(`InstructorID`),
@@ -104,7 +107,7 @@ CREATE TABLE `user` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `enrollment` (
-    `StudentID` VARCHAR(10) NOT NULL,
+    `StudentID` INT NOT NULL,
     `CRN` VARCHAR(10) NOT NULL,
     `EnrollmentDate` DATETIME(3) NULL,
     `EnrollmentApprovalDate` DATETIME(3) NULL,
@@ -113,37 +116,39 @@ CREATE TABLE `enrollment` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `attendance` (
-    `StudentID` VARCHAR(10) NOT NULL,
+    `StudentID` INT NOT NULL,
     `CRN` VARCHAR(10) NOT NULL,
-    `Date` DATETIME(3) NOT NULL,
+    `Week` INT NOT NULL,
     `Status` ENUM('Present', 'Absent', 'Late') NULL,
     INDEX `ATTENDANCE_CRN_fkey`(`CRN`),
-    PRIMARY KEY (`StudentID`, `CRN`, `Date`)
+    PRIMARY KEY (`StudentID`, `CRN`, `Week`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `exams` (
-    `ExamID` INTEGER NOT NULL AUTO_INCREMENT,
+    `ExamID` INT NOT NULL AUTO_INCREMENT,
     `CRN` VARCHAR(10) NULL,
-    `ExamStartTime` DATETIME(3) NULL,
-    `ExamEndTime` DATETIME(3) NULL,
+    `ExamName` VARCHAR(50) NULL,
+    `ExamDate` DATE NULL,
+    `ExamStartTime` TIME NOT NULL DEFAULT '18:00:00',
+    `ExamEndTime` TIME NOT NULL DEFAULT '20:00:00',
     `ExamLocation` VARCHAR(50) NULL,
     INDEX `EXAMS_CRN_fkey`(`CRN`),
     PRIMARY KEY (`ExamID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `in_term_grades` (
-    `StudentID` VARCHAR(10) NOT NULL,
+    `StudentID` INT NOT NULL,
     `CRN` VARCHAR(10) NOT NULL,
-    `GradeName` VARCHAR(50) NULL,
+    `GradeName` VARCHAR(50) NOT NULL,
     `GradeValue` DECIMAL(4, 1) NULL,
     `GradePercentage` DECIMAL(5, 2) NULL,
     `GradeDescription` VARCHAR(191) NULL,
     INDEX `IN_TERM_GRADES_CRN_fkey`(`CRN`),
-    PRIMARY KEY (`StudentID`, `CRN`)
+    PRIMARY KEY (`StudentID`, `CRN`, `GradeName`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `end_of_term_grades` (
-    `StudentID` VARCHAR(10) NOT NULL,
+    `StudentID` INT NOT NULL,
     `CRN` VARCHAR(10) NOT NULL,
     `LetterGrade` VARCHAR(10) NULL,
     `GradeOutOf100` DECIMAL(5, 2) NULL,
@@ -152,7 +157,7 @@ CREATE TABLE `end_of_term_grades` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE notification (
-    `NotificationID` INTEGER AUTO_INCREMENT,
+    `NotificationID` INT AUTO_INCREMENT,
     `Title` VARCHAR(100) NOT NULL,
     `Message` TEXT NOT NULL,
     `CreatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -177,6 +182,8 @@ ALTER TABLE `department`
     FOREIGN KEY (`BuildingID`) REFERENCES `building`(`BuildingID`) 
     ON DELETE SET NULL ON UPDATE CASCADE;
 
+ALTER TABLE `instructor` AUTO_INCREMENT = 200001;
+
 ALTER TABLE `instructor` 
     ADD CONSTRAINT `INSTRUCTOR_DepartmentID_fkey` 
     FOREIGN KEY (`DepartmentID`) REFERENCES `department`(`DepartmentID`) 
@@ -188,8 +195,8 @@ ALTER TABLE `course`
     ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE `course_schedules` 
-    ADD CONSTRAINT `COURSE_SCHEDULES_CourseCode_fkey` 
-    FOREIGN KEY (`CourseCode`) REFERENCES `course`(`CourseCode`) 
+    ADD CONSTRAINT `COURSE_SCHEDULES_CourseID_fkey` 
+    FOREIGN KEY (`CourseID`) REFERENCES `course`(`CourseID`) 
     ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE `course_schedules` 
@@ -197,11 +204,13 @@ ALTER TABLE `course_schedules`
     FOREIGN KEY (`InstructorID`) REFERENCES `instructor`(`InstructorID`) 
     ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE Student
+ALTER TABLE `student` AUTO_INCREMENT = 100001;
+
+ALTER TABLE `student`
     ADD CONSTRAINT GPA_CHECK CHECK (GPA <= 4.0),
     ADD CONSTRAINT Credits_CHECK CHECK (TotalCredits >= 0);
 
-ALTER TABLE `student` 
+ALTER TABLE `student`
     ADD CONSTRAINT `STUDENT_DepartmentID_fkey` 
     FOREIGN KEY (`DepartmentID`) REFERENCES `department`(`DepartmentID`) 
     ON DELETE SET NULL ON UPDATE CASCADE;
@@ -210,6 +219,8 @@ ALTER TABLE `student`
     ADD CONSTRAINT `STUDENT_Advisor_fkey`
     FOREIGN KEY (`Advisor`) REFERENCES `instructor`(`InstructorID`)
     ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE `admin` AUTO_INCREMENT = 300001;
 
 ALTER TABLE `user` 
     ADD CONSTRAINT `USER_StudentID_fkey` 
@@ -280,3 +291,21 @@ ALTER TABLE `user_notification`
     ADD CONSTRAINT `USER_NOTIFICATION_UserID_fkey`
     FOREIGN KEY (`UserID`) REFERENCES `User`(`ID`) 
     ON DELETE CASCADE;
+
+CREATE TRIGGER `student_to_user_trigger`
+AFTER INSERT ON `student`
+FOR EACH ROW
+INSERT INTO `user` (`ID`, `Email`, `Password`, `Role`, `CreatedAt`, `StudentID`)
+VALUES (NEW.StudentID, NEW.StudentEmail, SHA2('password123', 256), 'STUDENT', CURRENT_TIMESTAMP, NEW.StudentID);
+
+CREATE TRIGGER `instructor_to_user_trigger`
+AFTER INSERT ON `instructor`
+FOR EACH ROW
+INSERT INTO `user` (`ID`, `Email`, `Password`, `Role`, `CreatedAt`, `InstructorID`)
+VALUES (NEW.InstructorID, NEW.InstructorEmail, SHA2('password123', 256), 'INSTRUCTOR', CURRENT_TIMESTAMP, NEW.InstructorID);
+
+CREATE TRIGGER `admin_to_user_trigger`
+AFTER INSERT ON `admin`
+FOR EACH ROW
+INSERT INTO `user` (`ID`, `Email`, `Password`, `Role`, `CreatedAt`, `AdminID`)
+VALUES (NEW.AdminID, NEW.AdminEmail, SHA2('password123', 256), 'ADMIN', CURRENT_TIMESTAMP, NEW.AdminID);
