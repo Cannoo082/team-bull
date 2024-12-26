@@ -1,5 +1,5 @@
 import * as endpoints from "../constants/endpoints";
-import { error as errMsg} from "@/helpers/constants/messages";
+import { error as errMsg } from "@/helpers/constants/messages";
 function optionsFactory({ method = "POST", mode = "cors", body = {} }) {
   return {
     method,
@@ -51,17 +51,22 @@ export async function sendRequestLogin(email, password) {
   return await sendRequest(endpoint, options);
 }
 
-export async function sendRequestGetCourses(userId) { 
-  const endpoint = `${endpoints.courses}?userId=${userId}`;          
-  return await sendRequest(endpoint); 
-} 
+export async function sendRequestGetCourses(userId) {
+  const endpoint = `${endpoints.courses}?userId=${userId}`;
+  return await sendRequest(endpoint);
+}
 
 export async function sendRequestGetGrades(userId, courseId) {
-  const endpoint = `${endpoints.grades}?userId=${userId}&courseId=${courseId}`; 
-  return await sendRequest(endpoint); 
-} 
+  const endpoint = `${endpoints.grades}?userId=${userId}&courseId=${courseId}`;
+  return await sendRequest(endpoint);
+}
 
 export async function sendRequestGetExams(userId, courseId) {
-  const endpoint = `${endpoints.exams}?userId=${userId}&courseId=${courseId}`; 
-  return await sendRequest(endpoint); 
+  const endpoint = `${endpoints.exams}?userId=${userId}&courseId=${courseId}`;
+  return await sendRequest(endpoint);
+}
+
+export async function sendRequestGetNotifications(userId) {
+  const endpoint = `${endpoints.notifications}?userId=${userId}`;
+  return await sendRequest(endpoint);
 }
