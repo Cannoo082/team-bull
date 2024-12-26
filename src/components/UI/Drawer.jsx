@@ -28,31 +28,17 @@ export default function Drawer({ open, handleToggleDrawer, options }) {
         onClick={(event) => handleToggleDrawer(event, false)}
         onKeyDown={(event) => handleToggleDrawer(event, false)}
       >
-        {authCtx.userState.role === "admin" && (
-          <>
-            <List>
-              <ListItem disablePadding>
-                <ListItemButton onClick={() => router.push("/admin")}>
-                  <ListItemIcon>
-                    <SupervisorAccountIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Admin" />
-                </ListItemButton>
-              </ListItem>
-            </List>
-            <Divider />
-          </>
-        )}
         <List>
           {Object.keys(options).map((key) => (
-            <ListItem key={key} disablePadding>
-              <ListItemButton onClick={() => router.push(options[key].path)}>
-                <ListItemIcon>
-                  <InsertDriveFileOutlinedIcon />
-                </ListItemIcon>
-                <ListItemText primary={options[key].name} />
-              </ListItemButton>
-            </ListItem>
+            <div key={key}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => router.push(options[key].path)}>
+                  <ListItemIcon>{options[key].icon}</ListItemIcon>
+                  <ListItemText primary={options[key].name} />
+                </ListItemButton>
+              </ListItem>
+              {options[key].divider && <Divider />}
+            </div>
           ))}
         </List>
       </Box>
