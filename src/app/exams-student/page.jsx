@@ -80,11 +80,8 @@ export default function ExamsStudentPage() {
         <p>No exams found</p>
       ) : (
         <Table
-          columns={["name", "type", "weight", "date"]}
-          rows={exams.map((exam) => ({
-            ...exam,
-            weight: "%" + exam.weight,
-          }))}
+          columns={["name", "date", "start_time", "end_time", "location"]}
+          rows={exams}
           rowKey="name"
           emptyValue="-"
           handleColumnFormat={(word) => formatString(word, ["_"])}
