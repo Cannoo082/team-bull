@@ -289,7 +289,7 @@ ALTER TABLE `user_notification`
 
 ALTER TABLE `user_notification`
     ADD CONSTRAINT `USER_NOTIFICATION_UserID_fkey`
-    FOREIGN KEY (`UserID`) REFERENCES `User`(`ID`) 
+    FOREIGN KEY (`UserID`) REFERENCES `user`(`ID`) 
     ON DELETE CASCADE;
 
 CREATE TRIGGER `student_to_user_trigger`
