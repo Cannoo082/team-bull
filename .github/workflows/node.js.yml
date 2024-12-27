@@ -1,45 +1,38 @@
-name: Node.js CI
+name: Deploy to EC2
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
-  build:
-
+  deploy:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-
-    - run: npm ci
-    - run: npm run build --if-present
-
-    - name: Deploy with rsync as sudo
+    - uses: actions/checkout@v2
+    
+    - name: Deploy to EC2
+      env:
+        PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        HOST: ${{ secrets.EC2_HOST }}
+        USER: ${{ secrets.EC2_USER }}
       run: |
-        rsync -avzr --delete --exclude 'node_modules' -e "ssh -i '${{ secrets.SSH_PRIVATE_KEY }}'" ./ ubuntu@ec2-23-23-23-113.compute-1.amazonaws.com:/tmp/deploy
-        ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ubuntu@ec2-23-23-23-113.compute-1.amazonaws.com << EOF
-          sudo rsync -avzr --delete /tmp/deploy/ /var/www/team-bull/
-          sudo rm -rf /tmp/deploy
-        EOF
+        echo "$PRIVATE_KEY" > github-ec2.pem && chmod 600 github-ec2.pem
+        ssh -o StrictHostKeyChecking=no -i github-ec2.pem ${USER}@${HOST} '
+        echo "Current directory: $(pwd)"
+        echo "Listing home directory:"
+        ls -la ~
 
-    - name: Post-deployment setup
-      run: |
-        ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ubuntu@ec2-23-23-23-113.compute-1.amazonaws.com << EOF
-          sudo su
-          cd /var/www/team-bull
-          npm i
-        EOF
+        REPO_URL="https://github.com/Cannoo082/team-bull.git"
+        BRANCH="main"
+        REPO_DIR="/var/www/team-bull"
+        if [ -d "$REPO_DIR/.git" ]; then
+          cd "$REPO_DIR"
+          git pull origin "$BRANCH"
+        else
+          git clone "$REPO_URL" "$REPO_DIR"
+          cd "$REPO_DIR"
+        fi
+
+        cd "$REPO_DIR"
+        npm install
+        '
