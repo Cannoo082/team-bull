@@ -34,5 +34,7 @@ jobs:
         fi
 
         cd "$REPO_DIR"
+        sudo su
         npm install
+        npm run build
         '
