@@ -1,0 +1,13 @@
+.container {
+  display: flex; 
+  flex-direction: column; 
+}
+
+.container h1, .container h2 { 
+  margin-top: 0.5rem; 
+  margin-bottom: 0.5rem;
+} 
+
+.grade-buttons-container {
+  display: flex; 
+}

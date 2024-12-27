@@ -24,9 +24,9 @@ export default function App({ children }) {
     }
 
     authCtx.handleUserSignIn(
-      cookieUser["user_id"],
-      cookieUser["email"],
-      cookieUser["role"]
+      cookieUser["user_id"] ?? null,
+      cookieUser["email"] ?? null,
+      cookieUser["role"] ?? null
     );
   }
 
@@ -46,7 +46,7 @@ export default function App({ children }) {
   return (
     <>
       {authCtx.userState.isSignedIn && pathname !== "/login" && <TopMenu />}
-      <div>{children}</div>
+      <div style={{ margin: "0 1rem 1rem 1rem" }}>{children}</div>
     </>
   );
 }

@@ -39,7 +39,7 @@ export default function LoginPage() {
       return alert(response.message);
     }
     const { userId, email, role } = response;
-    authCtx.handleUserSignIn(userId, email, role);
+    authCtx.handleUserSignIn(userId ?? null, email ?? null, role ?? null);
     const cookie = getCookie(cookies.user);
     if (cookie === undefined) {
       const newCookie = {

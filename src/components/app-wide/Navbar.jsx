@@ -115,7 +115,9 @@ export default function Navbar({ handleDatetimeOpen }) {
       <Drawer
         open={open}
         handleToggleDrawer={handleToggleDrawer}
-        options={routeOptions[AuthContext.userState?.role || "student"]}
+        options={
+          routeOptions[authCtx.userState.role] || routeOptions["student"]
+        }
       />
     </div>
   );
