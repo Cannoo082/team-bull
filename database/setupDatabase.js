@@ -1,17 +1,15 @@
-const pool = require('../src/lib/db');
+const { initDB } = require('../src/lib/db');
+const { pool } = require('../src/lib/db');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
 (async function initializeDatabase() {
   try {
+    await initDB();
+
     const databaseName = process.env.DB_NAME;
-    await pool.query(`CREATE DATABASE IF NOT EXISTS \`${databaseName}\``);
-    console.log(`Database "${databaseName}" ensured.`);
-
     await pool.query(`USE \`${databaseName}\``);
-
-    await pool.query(`SET FOREIGN_KEY_CHECKS = 0;`);
 
     const schemaPath = path.join(__dirname, 'schema.sql');
     const schema = fs.readFileSync(schemaPath, 'utf8');
@@ -36,8 +34,6 @@ require('dotenv').config();
     const fullScript = dropStatements + schema;
 
     await pool.query(fullScript);
-
-    await pool.query(`SET FOREIGN_KEY_CHECKS = 1;`);
     
     console.log('Database schema initialized successfully.');
   } catch (error) {

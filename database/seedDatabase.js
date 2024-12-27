@@ -1,42 +1,41 @@
-const pool = require('../src/lib/db');
+const { pool } = require('../src/lib/db');
 const faker = require('@faker-js/faker').faker;
-const bcrypt = require('bcrypt');
 
 const buildings = [
-  { id: 'B001', name: 'Engineering Building', abbreviation: 'ENG' },
-  { id: 'B002', name: 'Science and Research Center', abbreviation: 'SCI' },
-  { id: 'B003', name: 'Business and Economics Hall', abbreviation: 'BUS' },
-  { id: 'B004', name: 'Humanities and Social Sciences Building', abbreviation: 'HUM' },
-  { id: 'B005', name: 'Law and Legal Studies Center', abbreviation: 'LAW' },
-  { id: 'B006', name: 'Health Sciences Complex', abbreviation: 'HLT' },
-  { id: 'B007', name: 'Art and Design Pavilion', abbreviation: 'ART' },
-  { id: 'B008', name: 'Library and Information Center', abbreviation: 'LIB' },
-  { id: 'B009', name: 'Student Union Building', abbreviation: 'STU' },
-  { id: 'B010', name: 'Athletics and Recreation Complex', abbreviation: 'ATH' },
-  { id: 'B011', name: 'Administration Building', abbreviation: 'ADM' },
+  { code: 'ENGB', name: 'Engineering Building'},
+  { code: 'SCIB', name: 'Science and Research Center'},
+  { code: 'BUSB', name: 'Business and Economics Hall'},
+  { code: 'HUMB', name: 'Humanities and Social Sciences Building'},
+  { code: 'LAWB', name: 'Law and Legal Studies Center'},
+  { code: 'HLTB', name: 'Health Sciences Complex'},
+  { code: 'ARTB', name: 'Art and Design Pavilion'},
+  { code: 'LIB', name: 'Library and Information Center'},
+  { code: 'STU', name: 'Student Union Building'},
+  { code: 'ATH', name: 'Athletics and Recreation Complex'},
+  { code: 'ADM', name: 'Administration Building'},
 ];
 
 const departmentsWithBuildings = [
-  { id: 'D001', name: 'Computer Science', buildingId: 'B001', abbreviation: 'CS' },
-  { id: 'D002', name: 'Mechanical Engineering', buildingId: 'B001', abbreviation: 'ME' },
-  { id: 'D003', name: 'Electrical Engineering', buildingId: 'B001', abbreviation: 'EE' },
-  { id: 'D004', name: 'Civil Engineering', buildingId: 'B001', abbreviation: 'CE' },
-  { id: 'D005', name: 'Mathematics', buildingId: 'B002', abbreviation: 'MATH' },
-  { id: 'D006', name: 'Physics', buildingId: 'B002', abbreviation: 'PHYS' },
-  { id: 'D007', name: 'Chemistry', buildingId: 'B002', abbreviation: 'CHEM' },
-  { id: 'D008', name: 'Biology', buildingId: 'B002', abbreviation: 'BIO' },
-  { id: 'D009', name: 'Environmental Science', buildingId: 'B002', abbreviation: 'ENV' },
-  { id: 'D010', name: 'Economics', buildingId: 'B003', abbreviation: 'ECON' },
-  { id: 'D011', name: 'Business Administration', buildingId: 'B003', abbreviation: 'BUS' },
-  { id: 'D012', name: 'English Literature', buildingId: 'B004', abbreviation: 'ENG' },
-  { id: 'D013', name: 'History', buildingId: 'B004', abbreviation: 'HIST' },
-  { id: 'D014', name: 'Sociology', buildingId: 'B004', abbreviation: 'SOC' },
-  { id: 'D015', name: 'Philosophy', buildingId: 'B004', abbreviation: 'PHIL' },
-  { id: 'D016', name: 'Law', buildingId: 'B005', abbreviation: 'LAW' },
-  { id: 'D017', name: 'Medicine', buildingId: 'B006', abbreviation: 'MED' },
-  { id: 'D018', name: 'Nursing', buildingId: 'B006', abbreviation: 'NUR' },
-  { id: 'D019', name: 'Art and Design', buildingId: 'B007', abbreviation: 'ART' },
-  { id: 'D020', name: 'Music', buildingId: 'B007', abbreviation: 'MUS' },
+  { code: 'D001', name: 'Computer Science', buildingCode: 'ENGB', abbreviation: 'CS' },
+  { code: 'D002', name: 'Mechanical Engineering', buildingCode: 'ENGB', abbreviation: 'ME' },
+  { code: 'D003', name: 'Electrical Engineering', buildingCode: 'ENGB', abbreviation: 'EE' },
+  { code: 'D004', name: 'Civil Engineering', buildingCode: 'ENGB', abbreviation: 'CE' },
+  { code: 'D005', name: 'Mathematics', buildingCode: 'SCIB', abbreviation: 'MATH' },
+  { code: 'D006', name: 'Physics', buildingCode: 'SCIB', abbreviation: 'PHYS' },
+  { code: 'D007', name: 'Chemistry', buildingCode: 'SCIB', abbreviation: 'CHEM' },
+  { code: 'D008', name: 'Biology', buildingCode: 'SCIB', abbreviation: 'BIO' },
+  { code: 'D009', name: 'Environmental Science', buildingCode: 'SCIB', abbreviation: 'ENV' },
+  { code: 'D010', name: 'Economics', buildingCode: 'BUSB', abbreviation: 'ECON' },
+  { code: 'D011', name: 'Business Administration', buildingCode: 'BUSB', abbreviation: 'BUS' },
+  { code: 'D012', name: 'English Literature', buildingCode: 'HUMB', abbreviation: 'ENG' },
+  { code: 'D013', name: 'History', buildingCode: 'HUMB', abbreviation: 'HIST' },
+  { code: 'D014', name: 'Sociology', buildingCode: 'HUMB', abbreviation: 'SOC' },
+  { code: 'D015', name: 'Philosophy', buildingCode: 'HUMB', abbreviation: 'PHIL' },
+  { code: 'D016', name: 'Law', buildingCode: 'LAWB', abbreviation: 'LAW' },
+  { code: 'D017', name: 'Medicine', buildingCode: 'HLTB', abbreviation: 'MED' },
+  { code: 'D018', name: 'Nursing', buildingCode: 'HLTB', abbreviation: 'NUR' },
+  { code: 'D019', name: 'Art and Design', buildingCode: 'ARTB', abbreviation: 'ART' },
+  { code: 'D020', name: 'Music', buildingCode: 'ARTB', abbreviation: 'MUS' },
 ];
 
 const coursesByDepartment = {
@@ -73,288 +72,428 @@ const coursesByDepartment = {
     console.log('Seeding `building`...');
     for (const building of buildings) {
       await executeQuery(
-        `INSERT INTO building (BuildingID, BuildingName, BuildingCode) VALUES (?, ?, ?)`,
-        [building.id, building.name, building.abbreviation]
+        `INSERT INTO building (BuildingCode, BuildingName) VALUES (?, ?)`,
+        [building.code, building.name]
       );
     }
 
     // Seed `department`
     console.log('Seeding `department`...');
     for (const department of departmentsWithBuildings) {
-      await executeQuery(
-        `INSERT INTO department (DepartmentID, DepartmentName, BuildingID, Abbreviation) VALUES (?, ?, ?, ?)`,
-        [department.id, department.name, department.buildingId, department.abbreviation]
+      const building = await executeQuery(
+        `SELECT BuildingID FROM building WHERE BuildingCode = ?`,
+        [department.buildingCode]
       );
+
+      if (building.length > 0) {
+        const buildingId = building[0].BuildingID;
+
+        await executeQuery(
+          `INSERT INTO department (DepartmentCode, DepartmentName, BuildingID, Abbreviation) VALUES (?, ?, ?, ?)`,
+          [department.code, department.name, buildingId, department.abbreviation]
+        );
+      } else {
+        console.error(`BuildingCode ${department.buildingCode} not found for department ${department.name}`);
+      }
     }
 
     // Seed `instructor`
-    console.log('Seeding `instructor`...');
-    const departments = await executeQuery(`SELECT DepartmentID FROM department`);
+    console.log('Seeding `instructor` and `user`...');
+    const departments = await executeQuery(
+      `SELECT d.DepartmentID, b.BuildingCode 
+      FROM department d
+      JOIN building b ON d.BuildingID = b.BuildingID
+    `);
     for (let i = 1; i <= 50; i++) {
       const department = faker.helpers.arrayElement(departments);
-
+    
       const firstName = faker.person.firstName().slice(0, 20);
       const middleName = faker.helpers.maybe(() => faker.person.firstName().slice(0, 20), { probability: 0.5 });
       const lastName = faker.person.lastName().slice(0, 20);
-
       const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ');
 
       const phoneNumber = faker.phone.number('(###) ###-####').slice(0, 15);
-
       const emailDomain = 'example.com';
-      const email = `${lastName.toLowerCase()}-i${i.toString().padStart(3, '0')}@${emailDomain}`;
 
-      const personalEmail = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${emailDomain}`;
-
-      await executeQuery(
-        `INSERT INTO instructor (InstructorID, InstructorFirstName, InstructorLastName, InstructorFullName, InstructorEmail, InstructorPersonalEmail, InstructorLocation, InstructorPhoneNum, DepartmentID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      const result = await executeQuery(
+        `INSERT INTO instructor (InstructorFirstName, InstructorLastName, InstructorFullName, InstructorEmail, InstructorPersonalEmail, InstructorPhoto, WebsiteLink, InstructorLocation, InstructorPhoneNum, DepartmentID)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
-          `I${i.toString().padStart(3, '0')}`,
           firstName,
           lastName,
           fullName,
-          email,
-          personalEmail,
-          faker.location.streetAddress(),
+          `${lastName.toLowerCase()}-i${i.toString().padStart(3, '0')}@${emailDomain}`,
+          `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${emailDomain}`,
+          faker.image.dataUri(),
+          `https://www.${lastName.toLowerCase()}${i}.edu`,
+          `${department.BuildingCode} Room ${faker.number.int({ min: 100, max: 400 })}`,
           phoneNumber,
           department.DepartmentID,
         ]
       );
-    }
+    
+      const instructorId = result.insertId;
+      const email = `${lastName.toLowerCase()}${instructorId}@${emailDomain}`;
+    
+      await executeQuery(
+        `UPDATE instructor SET InstructorEmail = ? WHERE InstructorID = ?`,
+        [email, instructorId]
+      );
+      await executeQuery(
+        `UPDATE user SET Email = ? WHERE InstructorID = ?`,
+        [email, instructorId]
+      );
+    }    
 
     // Seed `course`
     console.log('Seeding `course`...');
+    const dbDepartments = await executeQuery(`SELECT DepartmentID, DepartmentCode FROM department`);
     for (const [departmentName, courses] of Object.entries(coursesByDepartment)) {
       const department = departmentsWithBuildings.find((d) => d.name === departmentName);
       if (department) {
-        for (const course of courses) {
-          const courseCode = course.split(' ')[0];
-          const courseTitle = course.substring(course.indexOf(' ') + 1);
-          await executeQuery(
-            `INSERT INTO course (CourseCode, CourseTitle, DepartmentID, Credits, CourseDescription) VALUES (?, ?, ?, ?, ?)`,
-            [
-              courseCode,
-              courseTitle,
-              department.id,
-              faker.number.int({ min: 2, max: 6 }) / 2,
-              faker.lorem.sentence(),
-            ]
-          );
+        const dbDepartment = dbDepartments.find((d) => d.DepartmentCode === department.code);
+        if (dbDepartment) {
+          for (const course of courses) {
+            const courseCode = course.split(' ')[0];
+            const courseTitle = course.substring(course.indexOf(' ') + 1);
+            await executeQuery(
+              `INSERT INTO course (CourseCode, CourseTitle, DepartmentID, Credits, CourseDescription) 
+              VALUES (?, ?, ?, ?, ?)`,
+              [
+                courseCode,
+                courseTitle,
+                dbDepartment.DepartmentID,
+                faker.number.int({ min: 4, max: 6 }) / 2,
+                faker.lorem.sentence(),
+              ]
+            );
+          }
         }
       }
     }
 
     // Seed `student`
-    console.log('Seeding `student`...');
+    console.log('Seeding `student` and `user`...');
     const advisors = await executeQuery(`SELECT InstructorID FROM instructor`);
 
-    for (let i = 1; i <= 50; i++) {
+    for (let i = 1; i <= 200; i++) {
       const department = faker.helpers.arrayElement(departments);
       const advisor = faker.helpers.arrayElement(advisors);
 
       const firstName = faker.person.firstName().slice(0, 20);
       const middleName = faker.helpers.maybe(() => faker.person.firstName().slice(0, 20), { probability: 0.5 });
       const lastName = faker.person.lastName().slice(0, 20);
-
       const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ');
 
       const phoneNumber = faker.phone.number('(###) ###-####').slice(0, 15);
-
       const emailDomain = 'example.com';
-      const email = `${lastName.toLowerCase()}-s${i.toString().padStart(3, '0')}@${emailDomain}`;
-      const personalEmail = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${emailDomain}`;
 
-      await executeQuery(
-        `INSERT INTO student (StudentID, StudentFirstName, StudentLastName, StudentFullName, StudentEmail, StudentPersonalEmail, DepartmentID, Grade, TotalCredits, GPA, StudentPhoto, StudentPhoneNumber, Advisor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      const totalCreditsRanges = [
+        { min: 0, max: 3.5, grade: '1' },
+        { min: 4, max: 7.5, grade: '2' },
+        { min: 8, max: 11.5, grade: '3' },
+        { min: 12, max: 16, grade: '4' },
+      ];
+      const selectedRange = faker.helpers.arrayElement(totalCreditsRanges);
+      const totalCredits = faker.number.int({ min: selectedRange.min*2, max: selectedRange.max*2 }) / 2;
+      const grade = selectedRange.grade;
+
+      const result = await executeQuery(
+        `INSERT INTO student (StudentFirstName, StudentLastName, StudentFullName, StudentEmail, StudentPersonalEmail, DepartmentID, Grade, TotalCredits, GPA, StudentPhoto, StudentPhoneNumber, Advisor) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
-          `S${i.toString().padStart(3, '0')}`,
           firstName,
           lastName,
           fullName,
-          email,
-          personalEmail,
+          `${lastName.toLowerCase()}-s${i.toString().padStart(3, '0')}@${emailDomain}`,
+          `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${emailDomain}`,
           department.DepartmentID,
-          faker.helpers.arrayElement(['1', '2', '3', '4']),
-          faker.number.int({ min: 0, max: 40 }) / 2,
-          faker.number.float({ min: 0, max: 4, precision: 0.5 }),
+          grade,
+          totalCredits,
+          faker.number.float({ min: 1.5, max: 4, precision: 0.01 }),
           faker.image.dataUri(),
           phoneNumber,
           advisor.InstructorID,
         ]
       );
+
+      const studentId = result.insertId;
+      const email = `${lastName.toLowerCase()}${studentId}@${emailDomain}`;
+    
+      await executeQuery(
+        `UPDATE student SET StudentEmail = ? WHERE StudentID = ?`,
+        [email, studentId]
+      );
+      await executeQuery(
+        `UPDATE user SET Email = ? WHERE StudentID = ?`,
+        [email, studentId]
+      );
     }
 
     // Seed `admin`
-    console.log('Seeding `admin`...');
+    console.log('Seeding `admin` and `user`...');
     for (let i = 1; i <= 6; i++) {
       const firstName = faker.person.firstName().slice(0, 20);
       const middleName = faker.helpers.maybe(() => faker.person.firstName().slice(0, 20), { probability: 0.5 });
       const lastName = faker.person.lastName().slice(0, 20);
-
       const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ');
 
       const phoneNumber = faker.phone.number('(###) ###-####').slice(0, 15);
-
       const emailDomain = 'example.com';
-      const email = `${lastName.toLowerCase()}-a${i.toString().padStart(3, '0')}@${emailDomain}`;
 
-      await executeQuery(
-        `INSERT INTO admin (AdminID, AdminFirstName, AdminLastName, AdminFullName, AdminEmail, AdminPhoneNumber) VALUES (?, ?, ?, ?, ?, ?)`,
+      const result = await executeQuery(
+        `INSERT INTO admin (AdminFirstName, AdminLastName, AdminFullName, AdminEmail, AdminPhoneNumber, AdminPhoto) 
+        VALUES (?, ?, ?, ?, ?, ?)`,
         [
-          `A${i.toString().padStart(3, '0')}`,
           firstName,
           lastName,
           fullName,
-          email,
+          `${lastName.toLowerCase()}-a${i.toString().padStart(3, '0')}@${emailDomain}`,
           phoneNumber,
+          faker.image.dataUri(),
         ]
       );
-    }
-
-    // Seed `user`
-    console.log('Seeding `user`...');
-    const students = await executeQuery(`SELECT StudentID, StudentEmail FROM student`);
-    const instructors = await executeQuery(`SELECT InstructorID, InstructorEmail FROM instructor`);
-    const admins = await executeQuery(`SELECT AdminID, AdminEmail FROM admin`);
-
-    // Create users for students
-    for (const { StudentID, StudentEmail } of students) {
-        const hashedPassword = await bcrypt.hash('password123', 10); 
-        await executeQuery(
-        `INSERT INTO User (email, password, role, studentId, instructorId) VALUES (?, ?, ?, ?, ?)`,
-        [StudentEmail, hashedPassword, 'STUDENT', StudentID, null]
-        );
-    }
     
-    // Create users for instructors
-    for (const { InstructorID, InstructorEmail } of instructors) {
-        const hashedPassword = await bcrypt.hash('password123', 10);
-        await executeQuery(
-        `INSERT INTO User (email, password, role, studentId, instructorId) VALUES (?, ?, ?, ?, ?)`,
-        [InstructorEmail, hashedPassword, 'INSTRUCTOR', null, InstructorID]
-        );
-    }
+      const adminId = result.insertId;
+    
+      const email = `${lastName.toLowerCase()}${adminId}@${emailDomain}`;
 
-    // Create users for admins
-    for (const { AdminID, AdminEmail } of admins) {
-      const hashedPassword = await bcrypt.hash('password123', 10);
       await executeQuery(
-        `INSERT INTO user (email, password, role, adminId) VALUES (?, ?, ?, ?)`,
-        [AdminEmail, hashedPassword, 'ADMIN', AdminID]
+        `UPDATE admin SET AdminEmail = ? WHERE AdminID = ?`,
+        [email, adminId]
+      );
+      await executeQuery(
+        `UPDATE user SET Email = ? WHERE AdminID = ?`,
+        [email, adminId]
       );
     }
 
     // Seed `course_schedules`
     console.log('Seeding `course_schedules`...');
-    const courses = await executeQuery(`SELECT CourseCode FROM course`);
-    const instructorsForSchedules = await executeQuery(`SELECT InstructorID FROM instructor`);
+    const courses = await executeQuery(`
+      SELECT c.CourseID, c.DepartmentID 
+      FROM course c
+    `);
+
+    const instructors = await executeQuery(`
+      SELECT i.InstructorID, i.DepartmentID 
+      FROM instructor i
+    `);
+
+    const buildingOfDepartment = await executeQuery(`
+      SELECT d.DepartmentID, b.BuildingCode 
+      FROM department d 
+      JOIN building b ON d.BuildingID = b.BuildingID
+    `);
+
+    const availableTimes = ["08:30:00", "09:30:00", "10:30:00", "11:30:00", "12:30:00", "13:30:00", "14:30:00", "15:30:00",];
+
     for (let i = 1; i <= 50; i++) {
-    await executeQuery(
-        `INSERT INTO course_schedules (CRN, CourseCode, Day, ClassStartTime, ClassEndTime, InstructorID, Term, Year, TeachingMethod, Capacity, Enrolled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      const selectedCourse = faker.helpers.arrayElement(courses);
+
+      const eligibleInstructors = instructors.filter(
+        (instructor) => instructor.DepartmentID === selectedCourse.DepartmentID
+      );
+
+      if (eligibleInstructors.length === 0) continue;
+
+      const selectedInstructor = faker.helpers.arrayElement(eligibleInstructors);
+
+      const capacity = faker.number.int({ min: 10, max: 50 });
+      const enrolled = faker.number.int({ min: 0, max: capacity });
+
+      const startTime = faker.helpers.arrayElement(availableTimes);
+      const endTime = new Date(`1970-01-01T${startTime}`);
+      endTime.setHours(endTime.getHours() + 2);
+      const formattedEndTime = endTime.toTimeString().slice(0, 8);
+
+      const teachingMethod = faker.helpers.arrayElement(['Online', 'InPerson', 'Hybrid']);
+
+      let location = null;
+      if (teachingMethod !== 'Online') {
+        const departmentBuilding = buildingOfDepartment.find(
+          (d) => d.DepartmentID === selectedCourse.DepartmentID
+        );
+        if (departmentBuilding) {
+          location = `${departmentBuilding.BuildingCode} Class ${faker.number.int({ min: 100, max: 400 })}`;
+        }
+      }
+
+      await executeQuery(
+        `INSERT INTO course_schedules (CRN, CourseID, Day, ClassStartTime, ClassEndTime, InstructorID, Term, Year, TeachingMethod, Capacity, Enrolled, Location) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
-        `CRN${i.toString().padStart(3, '0')}`,
-        courses[i % courses.length]?.CourseCode || `C${i.toString().padStart(3, '0')}`,
-        faker.helpers.arrayElement(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']),
-        faker.date.soon(),
-        faker.date.soon(),
-        instructorsForSchedules[i % instructorsForSchedules.length]?.InstructorID,
-        faker.helpers.arrayElement(['Fall', 'Spring', 'Summer']),
-        2024,
-        faker.helpers.arrayElement(['Online', 'InPerson', 'Hybrid']),
-        faker.number.int({ min: 10, max: 50 }),
-        faker.number.int({ min: 0, max: 50 }),
+          `CRN${i.toString().padStart(3, '0')}`,
+          selectedCourse.CourseID,
+          faker.helpers.arrayElement(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']),
+          startTime,
+          formattedEndTime,
+          selectedInstructor.InstructorID,
+          faker.helpers.arrayElement(['Fall', 'Spring', 'Summer']),
+          2024,
+          teachingMethod,
+          capacity,
+          enrolled,
+          location,
         ]
-    );
-    }
+      );
+    }   
 
     // Seed `enrollment`
     console.log('Seeding `enrollment`...');
-    const studentsForEnrollment = await executeQuery(`SELECT StudentID FROM student`);
-    const courseSchedules = await executeQuery(`SELECT CRN FROM course_schedules`);
-    for (let i = 1; i <= 50; i++) {
-    const studentId = studentsForEnrollment[i % studentsForEnrollment.length]?.StudentID;
-    const crn = courseSchedules[i % courseSchedules.length]?.CRN;
-    if (studentId && crn) {
+    const studentsForEnrollment = await executeQuery(`
+      SELECT StudentID, DepartmentID 
+      FROM student
+    `);
+
+    const courseSchedules = await executeQuery(`
+      SELECT cs.CRN, c.DepartmentID 
+      FROM course_schedules cs
+      JOIN course c ON cs.CourseID = c.CourseID
+    `);
+
+    for (const student of studentsForEnrollment) {
+      const eligibleCourses = courseSchedules.filter(
+        (course) => course.DepartmentID === student.DepartmentID
+      );
+      if (eligibleCourses.length === 0) continue;
+      const selectedCourses = eligibleCourses.slice(0, Math.min(eligibleCourses.length, 3));
+
+      const approvalDate = new Date('2024-09-29');
+
+      for (const course of selectedCourses) {
+        const enrollmentDate = faker.date.between({
+          from: new Date('2024-09-16'),
+          to: new Date('2024-09-27'),
+        });
+
         await executeQuery(
-        `INSERT INTO enrollment (StudentID, CRN, EnrollmentDate, EnrollmentApprovalDate) VALUES (?, ?, ?, ?)`,
-        [studentId, crn, faker.date.past(), faker.date.recent()]
+          `INSERT INTO enrollment (StudentID, CRN, EnrollmentDate, EnrollmentApprovalDate) VALUES (?, ?, ?, ?)`,
+          [
+            student.StudentID,
+            course.CRN,
+            enrollmentDate,
+            approvalDate,
+          ]
         );
-    }
+      }
     }
 
     // Seed `attendance`
     console.log('Seeding `attendance`...');
-    for (let i = 1; i <= 50; i++) {
-    const studentId = studentsForEnrollment[i % studentsForEnrollment.length]?.StudentID;
-    const crn = courseSchedules[i % courseSchedules.length]?.CRN;
-    if (studentId && crn) {
+    const enrollments = await executeQuery(`
+      SELECT StudentID, CRN
+      FROM enrollment
+    `);
+
+    const weeks = Array.from({ length: 14 }, (_, i) => i + 1);
+
+    for (const enrollment of enrollments) {
+      const { StudentID, CRN } = enrollment;
+
+      for (const week of weeks) {
         await executeQuery(
-        `INSERT INTO attendance (StudentID, CRN, Date, Status) VALUES (?, ?, ?, ?)`,
-        [studentId, crn, faker.date.past(), faker.helpers.arrayElement(['Present', 'Absent', 'Late'])]
+          `INSERT INTO attendance (StudentID, CRN, Week, Status) VALUES (?, ?, ?, ?)`,
+          [
+            StudentID,
+            CRN,
+            week,
+            faker.helpers.arrayElement(['Present', 'Absent', 'Late']),
+          ]
         );
-    }
+      }
     }
 
     // Seed `exams`
     console.log('Seeding `exams`...');
-    for (let i = 1; i <= 50; i++) {
-    const crn = courseSchedules[i % courseSchedules.length]?.CRN;
-    if (crn) {
-        await executeQuery(
-        `INSERT INTO exams (CRN, ExamStartTime, ExamEndTime, ExamLocation) VALUES (?, ?, ?, ?)`,
-        [crn, faker.date.soon(), faker.date.soon(), `Room ${faker.number.int({ min: 100, max: 500 })}`]
+
+    const courseDetails = await executeQuery(`
+      SELECT CRN, Location, Day, ClassStartTime, TeachingMethod
+      FROM course_schedules
+    `);
+
+    const examDetails = [
+      { name: 'Quiz1', type: 'Quiz', offsetWeeks: 3 },
+      { name: 'Quiz2', type: 'Quiz', offsetWeeks: 5 },
+      { name: 'Midterm1', type: 'Midterm', offsetWeeks: 7 },
+      { name: 'Quiz3', type: 'Quiz', offsetWeeks: 9 },
+      { name: 'Midterm2', type: 'Midterm', offsetWeeks: 11 },
+      { name: 'Quiz4', type: 'Quiz', offsetWeeks: 13 },
+      { name: 'Final', type: 'Final', offsetWeeks: 15 },
+    ];
+
+    const startDate = new Date('2024-09-30');
+
+    for (const { CRN, Location, Day, ClassStartTime, TeachingMethod } of courseDetails) {
+      const isOnline = TeachingMethod === 'Online';
+
+      const examLocation = isOnline ? 'Online' : Location;
+      if (!examLocation && !isOnline) {
+        console.warn(`Skipping CRN: ${CRN} due to missing location`);
+        continue;
+      }
+
+      const quizStartTime = new Date(`1970-01-01T${ClassStartTime || '08:30:00'}`);
+      const quizEndTime = new Date(quizStartTime);
+      quizEndTime.setMinutes(quizEndTime.getMinutes() + 30);
+
+      for (const { name, type, offsetWeeks } of examDetails) {
+        const examDate = new Date(startDate);
+        examDate.setDate(
+          examDate.getDate() +
+            (offsetWeeks - 1) * 7 +
+            ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].indexOf(Day)
         );
-    }
+
+        const startTime = type === 'Quiz' ? quizStartTime.toTimeString().slice(0, 8) : '18:00:00';
+        const endTime = type === 'Quiz' ? quizEndTime.toTimeString().slice(0, 8) : '20:00:00';
+
+        try {
+          await executeQuery(
+            `INSERT INTO exams (CRN, ExamName, ExamDate, ExamStartTime, ExamEndTime, ExamLocation) 
+            VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+              CRN,
+              name,
+              examDate.toISOString().split('T')[0],
+              startTime,
+              endTime,
+              examLocation,
+            ]
+          );
+        } catch (error) {
+          console.error(`Failed to insert exam for CRN: ${CRN}, Exam: ${name}. Error: ${error.message}`);
+        }
+      }
     }
 
     // Seed `in_term_grades`
     console.log('Seeding `in_term_grades`...');
+    const exams = [
+      { name: 'Midterm1', percentage: 20 },
+      { name: 'Midterm2', percentage: 20 },
+      { name: 'Quiz1', percentage: 5 },
+      { name: 'Quiz2', percentage: 5 },
+      { name: 'Quiz3', percentage: 5 },
+      { name: 'Quiz4', percentage: 5 },
+      { name: 'Final', percentage: 40 },
+    ];
 
-    // Fetch all unique CRNs and enrolled students
-    const distinctCRNs = await executeQuery(`SELECT DISTINCT CRN FROM course_schedules`);
     const enrollment = await executeQuery(`SELECT StudentID, CRN FROM enrollment`);
 
-    // Precompute grade details for each CRN
-    const gradesByCRN = {};
-    for (const { CRN } of distinctCRNs) {
-      const gradeName = faker.helpers.arrayElement(['Midterm1', 'Midterm2', 'Quiz1', 'Quiz2', 'Quiz3', 'Quiz4', 'Final']);
-      const gradeValue = faker.number.int({ min: 0, max: 200 }) / 2; ;
-      const gradePercentage = faker.number.int({ min: 2, max: 120 }) / 2;
-      const gradeComponentsCount = faker.number.int({ min: 2, max: 5 });
-      let remainingValue = gradeValue;
-      const gradeComponents = [];
-
-      for (let j = 1; j <= gradeComponentsCount; j++) {
-        const value = j === gradeComponentsCount
-          ? remainingValue
-          : faker.number.float({ min: 0, max: remainingValue, precision: 0.1 });
-        gradeComponents.push(`Q${j}:${value.toFixed(1)}`);
-        remainingValue -= value;
-      }
-
-      const gradeDescription = gradeComponents.join(', ');
-
-      gradesByCRN[CRN] = {
-        gradeName,
-        gradeValue: gradeValue.toFixed(1),
-        gradePercentage: gradePercentage.toFixed(2),
-        gradeDescription,
-      };
-    }
-
-    // Assign grades to students for their CRNs
     for (const { StudentID, CRN } of enrollment) {
-      if (gradesByCRN[CRN]) {
-        const { gradeName, gradeValue, gradePercentage, gradeDescription } = gradesByCRN[CRN];
+      for (const exam of exams) {
+        const gradeValue = faker.number.int({ min: 0, max: 200 }) / 2;
+
         await executeQuery(
           `INSERT INTO in_term_grades (StudentID, CRN, GradeName, GradeValue, GradePercentage, GradeDescription) VALUES (?, ?, ?, ?, ?, ?)`,
           [
             StudentID,
             CRN,
-            gradeName,
+            exam.name,
             gradeValue,
-            gradePercentage,
-            gradeDescription,
+            exam.percentage,
+            `${exam.name} Score: ${gradeValue}, Weight: ${exam.percentage}%`,
           ]
         );
       }
@@ -362,20 +501,37 @@ const coursesByDepartment = {
 
     // Seed `end_of_term_grades`
     console.log('Seeding `end_of_term_grades`...');
-    for (let i = 1; i <= 50; i++) {
-    const studentId = studentsForEnrollment[i % studentsForEnrollment.length]?.StudentID;
-    const crn = courseSchedules[i % courseSchedules.length]?.CRN;
-    if (studentId && crn) {
-        await executeQuery(
+
+    const aggregatedGrades = await executeQuery(`
+      SELECT StudentID, CRN, SUM(GradeValue * (GradePercentage / 100)) AS TotalGrade 
+      FROM in_term_grades 
+      GROUP BY StudentID, CRN
+    `);
+
+    const getLetterGrade = (grade) => {
+      if (grade >= 90) return 'AA';
+      if (grade >= 80) return 'BA';
+      if (grade >= 70) return 'BB';
+      if (grade >= 60) return 'CB';
+      if (grade >= 50) return 'CC';
+      if (grade >= 45) return 'DC';
+      if (grade >= 40) return 'DD';
+      return 'FF';
+    };
+
+    for (const { StudentID, CRN, TotalGrade } of aggregatedGrades) {
+      const gradeOutOf100 = parseFloat(TotalGrade);
+      const letterGrade = getLetterGrade(gradeOutOf100);
+
+      await executeQuery(
         `INSERT INTO end_of_term_grades (StudentID, CRN, LetterGrade, GradeOutOf100) VALUES (?, ?, ?, ?)`,
         [
-            studentId,
-            crn,
-            faker.helpers.arrayElement(['AA', 'BA', 'BB', 'CB', 'CC', 'DC', 'DD', 'FF']),
-            faker.number.float({ min: 50, max: 100, precision: 0.1 }),
+          StudentID,
+          CRN,
+          letterGrade,
+          gradeOutOf100,
         ]
-        );
-    }
+      );
     }
 
     // Seed `notification`
