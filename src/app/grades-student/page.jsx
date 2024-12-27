@@ -1,6 +1,6 @@
 "use client";
-
 import styles from "@/styles/pages/GradesStudentPage.module.css";
+import Button from "@/components/UI/Button";
 import {
   sendRequestGetCourses,
   sendRequestGetGrades,
@@ -19,6 +19,7 @@ export default function GradesStudentPage() {
     selectedCourseIdDefault
   );
   const [grades, setGrades] = useState(null);
+  const [selectedGrade, setSelectedGrade] = useState(null);
   useEffect(() => {
     async function handleGetCourses() {
       const data = await sendRequestGetCourses(authCtx.userState.userId);
@@ -50,6 +51,7 @@ export default function GradesStudentPage() {
       setGrades(data);
     }
     if (selectedCourseId !== selectedCourseIdDefault) {
+      setSelectedGrade(null);
       handleGetGrades();
     }
   }, [selectedCourseId]);
@@ -76,19 +78,49 @@ export default function GradesStudentPage() {
           />
         </>
       )}
-      {!grades ? null : !grades.length ? (
-        <p>No grades found</p>
-      ) : (
-        <Table
-          columns={["name", "type", "weight", "grade"]}
-          rows={grades.map((grade) => ({
-            ...grade,
-            weight: "%" + grade.weight,
-          }))}
-          rowKey="name"
-          emptyValue="-"
-          handleColumnFormat={(word) => formatString(word, ["_"])}
-        />
+      {!grades ? null : (
+        <>
+          <div className={styles["grade-buttons-container"]}>
+            <Button
+              title="In Grade"
+              sx={{ width: "10rem" }}
+              onClick={() => {
+                if (selectedGrade !== "in_grade") {
+                  setSelectedGrade("in_grade");
+                }
+              }}
+            />
+            <span style={{ width: "1rem" }}></span>
+            <Button
+              title="End Grade"
+              sx={{ width: "10rem" }}
+              onClick={() => {
+                if (selectedGrade !== "end_grade") {
+                  setSelectedGrade("end_grade");
+                }
+              }}
+            />
+          </div>
+          <br />
+          {selectedGrade === "in_grade" && (
+            <Table
+              columns={["name", "grade", "weight", "description"]}
+              rows={grades.inGrade.map((grade) => ({
+                ...grade,
+                weight: "%" + grade.weight,
+              }))}
+              rowKey="name"
+              emptyValue="-"
+              handleColumnFormat={(word) => formatString(word, ["_"])}
+            />
+          )}
+          {selectedGrade === "end_grade" && (
+            <>
+              <p>grade: {grades.endGrade.grade}</p>
+              <p>letter grade: {grades.endGrade.letterGrade}</p>
+            </>
+          )}
+        </>
       )}
     </div>
   );
