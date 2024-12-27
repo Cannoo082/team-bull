@@ -1,3 +1,4 @@
+import { execute } from "@/backend/db";
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
@@ -27,28 +28,68 @@ export async function GET(request) {
 
   let sql;
   let params;
+  let rows;
   if (role === "student") {
     sql = `
-        SELECT c.* FROM enrollment e 
-        JOIN course_schedules cs ON e.CRN=cs.CRN 
-        JOIN course c ON cs.CourseID=c.CourseID 
-        WHERE e.StudentID=?; 
+    (
+      SELECT  
+        "in" AS type, 
+        GradeName AS in_grade_name , 
+        GradeValue AS in_grade_value , 
+        GradePercentage AS in_grade_percentage , 
+        GradeDescription AS in_grade_description , 
+        null AS end_letter_grade , 
+        null AS end_grade_out_of_100 
+      FROM in_term_grades WHERE StudentID=? AND CRN=(SELECT CRN FROM course_schedules WHERE CourseID=?) 
+    )
+    UNION ALL 
+    (
+      SELECT 
+        "end" AS type, 
+        null AS in_grade_name, 
+        null AS in_grade_value, 
+        null AS in_grade_percentage, 
+        null AS in_grade_description, 
+        LetterGrade AS end_letter_grade, 
+        GradeOutOf100 AS end_grade_out_of_100 
+      FROM end_of_term_grades WHERE StudentID=? AND CRN=(SELECT CRN FROM course_schedules WHERE CourseID=?)
+    ) 
       `;
-    params = [user.StudentID];
+    params = [user.StudentID, courseId, user.StudentID, courseId];
+    const data = await execute(sql, params);
+    if (data === undefined) {
+      return Response.json(
+        { message: "Failed to load grades" },
+        { status: 500 }
+      );
+    }
+
+    rows = {
+      inGrade: [],
+      endGrade: {},
+    };
+
+    data.forEach((row) => {
+      if (row.type === "in") {
+        const record = {
+          name: row.in_grade_name,
+          grade: row.in_grade_value,
+          weight: row.in_grade_percentage,
+          description: row.in_grade_description,
+        };
+        rows.inGrade.push(record);
+      } else {
+        rows.endGrade.letterGrade = row.end_letter_grade;
+        rows.endGrade.grade = row.end_grade_out_of_100;
+      }
+    });
   }
 
   if (role === "instructor") {
   }
 
-  console.log(userId, courseId);
-
   const grades = [
-    {
-      type: "quiz",
-      weight: 5,
-      grade: Math.ceil(Math.random() * 100),
-      name: "Quiz 1",
-    },
+    { type: "quiz", weight: 5, grade: 40, name: "Quiz 1" },
     { type: "quiz", weight: 5, grade: 40, name: "Quiz 2" },
     { type: "midterm", weight: 20, grade: 20, name: "Midterm" },
     { type: "quiz", weight: 5, grade: 100, name: "Quiz 3" },
@@ -57,5 +98,5 @@ export async function GET(request) {
     { type: "homework", weight: 10, grade: null, name: "Homework 2" },
     { type: "final", weight: 40, grade: null, name: "Final" },
   ];
-  return Response.json(grades);
+  return Response.json(rows);
 }
