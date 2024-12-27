@@ -16,6 +16,7 @@ jobs:
         HOST: ${{ secrets.EC2_HOST }}
         USER: ${{ secrets.EC2_USER }}
       run: |
+        sudo su
         echo "$PRIVATE_KEY" > github-ec2.pem && chmod 600 github-ec2.pem
         ssh -o StrictHostKeyChecking=no -i github-ec2.pem ${USER}@${HOST} '
         echo "Current directory: $(pwd)"
@@ -34,7 +35,6 @@ jobs:
         fi
 
         cd "$REPO_DIR"
-        sudo su
         npm install
         npm run build
         '
