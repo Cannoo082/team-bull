@@ -5,7 +5,7 @@ import Provider from "@/components/app-wide/Provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "App Name ",
+  title: "Student Administration System",
   description: "Student Administration System",
 };
 
