@@ -34,6 +34,9 @@ jobs:
           cd "$REPO_DIR"
         fi
 
+        sudo chown -R $USER:$USER $REPO_DIR
+        sudo chmod -R 755 $REPO_DIR
+
         cd "$REPO_DIR"
         npm install
         npm run build
