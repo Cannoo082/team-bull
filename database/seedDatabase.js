@@ -1,6 +1,8 @@
 const { pool } = require('../src/lib/db');
 const faker = require('@faker-js/faker').faker;
 
+const hashedPassword = '$2b$10$THBe7V4iuIDKWLvEC4DENOvKKRhhTiPltsLrvUl4oR5HR5Jebv1Vi'
+
 const buildings = [
   { code: 'ENGB', name: 'Engineering Building'},
   { code: 'SCIB', name: 'Science and Research Center'},
@@ -139,9 +141,16 @@ const coursesByDepartment = {
         `UPDATE instructor SET InstructorEmail = ? WHERE InstructorID = ?`,
         [email, instructorId]
       );
+      
+      // Insert into user table
       await executeQuery(
-        `UPDATE user SET Email = ? WHERE InstructorID = ?`,
-        [email, instructorId]
+        `INSERT INTO user (Email, Password, Role, InstructorID) VALUES (?, ?, ?, ?)`,
+        [
+          email,
+          hashedPassword,
+          'INSTRUCTOR',
+          instructorId,
+        ]
       );
     }    
 
@@ -224,9 +233,16 @@ const coursesByDepartment = {
         `UPDATE student SET StudentEmail = ? WHERE StudentID = ?`,
         [email, studentId]
       );
+
+      // Insert into user table
       await executeQuery(
-        `UPDATE user SET Email = ? WHERE StudentID = ?`,
-        [email, studentId]
+        `INSERT INTO user (Email, Password, Role, StudentID) VALUES (?, ?, ?, ?)`,
+        [
+          email,
+          hashedPassword,
+          'STUDENT',
+          studentId,
+        ]
       );
     }
 
@@ -262,9 +278,16 @@ const coursesByDepartment = {
         `UPDATE admin SET AdminEmail = ? WHERE AdminID = ?`,
         [email, adminId]
       );
+      
+      // Insert into user table
       await executeQuery(
-        `UPDATE user SET Email = ? WHERE AdminID = ?`,
-        [email, adminId]
+        `INSERT INTO user (Email, Password, Role, AdminID) VALUES (?, ?, ?, ?)`,
+        [
+          email,
+          hashedPassword,
+          'ADMIN',
+          adminId,
+        ]
       );
     }
 

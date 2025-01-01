@@ -222,6 +222,8 @@ ALTER TABLE `student`
 
 ALTER TABLE `admin` AUTO_INCREMENT = 300001;
 
+ALTER TABLE `user` AUTO_INCREMENT = 400001;
+
 ALTER TABLE `user` 
     ADD CONSTRAINT `USER_StudentID_fkey` 
     FOREIGN KEY (`StudentID`) REFERENCES `student`(`StudentID`) 
@@ -291,21 +293,3 @@ ALTER TABLE `user_notification`
     ADD CONSTRAINT `USER_NOTIFICATION_UserID_fkey`
     FOREIGN KEY (`UserID`) REFERENCES `user`(`ID`) 
     ON DELETE CASCADE;
-
-CREATE TRIGGER `student_to_user_trigger`
-AFTER INSERT ON `student`
-FOR EACH ROW
-INSERT INTO `user` (`ID`, `Email`, `Password`, `Role`, `CreatedAt`, `StudentID`)
-VALUES (NEW.StudentID, NEW.StudentEmail, SHA2('password123', 256), 'STUDENT', CURRENT_TIMESTAMP, NEW.StudentID);
-
-CREATE TRIGGER `instructor_to_user_trigger`
-AFTER INSERT ON `instructor`
-FOR EACH ROW
-INSERT INTO `user` (`ID`, `Email`, `Password`, `Role`, `CreatedAt`, `InstructorID`)
-VALUES (NEW.InstructorID, NEW.InstructorEmail, SHA2('password123', 256), 'INSTRUCTOR', CURRENT_TIMESTAMP, NEW.InstructorID);
-
-CREATE TRIGGER `admin_to_user_trigger`
-AFTER INSERT ON `admin`
-FOR EACH ROW
-INSERT INTO `user` (`ID`, `Email`, `Password`, `Role`, `CreatedAt`, `AdminID`)
-VALUES (NEW.AdminID, NEW.AdminEmail, SHA2('password123', 256), 'ADMIN', CURRENT_TIMESTAMP, NEW.AdminID);
