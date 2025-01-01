@@ -70,3 +70,8 @@ export async function sendRequestGetNotifications(userId) {
   const endpoint = `${endpoints.notifications}?userId=${userId}`;
   return await sendRequest(endpoint);
 }
+
+export async function sendRequestGetProfile(userId) {
+  const endpoint = `${endpoints.profile}?userId=${userId}`;
+  return await sendRequest(endpoint);
+}
