@@ -167,16 +167,16 @@ const coursesByDepartment = {
 const semesterData = [
   {SemesterID: '23F', Year: 2023, Term: 'Fall',
     TermStartDate: '2023-10-02', EnrollmentStartDate: '2023-09-11 10:00:00',
-    EnrollmentEndDate: '2023-09-22 17:00:00', EnrollmentApprovalDate: '2023-09-25 12:00:00',},
+    EnrollmentEndDate: '2023-09-22 17:00:00', EnrollmentApprovalDate: '2023-09-25 12:00:00', Active: false},
   {SemesterID: '24S', Year: 2024, Term: 'Spring',
     TermStartDate: '2024-02-12', EnrollmentStartDate: '2024-01-22 10:00:00',
-    EnrollmentEndDate: '2024-02-02 17:00:00', EnrollmentApprovalDate: '2024-02-05 12:00:00',},
+    EnrollmentEndDate: '2024-02-02 17:00:00', EnrollmentApprovalDate: '2024-02-05 12:00:00', Active: false},
   {SemesterID: '24F', Year: 2024, Term: 'Fall',
     TermStartDate: '2024-09-30', EnrollmentStartDate: '2024-09-09 10:00:00',
-    EnrollmentEndDate: '2024-09-20 17:00:00', EnrollmentApprovalDate: '2024-09-23 12:00:00',},
+    EnrollmentEndDate: '2024-09-20 17:00:00', EnrollmentApprovalDate: '2024-09-23 12:00:00', Active: true},
   {SemesterID: '25S', Year: 2025, Term: 'Spring',
     TermStartDate: '2025-02-17', EnrollmentStartDate: '2025-01-27 10:00:00',
-    EnrollmentEndDate: '2025-02-07 17:00:00', EnrollmentApprovalDate: '2025-02-10 12:00:00',},
+    EnrollmentEndDate: '2025-02-07 17:00:00', EnrollmentApprovalDate: '2025-02-10 12:00:00', Active: false},
 ];
 
 (async function seedDatabase() {
@@ -191,8 +191,8 @@ const semesterData = [
     for (const semester of semesterData) {
       await executeQuery(
         `INSERT INTO semester 
-        (SemesterID, Year, Term, TermStartDate, EnrollmentStartDate, EnrollmentEndDate, EnrollmentApprovalDate) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        (SemesterID, Year, Term, TermStartDate, EnrollmentStartDate, EnrollmentEndDate, EnrollmentApprovalDate, Active) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           semester.SemesterID,
           semester.Year,
@@ -201,6 +201,7 @@ const semesterData = [
           semester.EnrollmentStartDate,
           semester.EnrollmentEndDate,
           semester.EnrollmentApprovalDate,
+          semester.Active,
         ]
       );
     }

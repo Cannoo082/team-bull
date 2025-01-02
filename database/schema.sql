@@ -39,6 +39,7 @@ CREATE TABLE `semester` (
     `EnrollmentStartDate` DATETIME NULL,
     `EnrollmentEndDate` DATETIME NULL,
     `EnrollmentApprovalDate` DATETIME NULL,
+    `Active` BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (`SemesterID`),
     UNIQUE KEY `UniqueYearTerm` (`Year`, `Term`),
     CHECK (`EnrollmentStartDate` < `EnrollmentEndDate` AND `EnrollmentEndDate` < `EnrollmentApprovalDate`)
