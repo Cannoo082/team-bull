@@ -71,6 +71,11 @@ export async function sendRequestGetNotifications(userId) {
   return await sendRequest(endpoint);
 }
 
+export async function sendRequestGetProfile(userId) {
+  const endpoint = `${endpoints.profile}?userId=${userId}`;
+  return await sendRequest(endpoint);
+}
+
 export async function sendRequestGetAttendance(userId) {
   const endpoint = `${endpoints.attendance}?userId=${userId}`;
   return await sendRequest(endpoint);
