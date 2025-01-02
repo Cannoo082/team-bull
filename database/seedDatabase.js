@@ -556,6 +556,10 @@ const semesterData = [
       WHERE SemesterID IN ('23F', '24S', '24F')
     `);
 
+    const enrollmentBatchSize = 1000;
+    let enrollmentRecords = [];
+    let capacityUpdates = [];
+
     for (const student of studentsForEnrollment) {
       const { StudentID, DepartmentID, Grade } = student;
       const studentGrade = parseInt(Grade, 10);
@@ -564,16 +568,18 @@ const semesterData = [
       const previousYear = studentGrade - 1;
 
       const currentYearCourses = courseSchedules.filter(
-          (course) =>
-            course.DepartmentID === DepartmentID &&
-            course.YearOfCourse === currentYear.toString());
+        (course) =>
+          course.DepartmentID === DepartmentID &&
+          course.YearOfCourse === currentYear.toString()
+      );
 
       const prevYearCourses = courseSchedules.filter(
-          (course) =>
-            course.DepartmentID === DepartmentID &&
-            course.YearOfCourse === previousYear.toString());
+        (course) =>
+          course.DepartmentID === DepartmentID &&
+          course.YearOfCourse === previousYear.toString()
+      );
 
-      const indices = shuffle([0,1,2,3,4]);
+      const indices = shuffle([0, 1, 2, 3, 4]);
 
       for (const semester of semesterDetails) {
         const { SemesterID, EnrollmentStartDate, EnrollmentEndDate, EnrollmentApprovalDate } = semester;
@@ -582,18 +588,19 @@ const semesterData = [
         if (SemesterID === '23F' || SemesterID === '24S') {
           targetCourses = prevYearCourses.filter((course) => course.SemesterID === SemesterID);
         } else if (SemesterID === '24F') {
-          targetCourses = currentYearCourses.filter((course) => course.SemesterID === SemesterID);;
+          targetCourses = currentYearCourses.filter((course) => course.SemesterID === SemesterID);
         }
 
         if (!targetCourses || targetCourses.length < 5) continue;
 
-        targetCourses = indices.map(index => targetCourses[index]);
+        targetCourses = indices.map((index) => targetCourses[index]);
+
 
         let selectedCourses;
         if (SemesterID.endsWith('F')) {
-            selectedCourses = targetCourses.slice(0, 3);
+          selectedCourses = targetCourses.slice(0, 3);
         } else if (SemesterID.endsWith('S')) {
-            selectedCourses = targetCourses.slice(3, 5);
+          selectedCourses = targetCourses.slice(3, 5);
         }
 
         for (const course of selectedCourses) {
@@ -601,24 +608,52 @@ const semesterData = [
             from: new Date(EnrollmentStartDate),
             to: new Date(EnrollmentEndDate),
           });
-
-          await executeQuery(
-            `INSERT INTO enrollment (StudentID, CRN, EnrollmentDate, EnrollmentApprovalDate) VALUES (?, ?, ?, ?)`,
-            [
-              StudentID,
-              course.CRN,
-              enrollmentDate,
-              new Date(EnrollmentApprovalDate),
-            ]
-          );
-
-          await executeQuery(
-            `UPDATE course_schedules SET Enrolled = Enrolled + 1 WHERE CRN = ?`,
-            [course.CRN]
-          );
+    
+          enrollmentRecords.push([
+            StudentID,
+            course.CRN,
+            enrollmentDate,
+            new Date(EnrollmentApprovalDate),
+          ]);
+    
+          capacityUpdates.push([course.CRN]);
+    
+          if (enrollmentRecords.length >= enrollmentBatchSize) {
+            await executeQuery(
+              `INSERT INTO enrollment (StudentID, CRN, EnrollmentDate, EnrollmentApprovalDate) VALUES ?`,
+              [enrollmentRecords]
+            );
+            enrollmentRecords = [];
+          }
         }
       }
-    }     
+    }
+    
+    if (enrollmentRecords.length > 0) {
+      await executeQuery(
+        `INSERT INTO enrollment (StudentID, CRN, EnrollmentDate, EnrollmentApprovalDate) VALUES ?`,
+        [enrollmentRecords]
+      );
+    }
+    
+    if (capacityUpdates.length > 0) {
+      const enrollmentCounts = new Map();
+    
+      for (const [CRN] of capacityUpdates) {
+        enrollmentCounts.set(CRN, (enrollmentCounts.get(CRN) || 0) + 1);
+      }
+    
+      const updateQueries = Array.from(enrollmentCounts.entries()).map(
+        ([CRN, count]) => ({
+          query: `UPDATE course_schedules SET Enrolled = Enrolled + ? WHERE CRN = ?`,
+          values: [count, CRN],
+        })
+      );
+    
+      for (const { query, values } of updateQueries) {
+        await executeQuery(query, values);
+      }
+    }
 
     // Seed `attendance`
     console.log('Seeding `attendance`...');
@@ -629,20 +664,34 @@ const semesterData = [
 
     const weeks = Array.from({ length: 14 }, (_, i) => i + 1);
 
+    const attendanceBatchSize = 1000;
+    let attendanceRecords = [];
+
     for (const enrollment of enrollments) {
       const { StudentID, CRN } = enrollment;
 
       for (const week of weeks) {
-        await executeQuery(
-          `INSERT INTO attendance (StudentID, CRN, Week, Status) VALUES (?, ?, ?, ?)`,
-          [
-            StudentID,
-            CRN,
-            week,
-            faker.helpers.arrayElement(['Present', 'Absent', 'Late']),
-          ]
-        );
+        attendanceRecords.push([
+          StudentID,
+          CRN,
+          week,
+          faker.helpers.arrayElement(['Present', 'Absent', 'Late']),
+        ]);
+
+        if (attendanceRecords.length >= attendanceBatchSize) {
+          await executeQuery(
+            `INSERT INTO attendance (StudentID, CRN, Week, Status) VALUES ?`,
+            [attendanceRecords]
+          );
+          attendanceRecords = [];
+        }
       }
+    }
+    if (attendanceRecords.length > 0) {
+      await executeQuery(
+        `INSERT INTO attendance (StudentID, CRN, Week, Status) VALUES ?`,
+        [attendanceRecords]
+      );
     }
 
     // Seed `exams`
@@ -665,6 +714,7 @@ const semesterData = [
       { name: 'Final', type: 'Final', offsetWeeks: 15 },
     ];
 
+    const examInsertBatch = [];
     for (const { CRN, Location, Day, ClassStartTime, TeachingMethod, TermStartDate } of courseDetails) {
       if (!TermStartDate) {
         console.warn(`Skipping CRN: ${CRN} due to missing TermStartDate`);
@@ -690,23 +740,22 @@ const semesterData = [
         const startTime = type === 'Quiz' ? quizStartTime.toTimeString().slice(0, 8) : '18:00:00';
         const endTime = type === 'Quiz' ? quizEndTime.toTimeString().slice(0, 8) : '20:00:00';
 
-        try {
-          await executeQuery(
-            `INSERT INTO exams (CRN, ExamName, ExamDate, ExamStartTime, ExamEndTime, ExamLocation) 
-            VALUES (?, ?, ?, ?, ?, ?)`,
-            [
-              CRN,
-              name,
-              examDate.toISOString().split('T')[0],
-              startTime,
-              endTime,
-              examLocation,
-            ]
-          );
-        } catch (error) {
-          console.error(`Failed to insert exam for CRN: ${CRN}, Exam: ${name}. Error: ${error.message}`);
-        }
+        examInsertBatch.push([
+          CRN,
+          name,
+          examDate.toISOString().split('T')[0],
+          startTime,
+          endTime,
+          examLocation,
+        ]);
       }
+    }
+
+    if (examInsertBatch.length > 0) {
+      await executeQuery(
+        `INSERT INTO exams (CRN, ExamName, ExamDate, ExamStartTime, ExamEndTime, ExamLocation) VALUES ?`,
+        [examInsertBatch]
+      );
     }
 
     // Seed `in_term_grades`
@@ -722,23 +771,26 @@ const semesterData = [
     ];
 
     const enrollment = await executeQuery(`SELECT StudentID, CRN FROM enrollment`);
-
+    const inTermGradesBatch = [];
     for (const { StudentID, CRN } of enrollment) {
       for (const exam of exams) {
         const gradeValue = faker.number.int({ min: 0, max: 200 }) / 2;
-
-        await executeQuery(
-          `INSERT INTO in_term_grades (StudentID, CRN, GradeName, GradeValue, GradePercentage, GradeDescription) VALUES (?, ?, ?, ?, ?, ?)`,
-          [
-            StudentID,
-            CRN,
-            exam.name,
-            gradeValue,
-            exam.percentage,
-            `${exam.name} Score: ${gradeValue}, Weight: ${exam.percentage}%`,
-          ]
-        );
+        inTermGradesBatch.push([
+          StudentID,
+          CRN,
+          exam.name,
+          gradeValue,
+          exam.percentage,
+          `${exam.name} Score: ${gradeValue}, Weight: ${exam.percentage}%`,
+        ]);
       }
+    }
+    
+    if (inTermGradesBatch.length > 0) {
+      await executeQuery(
+        `INSERT INTO in_term_grades (StudentID, CRN, GradeName, GradeValue, GradePercentage, GradeDescription) VALUES ?`,
+        [inTermGradesBatch]
+      );
     }
 
     // Seed `end_of_term_grades`
@@ -761,18 +813,23 @@ const semesterData = [
       return 'FF';
     };
 
+    const endOfTermGradesBatch = [];
     for (const { StudentID, CRN, TotalGrade } of aggregatedGrades) {
       const gradeOutOf100 = parseFloat(TotalGrade);
       const letterGrade = getLetterGrade(gradeOutOf100);
-
+    
+      endOfTermGradesBatch.push([
+        StudentID,
+        CRN,
+        letterGrade,
+        gradeOutOf100,
+      ]);
+    }
+    
+    if (endOfTermGradesBatch.length > 0) {
       await executeQuery(
-        `INSERT INTO end_of_term_grades (StudentID, CRN, LetterGrade, GradeOutOf100) VALUES (?, ?, ?, ?)`,
-        [
-          StudentID,
-          CRN,
-          letterGrade,
-          gradeOutOf100,
-        ]
+        `INSERT INTO end_of_term_grades (StudentID, CRN, LetterGrade, GradeOutOf100) VALUES ?`,
+        [endOfTermGradesBatch]
       );
     }
 
