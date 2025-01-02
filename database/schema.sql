@@ -20,7 +20,7 @@ CREATE TABLE `instructor` (
     `InstructorFirstName` VARCHAR(20) NULL,
     `InstructorLastName` VARCHAR(20) NULL,
     `InstructorFullName` VARCHAR(60) NULL,
-    `InstructorEmail` VARCHAR(50) NULL,
+    `InstructorEmail` VARCHAR(50) NOT NULL UNIQUE,
     `InstructorPersonalEmail` VARCHAR(50) NULL,
     `InstructorPhoto` LONGBLOB NULL,
     `WebsiteLink` VARCHAR(100) NULL,
@@ -79,7 +79,7 @@ CREATE TABLE `student` (
     `StudentFirstName` VARCHAR(20) NULL,
     `StudentLastName` VARCHAR(20) NULL,
     `StudentFullName` VARCHAR(60) NULL,
-    `StudentEmail` VARCHAR(50) NULL,
+    `StudentEmail` VARCHAR(50) NOT NULL UNIQUE,
     `StudentPersonalEmail` VARCHAR(50) NULL,
     `DepartmentID` INT NULL,
     `Grade` ENUM('1', '2', '3', '4') DEFAULT '1',
@@ -106,7 +106,7 @@ CREATE TABLE `admin` (
 
 CREATE TABLE `user` (
     `ID` INTEGER NOT NULL AUTO_INCREMENT,
-    `Email` VARCHAR(191) NOT NULL,
+    `Email` VARCHAR(191) NOT NULL UNIQUE,
     `Password` VARCHAR(191) NOT NULL,
     `Role` ENUM('STUDENT', 'INSTRUCTOR', 'ADMIN') NOT NULL,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
