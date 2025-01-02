@@ -878,6 +878,52 @@ const semesterData = [
       }
     }
 
+    // Seed `TotalCredits` update
+    console.log('Updating `TotalCredits` based on the active term...');
+
+    const activeSemester = await executeQuery(`
+      SELECT SemesterID 
+      FROM semester 
+      WHERE Active = true
+    `);
+
+    if (activeSemester.length === 0) {
+      console.warn('No active semester found. Skipping total credits update.');
+    } else {
+      const { SemesterID } = activeSemester[0];
+
+      const studentCredits = await executeQuery(`
+        SELECT 
+          e.StudentID,
+          SUM(c.Credits) AS TotalCreditsInActiveTerm
+        FROM 
+          enrollment e
+        JOIN 
+          course_schedules cs ON e.CRN = cs.CRN
+        JOIN 
+          course c ON cs.CourseID = c.CourseID
+        WHERE 
+          cs.SemesterID = ?
+        GROUP BY 
+          e.StudentID
+      `, [SemesterID]);
+
+      if (studentCredits.length > 0) {
+        const updates = studentCredits.map(({ StudentID, TotalCreditsInActiveTerm }) => {
+          return executeQuery(
+            `UPDATE student 
+            SET TotalCredits = TotalCredits + ? 
+            WHERE StudentID = ?`,
+            [TotalCreditsInActiveTerm, StudentID]
+          );
+        });
+
+        await Promise.all(updates);
+      } else {
+        console.warn('No enrollments found for the active term. No updates made.');
+      }
+    }
+
     console.log('Seeding complete!');
   } catch (error) {
     console.error('An error occurred during seeding:', error.message || error);
