@@ -83,6 +83,7 @@ export default function ChangeEmail() {
         <TextField
           sx={{ width: "500px" }}
           label="Email"
+          autoFocus
           variant="outlined"
           type="text"
           value={email}

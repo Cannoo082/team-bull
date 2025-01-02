@@ -36,7 +36,7 @@ export default function ChangePassword() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   function handleChange(event) {
-    const updatedObject = structuredClone(passwordObject); 
+    const updatedObject = structuredClone(passwordObject);
     updatedObject[event.target.name].value = event.target.value;
     setPasswordObject(updatedObject);
   }
@@ -95,7 +95,7 @@ export default function ChangePassword() {
   }
 
   function handleVisibilityChange(name) {
-    const updatedObject = structuredClone(passwordObject); 
+    const updatedObject = structuredClone(passwordObject);
 
     updatedObject[name].showPassword = !passwordObject[name].showPassword;
 
@@ -120,12 +120,13 @@ export default function ChangePassword() {
         </Alert>
       </Snackbar>
 
-      {Object.keys(passwordObject).map((passwordName) => {
+      {Object.keys(passwordObject).map((passwordName, index) => {
         return (
           <div key={passwordName} className={styles["password-container"]}>
             <TextField
               name={passwordName}
               sx={{ width: "500px" }}
+              autoFocus={index === 0}
               label={passwordObject[passwordName].label}
               variant="outlined"
               type={
