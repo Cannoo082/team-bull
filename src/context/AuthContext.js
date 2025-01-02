@@ -22,6 +22,11 @@ export default function AuthProvider({ children }) {
         };
       case "SIGN-OUT":
         return initialUserState;
+      case "UPDATE":
+        return {
+          ...userState,
+          ...action.object,
+        };
       default:
         return userState;
     }
@@ -37,12 +42,16 @@ export default function AuthProvider({ children }) {
     dispatch({ type: "SIGN-OUT" });
   }
 
+  function handleChangeObject(object) {
+    dispatch({ type: "UPDATE", object });
+  }
   return (
     <AuthContext.Provider
       value={{
         userState,
         handleUserSignIn,
         handleUserSignOut,
+        handleChangeObject,
       }}
     >
       {children}
