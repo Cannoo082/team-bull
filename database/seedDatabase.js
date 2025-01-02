@@ -1,5 +1,6 @@
 const { pool } = require('../src/lib/db');
 const faker = require('@faker-js/faker').faker;
+const { shuffle } = faker.helpers;
 
 const hashedPassword = '$2b$10$THBe7V4iuIDKWLvEC4DENOvKKRhhTiPltsLrvUl4oR5HR5Jebv1Vi'
 
@@ -163,12 +164,46 @@ const coursesByDepartment = {
   ]
 };
 
+const semesterData = [
+  {SemesterID: '23F', Year: 2023, Term: 'Fall',
+    TermStartDate: '2023-10-02', EnrollmentStartDate: '2023-09-11 10:00:00',
+    EnrollmentEndDate: '2023-09-22 17:00:00', EnrollmentApprovalDate: '2023-09-25 12:00:00',},
+  {SemesterID: '24S', Year: 2024, Term: 'Spring',
+    TermStartDate: '2024-02-12', EnrollmentStartDate: '2024-01-22 10:00:00',
+    EnrollmentEndDate: '2024-02-02 17:00:00', EnrollmentApprovalDate: '2024-02-05 12:00:00',},
+  {SemesterID: '24F', Year: 2024, Term: 'Fall',
+    TermStartDate: '2024-09-30', EnrollmentStartDate: '2024-09-09 10:00:00',
+    EnrollmentEndDate: '2024-09-20 17:00:00', EnrollmentApprovalDate: '2024-09-23 12:00:00',},
+  {SemesterID: '25S', Year: 2025, Term: 'Spring',
+    TermStartDate: '2025-02-17', EnrollmentStartDate: '2025-01-27 10:00:00',
+    EnrollmentEndDate: '2025-02-07 17:00:00', EnrollmentApprovalDate: '2025-02-10 12:00:00',},
+];
+
 (async function seedDatabase() {
   try {
     const executeQuery = async (query, values = []) => {
       const [rows] = await pool.query(query, values);
       return rows;
     };
+
+    // Seed `semester`
+    console.log('Seeding `semester`...');
+    for (const semester of semesterData) {
+      await executeQuery(
+        `INSERT INTO semester 
+        (SemesterID, Year, Term, TermStartDate, EnrollmentStartDate, EnrollmentEndDate, EnrollmentApprovalDate) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+          semester.SemesterID,
+          semester.Year,
+          semester.Term,
+          semester.TermStartDate,
+          semester.EnrollmentStartDate,
+          semester.EnrollmentEndDate,
+          semester.EnrollmentApprovalDate,
+        ]
+      );
+    }
 
     // Seed `building`
     console.log('Seeding `building`...');
@@ -395,7 +430,7 @@ const coursesByDepartment = {
     // Seed `course_schedules`
     console.log('Seeding `course_schedules`...');
     const courses = await executeQuery(`
-      SELECT c.CourseID, c.DepartmentID 
+      SELECT c.CourseID, c.DepartmentID, c.YearOfCourse 
       FROM course c
     `);
 
@@ -410,98 +445,180 @@ const coursesByDepartment = {
       JOIN building b ON d.BuildingID = b.BuildingID
     `);
 
-    const availableTimes = ["08:30:00", "09:30:00", "10:30:00", "11:30:00", "12:30:00", "13:30:00", "14:30:00", "15:30:00",];
+    const semesters = await executeQuery(`
+      SELECT SemesterID 
+      FROM semester
+    `);
 
-    for (let i = 1; i <= 50; i++) {
-      const selectedCourse = faker.helpers.arrayElement(courses);
+    const availableTimes = ["08:30:00", "09:30:00", "10:30:00", "11:30:00", "12:30:00", "13:30:00", "14:30:00", "15:30:00"];
+    const availableDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-      const eligibleInstructors = instructors.filter(
-        (instructor) => instructor.DepartmentID === selectedCourse.DepartmentID
-      );
+    let baseNumericPart = 10001;
 
-      if (eligibleInstructors.length === 0) continue;
+    const scheduleMap = new Map();
 
-      const selectedInstructor = faker.helpers.arrayElement(eligibleInstructors);
+    for (const semester of semesters) {
+      for (const selectedCourse of courses) {
+        const { DepartmentID, YearOfCourse } = selectedCourse;
 
-      const capacity = faker.number.int({ min: 10, max: 50 });
-      const enrolled = faker.number.int({ min: 0, max: capacity });
-
-      const startTime = faker.helpers.arrayElement(availableTimes);
-      const endTime = new Date(`1970-01-01T${startTime}`);
-      endTime.setHours(endTime.getHours() + 2);
-      const formattedEndTime = endTime.toTimeString().slice(0, 8);
-
-      const teachingMethod = faker.helpers.arrayElement(['Online', 'InPerson', 'Hybrid']);
-
-      let location = null;
-      if (teachingMethod !== 'Online') {
-        const departmentBuilding = buildingOfDepartment.find(
-          (d) => d.DepartmentID === selectedCourse.DepartmentID
-        );
-        if (departmentBuilding) {
-          location = `${departmentBuilding.BuildingCode} Class ${faker.number.int({ min: 100, max: 400 })}`;
+        const departmentYearKey = `${DepartmentID}-${YearOfCourse}`;
+        if (!scheduleMap.has(departmentYearKey)) {
+          scheduleMap.set(departmentYearKey, new Set());
         }
-      }
 
-      await executeQuery(
-        `INSERT INTO course_schedules (CRN, CourseID, Day, ClassStartTime, ClassEndTime, InstructorID, Term, Year, TeachingMethod, Capacity, Enrolled, Location) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          `CRN${i.toString().padStart(3, '0')}`,
-          selectedCourse.CourseID,
-          faker.helpers.arrayElement(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']),
-          startTime,
-          formattedEndTime,
-          selectedInstructor.InstructorID,
-          faker.helpers.arrayElement(['Fall', 'Spring', 'Summer']),
-          2024,
-          teachingMethod,
-          capacity,
-          enrolled,
-          location,
-        ]
-      );
-    }   
+        const eligibleInstructors = instructors.filter(
+          (instructor) => instructor.DepartmentID === DepartmentID
+        );
+
+        if (eligibleInstructors.length === 0) continue;
+
+        const selectedInstructor = faker.helpers.arrayElement(eligibleInstructors);
+
+        const randomizedDays = shuffle(availableDays);
+        const randomizedTimes = shuffle(availableTimes);
+
+        let startTime, endTime, assignedDay;
+        for (const day of randomizedDays) {
+          for (const time of randomizedTimes) {
+            const endTimeCandidate = new Date(`1970-01-01T${time}`);
+            endTimeCandidate.setHours(endTimeCandidate.getHours() + 2);
+            const formattedEndTime = endTimeCandidate.toTimeString().slice(0, 8);
+
+            const timeSlotKey = `${day}-${time}`;
+            if (!scheduleMap.get(departmentYearKey).has(timeSlotKey)) {
+              startTime = time;
+              endTime = formattedEndTime;
+              assignedDay = day;
+              scheduleMap.get(departmentYearKey).add(timeSlotKey);
+              break;
+            }
+          }
+          if (startTime && endTime && assignedDay) break;
+        }
+
+        if (!startTime || !endTime || !assignedDay) {
+          console.warn(
+            `No available time slot for CourseID ${selectedCourse.CourseID} in Semester ${semester.SemesterID}`
+          );
+          continue;
+        }
+
+        const teachingMethod = faker.helpers.arrayElement(['Online', 'InPerson', 'Hybrid']);
+
+        let location = teachingMethod === 'Online' ? 'Online' : null;
+        if (teachingMethod !== 'Online') {
+          const departmentBuilding = buildingOfDepartment.find(
+            (d) => d.DepartmentID === DepartmentID
+          );
+          if (departmentBuilding) {
+            location = `${departmentBuilding.BuildingCode} Class ${faker.number.int({ min: 100, max: 400 })}`;
+          }
+        }
+
+        const crn = `${semester.SemesterID}${baseNumericPart}`;
+        await executeQuery(
+          `INSERT INTO course_schedules (CRN, CourseID, Day, ClassStartTime, ClassEndTime, InstructorID, SemesterID, TeachingMethod, Capacity, Enrolled, Location) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            crn,
+            selectedCourse.CourseID,
+            assignedDay,
+            startTime,
+            endTime,
+            selectedInstructor.InstructorID,
+            semester.SemesterID,
+            teachingMethod,
+            20,
+            0,
+            location,
+          ]
+        );
+        baseNumericPart++;
+      }
+    }
 
     // Seed `enrollment`
     console.log('Seeding `enrollment`...');
     const studentsForEnrollment = await executeQuery(`
-      SELECT StudentID, DepartmentID 
+      SELECT StudentID, DepartmentID, Grade 
       FROM student
     `);
 
     const courseSchedules = await executeQuery(`
-      SELECT cs.CRN, c.DepartmentID 
+      SELECT cs.CRN, c.CourseID, c.DepartmentID, c.YearOfCourse, cs.SemesterID, cs.Capacity, cs.Enrolled
       FROM course_schedules cs
       JOIN course c ON cs.CourseID = c.CourseID
     `);
 
+    const semesterDetails = await executeQuery(`
+      SELECT SemesterID, EnrollmentStartDate, EnrollmentEndDate, EnrollmentApprovalDate
+      FROM semester
+      WHERE SemesterID IN ('23F', '24S', '24F')
+    `);
+
     for (const student of studentsForEnrollment) {
-      const eligibleCourses = courseSchedules.filter(
-        (course) => course.DepartmentID === student.DepartmentID
-      );
-      if (eligibleCourses.length === 0) continue;
-      const selectedCourses = eligibleCourses.slice(0, Math.min(eligibleCourses.length, 3));
+      const { StudentID, DepartmentID, Grade } = student;
+      const studentGrade = parseInt(Grade, 10);
 
-      const approvalDate = new Date('2024-09-29');
+      const currentYear = studentGrade;
+      const previousYear = studentGrade - 1;
 
-      for (const course of selectedCourses) {
-        const enrollmentDate = faker.date.between({
-          from: new Date('2024-09-16'),
-          to: new Date('2024-09-27'),
-        });
+      const currentYearCourses = courseSchedules.filter(
+          (course) =>
+            course.DepartmentID === DepartmentID &&
+            course.YearOfCourse === currentYear.toString());
 
-        await executeQuery(
-          `INSERT INTO enrollment (StudentID, CRN, EnrollmentDate, EnrollmentApprovalDate) VALUES (?, ?, ?, ?)`,
-          [
-            student.StudentID,
-            course.CRN,
-            enrollmentDate,
-            approvalDate,
-          ]
-        );
+      const prevYearCourses = courseSchedules.filter(
+          (course) =>
+            course.DepartmentID === DepartmentID &&
+            course.YearOfCourse === previousYear.toString());
+
+      const indices = shuffle([0,1,2,3,4]);
+
+      for (const semester of semesterDetails) {
+        const { SemesterID, EnrollmentStartDate, EnrollmentEndDate, EnrollmentApprovalDate } = semester;
+
+        let targetCourses;
+        if (SemesterID === '23F' || SemesterID === '24S') {
+          targetCourses = prevYearCourses.filter((course) => course.SemesterID === SemesterID);
+        } else if (SemesterID === '24F') {
+          targetCourses = currentYearCourses.filter((course) => course.SemesterID === SemesterID);;
+        }
+
+        if (!targetCourses || targetCourses.length < 5) continue;
+
+        targetCourses = indices.map(index => targetCourses[index]);
+
+        let selectedCourses;
+        if (SemesterID.endsWith('F')) {
+            selectedCourses = targetCourses.slice(0, 3);
+        } else if (SemesterID.endsWith('S')) {
+            selectedCourses = targetCourses.slice(3, 5);
+        }
+
+        for (const course of selectedCourses) {
+          const enrollmentDate = faker.date.between({
+            from: new Date(EnrollmentStartDate),
+            to: new Date(EnrollmentEndDate),
+          });
+
+          await executeQuery(
+            `INSERT INTO enrollment (StudentID, CRN, EnrollmentDate, EnrollmentApprovalDate) VALUES (?, ?, ?, ?)`,
+            [
+              StudentID,
+              course.CRN,
+              enrollmentDate,
+              new Date(EnrollmentApprovalDate),
+            ]
+          );
+
+          await executeQuery(
+            `UPDATE course_schedules SET Enrolled = Enrolled + 1 WHERE CRN = ?`,
+            [course.CRN]
+          );
+        }
       }
-    }
+    }     
 
     // Seed `attendance`
     console.log('Seeding `attendance`...');
@@ -532,8 +649,10 @@ const coursesByDepartment = {
     console.log('Seeding `exams`...');
 
     const courseDetails = await executeQuery(`
-      SELECT CRN, Location, Day, ClassStartTime, TeachingMethod
-      FROM course_schedules
+      SELECT cs.CRN, cs.Location, cs.Day, cs.ClassStartTime, cs.TeachingMethod, s.TermStartDate 
+      FROM course_schedules cs
+      JOIN semester s ON cs.SemesterID = s.SemesterID
+      WHERE s.SemesterID IN ('23F', '24S', '24F')
     `);
 
     const examDetails = [
@@ -546,17 +665,16 @@ const coursesByDepartment = {
       { name: 'Final', type: 'Final', offsetWeeks: 15 },
     ];
 
-    const startDate = new Date('2024-09-30');
-
-    for (const { CRN, Location, Day, ClassStartTime, TeachingMethod } of courseDetails) {
-      const isOnline = TeachingMethod === 'Online';
-
-      const examLocation = isOnline ? 'Online' : Location;
-      if (!examLocation && !isOnline) {
-        console.warn(`Skipping CRN: ${CRN} due to missing location`);
+    for (const { CRN, Location, Day, ClassStartTime, TeachingMethod, TermStartDate } of courseDetails) {
+      if (!TermStartDate) {
+        console.warn(`Skipping CRN: ${CRN} due to missing TermStartDate`);
         continue;
       }
-
+    
+      const isOnline = TeachingMethod === 'Online';
+      const examLocation = isOnline ? 'Online' : Location;
+    
+      const startDate = new Date(TermStartDate);
       const quizStartTime = new Date(`1970-01-01T${ClassStartTime || '08:30:00'}`);
       const quizEndTime = new Date(quizStartTime);
       quizEndTime.setMinutes(quizEndTime.getMinutes() + 30);

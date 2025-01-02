@@ -31,6 +31,19 @@ CREATE TABLE `instructor` (
     PRIMARY KEY (`InstructorID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+CREATE TABLE `semester` (
+    `SemesterID` VARCHAR(5) NOT NULL,
+    `Year` INT NOT NULL,
+    `Term` ENUM('Fall', 'Spring', 'Summer') NOT NULL,
+    `TermStartDate` DATE NULL,
+    `EnrollmentStartDate` DATETIME NULL,
+    `EnrollmentEndDate` DATETIME NULL,
+    `EnrollmentApprovalDate` DATETIME NULL,
+    PRIMARY KEY (`SemesterID`),
+    UNIQUE KEY `UniqueYearTerm` (`Year`, `Term`),
+    CHECK (`EnrollmentStartDate` < `EnrollmentEndDate` AND `EnrollmentEndDate` < `EnrollmentApprovalDate`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 CREATE TABLE `course` (
     `CourseID` INT NOT NULL AUTO_INCREMENT,
     `CourseCode` VARCHAR(10) NOT NULL UNIQUE,
@@ -50,14 +63,14 @@ CREATE TABLE `course_schedules` (
     `ClassStartTime` TIME NULL,
     `ClassEndTime` TIME NULL,
     `InstructorID` INT NULL,
-    `Term` VARCHAR(10) NULL,
-    `Year` INTEGER NULL,
+    `SemesterID` VARCHAR(5) NULL,
     `TeachingMethod` ENUM('Online', 'InPerson', 'Hybrid') NULL,
     `Capacity` INTEGER NULL,
     `Enrolled` INTEGER NULL,
     `Location` VARCHAR(50) NULL,
     INDEX `COURSE_SCHEDULES_CourseID_fkey`(`CourseID`),
     INDEX `COURSE_SCHEDULES_InstructorID_fkey`(`InstructorID`),
+    INDEX `COURSE_SCHEDULES_SemesterID_fkey`(`SemesterID`),
     PRIMARY KEY (`CRN`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -203,6 +216,11 @@ ALTER TABLE `course_schedules`
 ALTER TABLE `course_schedules` 
     ADD CONSTRAINT `COURSE_SCHEDULES_InstructorID_fkey` 
     FOREIGN KEY (`InstructorID`) REFERENCES `instructor`(`InstructorID`) 
+    ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE `course_schedules` 
+    ADD CONSTRAINT `COURSE_SCHEDULES_SemesterID_fkey` 
+    FOREIGN KEY (`SemesterID`) REFERENCES `semester`(`SemesterID`) 
     ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE `student` AUTO_INCREMENT = 100001;

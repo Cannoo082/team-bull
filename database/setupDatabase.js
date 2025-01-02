@@ -29,6 +29,7 @@ require('dotenv').config();
         DROP TABLE IF EXISTS instructor;
         DROP TABLE IF EXISTS department;
         DROP TABLE IF EXISTS building;
+        DROP TABLE IF EXISTS semester;
         DROP TABLE IF EXISTS admin;
     `;
     const fullScript = dropStatements + schema;
