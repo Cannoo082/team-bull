@@ -36,12 +36,7 @@ export default function ChangePassword() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   function handleChange(event) {
-    const updatedObject = {};
-
-    for (const key in passwordObject) {
-      updatedObject[key] = { ...passwordObject[key] };
-    }
-
+    const updatedObject = structuredClone(passwordObject); 
     updatedObject[event.target.name].value = event.target.value;
     setPasswordObject(updatedObject);
   }
@@ -100,11 +95,7 @@ export default function ChangePassword() {
   }
 
   function handleVisibilityChange(name) {
-    const updatedObject = {};
-
-    for (const key in passwordObject) {
-      updatedObject[key] = { ...passwordObject[key] };
-    }
+    const updatedObject = structuredClone(passwordObject); 
 
     updatedObject[name].showPassword = !passwordObject[name].showPassword;
 
