@@ -24,7 +24,7 @@ export const routeOptions = {
     },
     attendance: {
       name: "Attendance",
-      path: "/attendance",
+      path: "/attendance-student",
       icon: <BeenhereIcon />,
     },
   },
@@ -46,7 +46,7 @@ export const routeOptions = {
     },
     attendance: {
       name: "Enter Attendance",
-      path: "/attendance",
+      path: "/attendance-academic",
       icon: <BeenhereIcon />,
     },
   },
