@@ -80,3 +80,25 @@ export async function sendRequestGetAttendance(userId) {
   const endpoint = `${endpoints.attendance}?userId=${userId}`;
   return await sendRequest(endpoint);
 }
+
+export async function sendRequestChangeEmail(userId, newEmail) {
+  const endpoint = `${endpoints.users}?operation=change-email`;
+
+  const options = optionsFactory({
+    method: "PATCH",
+    body: { userId, newEmail },
+  });
+
+  return await sendRequest(endpoint, options);
+}
+
+export async function sendRequestChangePassword(userId, password, newPassword) {
+  const endpoint = `${endpoints.users}?operation=change-password`;
+
+  const options = optionsFactory({
+    method: "PATCH",
+    body: { userId, password, newPassword },
+  });
+
+  return await sendRequest(endpoint, options);
+}

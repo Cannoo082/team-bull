@@ -8,3 +8,5 @@ export const exams = "/api/exams";
 export const notifications = "/api/notifications";
 export const profile="/api/profile"; 
 export const attendance = "/api/attendance"; 
+
+export const users = "/api/users"; 
