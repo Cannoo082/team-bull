@@ -34,10 +34,11 @@ export default function CustomizedTables({
   rowKey,
   handleColumnFormat,
   emptyValue = "-",
+  sx = {},
 }) {
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 700 }} aria-label="customized table">
+    <TableContainer component={Paper} sx={{ ...sx }}>
+      <Table aria-label="customized table">
         <TableHead>
           <TableRow>
             {columns.map((column) => (
