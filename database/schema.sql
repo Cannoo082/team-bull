@@ -37,6 +37,7 @@ CREATE TABLE `course` (
     `CourseTitle` VARCHAR(50) NULL,
     `DepartmentID` INT NULL,
     `Credits` DECIMAL(2, 1) NULL,
+    `YearOfCourse` ENUM('1', '2', '3', '4') NULL,
     `CourseDescription` VARCHAR(191) NULL,
     INDEX `COURSE_DepartmentID_fkey`(`DepartmentID`),
     PRIMARY KEY (`CourseID`)

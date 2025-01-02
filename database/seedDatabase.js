@@ -41,26 +41,126 @@ const departmentsWithBuildings = [
 ];
 
 const coursesByDepartment = {
-  'Computer Science': ['CS101 Data Structures', 'CS102 Algorithms', 'CS201 Operating Systems', 'CS301 Artificial Intelligence', 'CS302 Machine Learning'],
-  'Mechanical Engineering': ['ME101 Thermodynamics', 'ME102 Fluid Mechanics', 'ME201 Mechanics of Materials', 'ME202 Heat Transfer', 'ME301 Control Systems'],
-  'Electrical Engineering': ['EE101 Circuit Analysis', 'EE102 Electromagnetic Fields', 'EE201 Power Systems', 'EE202 Signal Processing', 'EE301 Microelectronics'],
-  'Civil Engineering': ['CE101 Structural Analysis', 'CE102 Construction Materials', 'CE201 Geotechnical Engineering', 'CE202 Transportation Systems', 'CE301 Hydrology'],
-  'Mathematics': ['MATH101 Linear Algebra', 'MATH102 Calculus I', 'MATH201 Calculus II', 'MATH202 Abstract Algebra', 'MATH301 Differential Equations'],
-  'Physics': ['PHYS101 Classical Mechanics', 'PHYS102 Quantum Physics', 'PHYS201 Thermodynamics', 'PHYS202 Electrodynamics', 'PHYS301 Nuclear Physics'],
-  'Chemistry': ['CHEM101 Organic Chemistry', 'CHEM102 Inorganic Chemistry', 'CHEM201 Analytical Chemistry', 'CHEM202 Physical Chemistry', 'CHEM301 Biochemistry'],
-  'Biology': ['BIO101 Cell Biology', 'BIO102 Genetics', 'BIO201 Ecology', 'BIO202 Evolutionary Biology', 'BIO301 Microbiology'],
-  'Economics': ['ECON101 Microeconomics', 'ECON102 Macroeconomics', 'ECON201 Econometrics', 'ECON202 Game Theory', 'ECON301 International Trade'],
-  'Business Administration': ['BUS101 Principles of Management', 'BUS102 Marketing Strategies', 'BUS201 Business Ethics', 'BUS202 Entrepreneurship', 'BUS301 Organizational Behavior'],
-  'English Literature': ['ENG101 Introduction to Poetry', 'ENG102 Shakespearean Drama', 'ENG201 Modern Fiction', 'ENG202 Victorian Literature', 'ENG301 Literary Theory'],
-  'History': ['HIST101 World History', 'HIST102 Ancient Civilizations', 'HIST201 Medieval History', 'HIST202 Modern Europe', 'HIST301 American History'],
-  'Sociology': ['SOC101 Introduction to Sociology', 'SOC102 Social Stratification', 'SOC201 Cultural Anthropology', 'SOC202 Urban Sociology', 'SOC301 Sociology of Education'],
-  'Philosophy': ['PHIL101 Introduction to Philosophy', 'PHIL102 Ethics', 'PHIL201 Philosophy of Science', 'PHIL202 Logic', 'PHIL301 Political Philosophy'],
-  'Law': ['LAW101 Introduction to Law', 'LAW102 Constitutional Law', 'LAW201 Criminal Law', 'LAW202 International Law', 'LAW301 Corporate Law'],
-  'Medicine': ['MED101 Anatomy', 'MED102 Physiology', 'MED201 Pharmacology', 'MED202 Pathology', 'MED301 Clinical Medicine'],
-  'Nursing': ['NUR101 Fundamentals of Nursing', 'NUR102 Pediatric Nursing', 'NUR201 Community Health Nursing', 'NUR202 Psychiatric Nursing', 'NUR301 Critical Care Nursing'],
-  'Environmental Science': ['ENV101 Environmental Chemistry', 'ENV102 Ecological Principles', 'ENV201 Environmental Policy', 'ENV202 Climate Change Science', 'ENV301 Sustainable Development'],
-  'Art and Design': ['ART101 Introduction to Design', 'ART102 Drawing and Sketching', 'ART201 Sculpture', 'ART202 Digital Art', 'ART301 Art History'],
-  'Music': ['MUS101 Introduction to Music Theory', 'MUS102 History of Western Music', 'MUS201 Instrumental Performance', 'MUS202 Composition', 'MUS301 Conducting'],
+  'Computer Science': [
+    'CS101 Introduction to Programming', 'CS102 Data Structures', 'CS103 Computer Organization', 'CS104 Discrete Mathematics', 'CS105 Programming Fundamentals',
+    'CS201 Algorithms', 'CS202 Operating Systems', 'CS203 Database Systems', 'CS204 Software Engineering', 'CS205 Mobile App Development',
+    'CS301 Artificial Intelligence', 'CS302 Machine Learning', 'CS303 Computer Networks', 'CS304 Web Development', 'CS305 Big Data Analytics',
+    'CS401 Advanced Algorithms', 'CS402 Cybersecurity', 'CS403 Cloud Computing', 'CS404 Blockchain Technology', 'CS405 Natural Language Processing'
+  ],
+  'Mechanical Engineering': [
+    'ME101 Engineering Drawing', 'ME102 Mechanics', 'ME103 Thermodynamics', 'ME104 Materials Science', 'ME105 Introduction to Engineering',
+    'ME201 Fluid Mechanics', 'ME202 Heat Transfer', 'ME203 Dynamics of Machines', 'ME204 Manufacturing Processes', 'ME205 Mechanical Design',
+    'ME301 Control Systems', 'ME302 Mechanical Vibrations', 'ME303 Finite Element Analysis', 'ME304 Renewable Energy', 'ME305 Robotics Fundamentals',
+    'ME401 Advanced Robotics', 'ME402 HVAC Systems', 'ME403 Automotive Engineering', 'ME404 Mechatronics', 'ME405 Aerospace Engineering'
+  ],
+  'Electrical Engineering': [
+    'EE101 Circuit Analysis', 'EE102 Digital Logic Design', 'EE103 Electromagnetic Fields', 'EE104 Introduction to Power Systems', 'EE105 Electrical Engineering Basics',
+    'EE201 Analog Electronics', 'EE202 Signal Processing', 'EE203 Control Systems', 'EE204 Microcontrollers', 'EE205 Digital Circuits',
+    'EE301 Digital Communication', 'EE302 Power Electronics', 'EE303 Embedded Systems', 'EE304 Wireless Networks', 'EE305 Machine Learning for Engineers',
+    'EE401 Renewable Energy Systems', 'EE402 Smart Grids', 'EE403 Advanced Signal Processing', 'EE404 IoT Systems', 'EE405 Quantum Computing'
+  ],
+  'Civil Engineering': [
+    'CE101 Introduction to Civil Engineering', 'CE102 Structural Mechanics', 'CE103 Surveying', 'CE104 Geology for Engineers', 'CE105 Hydraulics',
+    'CE201 Construction Materials', 'CE202 Fluid Mechanics', 'CE203 Soil Mechanics', 'CE204 Transportation Engineering', 'CE205 Foundation Engineering',
+    'CE301 Reinforced Concrete Design', 'CE302 Steel Structures', 'CE303 Environmental Engineering', 'CE304 Hydrology', 'CE305 Advanced Construction Techniques',
+    'CE401 Advanced Structural Analysis', 'CE402 Bridge Engineering', 'CE403 Urban Planning', 'CE404 Construction Management', 'CE405 Disaster Management'
+  ],
+  'Mathematics': [
+    'MATH101 Linear Algebra', 'MATH102 Calculus I', 'MATH103 Discrete Mathematics', 'MATH104 Probability and Statistics', 'MATH105 Computational Mathematics',
+    'MATH201 Calculus II', 'MATH202 Abstract Algebra', 'MATH203 Differential Equations', 'MATH204 Complex Analysis', 'MATH205 Numerical Analysis',
+    'MATH301 Real Analysis', 'MATH302 Numerical Methods', 'MATH303 Mathematical Modeling', 'MATH304 Graph Theory', 'MATH305 Optimization',
+    'MATH401 Topology', 'MATH402 Functional Analysis', 'MATH403 Game Theory', 'MATH404 Advanced Probability', 'MATH405 Algebraic Geometry'
+  ],
+  'Physics': [
+    'PHYS101 Classical Mechanics', 'PHYS102 Quantum Physics', 'PHYS103 Thermodynamics', 'PHYS104 Electromagnetism', 'PHYS105 Experimental Physics',
+    'PHYS201 Statistical Mechanics', 'PHYS202 Optics', 'PHYS203 Modern Physics', 'PHYS204 Computational Physics', 'PHYS205 Solid State Physics',
+    'PHYS301 Condensed Matter Physics', 'PHYS302 Nuclear Physics', 'PHYS303 Astrophysics', 'PHYS304 Plasma Physics', 'PHYS305 Biophysics',
+    'PHYS401 Advanced Quantum Mechanics', 'PHYS402 General Relativity', 'PHYS403 Particle Physics', 'PHYS404 Cosmology', 'PHYS405 Quantum Field Theory'
+  ],
+  'Chemistry': [
+    'CHEM101 Organic Chemistry', 'CHEM102 Inorganic Chemistry', 'CHEM103 Physical Chemistry', 'CHEM104 Analytical Chemistry', 'CHEM105 Fundamentals of Chemistry',
+    'CHEM201 Environmental Chemistry', 'CHEM202 Biochemistry', 'CHEM203 Polymer Chemistry', 'CHEM204 Quantum Chemistry', 'CHEM205 Industrial Chemistry',
+    'CHEM301 Spectroscopy', 'CHEM302 Surface Chemistry', 'CHEM303 Computational Chemistry', 'CHEM304 Medicinal Chemistry', 'CHEM305 Green Chemistry',
+    'CHEM401 Advanced Organic Synthesis', 'CHEM402 Material Chemistry', 'CHEM403 Chemical Engineering Principles', 'CHEM404 Nanotechnology', 'CHEM405 Forensic Chemistry'
+  ],
+  'Biology': [
+    'BIO101 Cell Biology', 'BIO102 Genetics', 'BIO103 Ecology', 'BIO104 Evolutionary Biology', 'BIO105 Introduction to Life Sciences',
+    'BIO201 Microbiology', 'BIO202 Molecular Biology', 'BIO203 Biostatistics', 'BIO204 Developmental Biology', 'BIO205 Plant Biology',
+    'BIO301 Immunology', 'BIO302 Virology', 'BIO303 Neurobiology', 'BIO304 Systems Biology', 'BIO305 Animal Behavior',
+    'BIO401 Bioinformatics', 'BIO402 Cancer Biology', 'BIO403 Stem Cell Research', 'BIO404 Synthetic Biology', 'BIO405 Advanced Ecology'
+  ],
+  'Economics': [
+    'ECON101 Microeconomics', 'ECON102 Macroeconomics', 'ECON103 Economic History', 'ECON104 Behavioral Economics', 'ECON105 Financial Markets',
+    'ECON201 Econometrics', 'ECON202 Game Theory', 'ECON203 International Economics', 'ECON204 Public Economics', 'ECON205 Labor Economics',
+    'ECON301 Development Economics', 'ECON302 Environmental Economics', 'ECON303 Financial Economics', 'ECON304 Urban Economics', 'ECON305 Health Economics',
+    'ECON401 Advanced Econometrics', 'ECON402 Industrial Organization', 'ECON403 Advanced Microeconomics', 'ECON404 Advanced Macroeconomics', 'ECON405 Economic Policy Analysis'
+  ],
+  'Business Administration': [
+    'BUS101 Principles of Management', 'BUS102 Marketing Strategies', 'BUS103 Business Law', 'BUS104 Financial Accounting', 'BUS105 Introduction to Business',
+    'BUS201 Organizational Behavior', 'BUS202 Corporate Finance', 'BUS203 Entrepreneurship', 'BUS204 Business Ethics', 'BUS205 Sales Management',
+    'BUS301 Strategic Management', 'BUS302 Operations Management', 'BUS303 International Business', 'BUS304 Leadership', 'BUS305 Supply Chain Management',
+    'BUS401 Advanced Marketing', 'BUS402 Investment Analysis', 'BUS403 Risk Management', 'BUS404 E-Commerce Strategies', 'BUS405 Digital Marketing'
+  ],
+  'English Literature': [
+    'ENG101 Introduction to Poetry', 'ENG102 Shakespearean Drama', 'ENG103 American Literature', 'ENG104 Literary Analysis', 'ENG105 Introduction to Creative Writing',
+    'ENG201 Victorian Literature', 'ENG202 Modern Fiction', 'ENG203 Gothic Literature', 'ENG204 Postcolonial Studies', 'ENG205 The Short Story',
+    'ENG301 Romantic Poetry', 'ENG302 Literary Criticism', 'ENG303 Advanced Creative Writing', 'ENG304 Comparative Literature', 'ENG305 Digital Narratives',
+    'ENG401 Advanced Literary Theory', 'ENG402 Digital Humanities', 'ENG403 World Literature', 'ENG404 Feminist Literature', 'ENG405 Narrative Structures'
+  ],
+  'History': [
+    'HIST101 World History', 'HIST102 Ancient Civilizations', 'HIST103 European History', 'HIST104 Asian History', 'HIST105 African History',
+    'HIST201 Medieval History', 'HIST202 Modern Europe', 'HIST203 American History', 'HIST204 History of Science', 'HIST205 Latin American History',
+    'HIST301 Middle Eastern History', 'HIST302 History of Warfare', 'HIST303 History of Religion', 'HIST304 Economic History', 'HIST305 Social History',
+    'HIST401 Advanced Historiography', 'HIST402 Environmental History', 'HIST403 Cultural History', 'HIST404 Political History', 'HIST405 Historical Methods'
+  ],
+  'Sociology': [
+    'SOC101 Introduction to Sociology', 'SOC102 Social Stratification', 'SOC103 Sociology of Family', 'SOC104 Sociology of Media', 'SOC105 Sociology of Health',
+    'SOC201 Cultural Anthropology', 'SOC202 Urban Sociology', 'SOC203 Sociology of Education', 'SOC204 Sociology of Gender', 'SOC205 Race and Ethnicity',
+    'SOC301 Social Movements', 'SOC302 Political Sociology', 'SOC303 Sociology of Organizations', 'SOC304 Social Psychology', 'SOC305 Sociology of Technology',
+    'SOC401 Global Sociology', 'SOC402 Environmental Sociology', 'SOC403 Criminology', 'SOC404 Advanced Sociological Theory', 'SOC405 Comparative Sociology'
+  ],
+  'Philosophy': [
+    'PHIL101 Introduction to Philosophy', 'PHIL102 Ethics', 'PHIL103 Philosophy of Science', 'PHIL104 Logic', 'PHIL105 Philosophy of Religion',
+    'PHIL201 Ancient Philosophy', 'PHIL202 Medieval Philosophy', 'PHIL203 Modern Philosophy', 'PHIL204 Political Philosophy', 'PHIL205 Aesthetics',
+    'PHIL301 Existentialism', 'PHIL302 Philosophy of Mind', 'PHIL303 Epistemology', 'PHIL304 Metaphysics', 'PHIL305 Philosophy of Language',
+    'PHIL401 Advanced Logic', 'PHIL402 Philosophy of Law', 'PHIL403 Contemporary Philosophy', 'PHIL404 Ethics of AI', 'PHIL405 Philosophy of Art'
+  ],
+  'Law': [
+    'LAW101 Introduction to Law', 'LAW102 Constitutional Law', 'LAW103 Criminal Law', 'LAW104 Civil Procedure', 'LAW105 Legal Research',
+    'LAW201 International Law', 'LAW202 Business Law', 'LAW203 Environmental Law', 'LAW204 Human Rights Law', 'LAW205 Intellectual Property Law',
+    'LAW301 Labor Law', 'LAW302 Family Law', 'LAW303 Tax Law', 'LAW304 Advanced Criminal Procedure', 'LAW305 Alternative Dispute Resolution',
+    'LAW401 Corporate Law', 'LAW402 Cyber Law', 'LAW403 Environmental Litigation', 'LAW404 Advanced Contract Law', 'LAW405 International Trade Law'
+  ],
+  'Medicine': [
+    'MED101 Anatomy', 'MED102 Physiology', 'MED103 Histology', 'MED104 Biochemistry', 'MED105 Medical Terminology',
+    'MED201 Pathology', 'MED202 Pharmacology', 'MED203 Microbiology', 'MED204 Immunology', 'MED205 Clinical Skills',
+    'MED301 Clinical Medicine I', 'MED302 Clinical Medicine II', 'MED303 Pediatrics', 'MED304 Obstetrics and Gynecology', 'MED305 Geriatrics',
+    'MED401 Surgery', 'MED402 Psychiatry', 'MED403 Neurology', 'MED404 Oncology', 'MED405 Emergency Medicine'
+  ],
+  'Nursing': [
+    'NUR101 Fundamentals of Nursing', 'NUR102 Pediatric Nursing', 'NUR103 Community Health Nursing', 'NUR104 Medical-Surgical Nursing', 'NUR105 Nutrition',
+    'NUR201 Psychiatric Nursing', 'NUR202 Nursing Leadership', 'NUR203 Critical Care Nursing', 'NUR204 Geriatric Nursing', 'NUR205 Palliative Care',
+    'NUR301 Maternity Nursing', 'NUR302 Nursing Informatics', 'NUR303 Emergency Nursing', 'NUR304 Nursing Ethics', 'NUR305 Evidence-Based Practice',
+    'NUR401 Advanced Clinical Nursing', 'NUR402 Health Policy', 'NUR403 Nursing Education', 'NUR404 Global Health Nursing', 'NUR405 Advanced Pharmacology'
+  ],
+  'Environmental Science': [
+    'ENV101 Environmental Chemistry', 'ENV102 Ecological Principles', 'ENV103 Climate Change Science', 'ENV104 Conservation Biology', 'ENV105 Introduction to Environmental Science',
+    'ENV201 Environmental Policy', 'ENV202 Environmental Impact Assessment', 'ENV203 Renewable Energy', 'ENV204 Water Resource Management', 'ENV205 Marine Biology',
+    'ENV301 Sustainable Development', 'ENV302 Environmental Toxicology', 'ENV303 Urban Ecology', 'ENV304 Environmental Economics', 'ENV305 Biodiversity Management',
+    'ENV401 Environmental Law', 'ENV402 Advanced Climate Studies', 'ENV403 Waste Management', 'ENV404 Ecosystem Restoration', 'ENV405 Advanced Environmental Statistics'
+  ],
+  'Art and Design': [
+    'ART101 Introduction to Design', 'ART102 Drawing and Sketching', 'ART103 Painting Techniques', 'ART104 History of Art', 'ART105 Basics of Sculpting',
+    'ART201 Sculpture', 'ART202 Digital Art', 'ART203 Photography', 'ART204 Graphic Design', 'ART205 Textile Art',
+    'ART301 Ceramics', 'ART302 Animation', 'ART303 Industrial Design', 'ART304 Fashion Design', 'ART305 Exhibition Design',
+    'ART401 Advanced Sculpture', 'ART402 Contemporary Art', 'ART403 Portfolio Development', 'ART404 Art Critique', 'ART405 Creative Entrepreneurship'
+  ],
+  'Music': [
+    'MUS101 Introduction to Music Theory', 'MUS102 History of Western Music', 'MUS103 Aural Skills', 'MUS104 Fundamentals of Composition', 'MUS105 World Music Basics',
+    'MUS201 Instrumental Performance', 'MUS202 Music Technology', 'MUS203 Conducting I', 'MUS204 Choral Arranging', 'MUS205 Music Business',
+    'MUS301 Orchestration', 'MUS302 Advanced Composition', 'MUS303 Jazz Studies', 'MUS304 Music Production', 'MUS305 Experimental Music',
+    'MUS401 Music Pedagogy', 'MUS402 Conducting II', 'MUS403 Music Psychology', 'MUS404 Advanced Music Theory', 'MUS405 Film Scoring'
+  ]
 };
 
 (async function seedDatabase() {
@@ -106,52 +206,52 @@ const coursesByDepartment = {
       FROM department d
       JOIN building b ON d.BuildingID = b.BuildingID
     `);
-    for (let i = 1; i <= 50; i++) {
-      const department = faker.helpers.arrayElement(departments);
-    
-      const firstName = faker.person.firstName().slice(0, 20);
-      const middleName = faker.helpers.maybe(() => faker.person.firstName().slice(0, 20), { probability: 0.5 });
-      const lastName = faker.person.lastName().slice(0, 20);
-      const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ');
+    for (const department of departments) {
+      for (let i = 1; i <= 8; i++) {
+        const firstName = faker.person.firstName().slice(0, 20);
+        const middleName = faker.helpers.maybe(() => faker.person.firstName().slice(0, 20), { probability: 0.5 });
+        const lastName = faker.person.lastName().slice(0, 20);
+        const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ');
 
-      const phoneNumber = faker.phone.number('(###) ###-####').slice(0, 15);
-      const emailDomain = 'example.com';
+        const phoneNumber = faker.phone.number('(###) ###-####').slice(0, 15);
+        const emailDomain = 'example.com';
 
-      const result = await executeQuery(
-        `INSERT INTO instructor (InstructorFirstName, InstructorLastName, InstructorFullName, InstructorEmail, InstructorPersonalEmail, InstructorPhoto, WebsiteLink, InstructorLocation, InstructorPhoneNum, DepartmentID)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          firstName,
-          lastName,
-          fullName,
-          `${lastName.toLowerCase()}-i${i.toString().padStart(3, '0')}@${emailDomain}`,
-          `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${emailDomain}`,
-          faker.image.dataUri(),
-          `https://www.${lastName.toLowerCase()}${i}.edu`,
-          `${department.BuildingCode} Room ${faker.number.int({ min: 100, max: 400 })}`,
-          phoneNumber,
-          department.DepartmentID,
-        ]
-      );
-    
-      const instructorId = result.insertId;
-      const email = `${lastName.toLowerCase()}${instructorId}@${emailDomain}`;
-    
-      await executeQuery(
-        `UPDATE instructor SET InstructorEmail = ? WHERE InstructorID = ?`,
-        [email, instructorId]
-      );
+        const result = await executeQuery(
+          `INSERT INTO instructor (InstructorFirstName, InstructorLastName, InstructorFullName, InstructorEmail, InstructorPersonalEmail, InstructorPhoto, WebsiteLink, InstructorLocation, InstructorPhoneNum, DepartmentID)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            firstName,
+            lastName,
+            fullName,
+            `${lastName.toLowerCase()}-i${i.toString().padStart(3, '0')}@${emailDomain}`,
+            `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${emailDomain}`,
+            faker.image.dataUri(),
+            `https://www.${lastName.toLowerCase()}${i}.edu`,
+            `${department.BuildingCode} Room ${faker.number.int({ min: 100, max: 400 })}`,
+            phoneNumber,
+            department.DepartmentID,
+          ]
+        );
       
-      // Insert into user table
-      await executeQuery(
-        `INSERT INTO user (Email, Password, Role, InstructorID) VALUES (?, ?, ?, ?)`,
-        [
-          email,
-          hashedPassword,
-          'INSTRUCTOR',
-          instructorId,
-        ]
-      );
+        const instructorId = result.insertId;
+        const email = `${lastName.toLowerCase()}${instructorId}@${emailDomain}`;
+      
+        await executeQuery(
+          `UPDATE instructor SET InstructorEmail = ? WHERE InstructorID = ?`,
+          [email, instructorId]
+        );
+        
+        // Insert into user table
+        await executeQuery(
+          `INSERT INTO user (Email, Password, Role, InstructorID) VALUES (?, ?, ?, ?)`,
+          [
+            email,
+            hashedPassword,
+            'INSTRUCTOR',
+            instructorId,
+          ]
+        );
+      }
     }    
 
     // Seed `course`
@@ -162,17 +262,19 @@ const coursesByDepartment = {
       if (department) {
         const dbDepartment = dbDepartments.find((d) => d.DepartmentCode === department.code);
         if (dbDepartment) {
-          for (const course of courses) {
+          for (let i = 0; i < courses.length; i++) {
+            const course = courses[i];
             const courseCode = course.split(' ')[0];
             const courseTitle = course.substring(course.indexOf(' ') + 1);
             await executeQuery(
-              `INSERT INTO course (CourseCode, CourseTitle, DepartmentID, Credits, CourseDescription) 
-              VALUES (?, ?, ?, ?, ?)`,
+              `INSERT INTO course (CourseCode, CourseTitle, DepartmentID, Credits, YearOfCourse, CourseDescription) 
+              VALUES (?, ?, ?, ?, ?, ?)`,
               [
                 courseCode,
                 courseTitle,
                 dbDepartment.DepartmentID,
-                faker.number.int({ min: 4, max: 6 }) / 2,
+                3,
+                (Math.floor(i / 5) + 1).toString(),
                 faker.lorem.sentence(),
               ]
             );
@@ -183,67 +285,66 @@ const coursesByDepartment = {
 
     // Seed `student`
     console.log('Seeding `student` and `user`...');
-    const advisors = await executeQuery(`SELECT InstructorID FROM instructor`);
+    for (const department of departments) {
+      const advisors = await executeQuery(`
+        SELECT InstructorID 
+        FROM instructor 
+        WHERE DepartmentID = ?
+      `, [department.DepartmentID]);
+      for (let i = 1; i <= 60; i++) {
+        const advisor = faker.helpers.arrayElement(advisors);
 
-    for (let i = 1; i <= 200; i++) {
-      const department = faker.helpers.arrayElement(departments);
-      const advisor = faker.helpers.arrayElement(advisors);
+        const firstName = faker.person.firstName().slice(0, 20);
+        const middleName = faker.helpers.maybe(() => faker.person.firstName().slice(0, 20), { probability: 0.5 });
+        const lastName = faker.person.lastName().slice(0, 20);
+        const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ');
 
-      const firstName = faker.person.firstName().slice(0, 20);
-      const middleName = faker.helpers.maybe(() => faker.person.firstName().slice(0, 20), { probability: 0.5 });
-      const lastName = faker.person.lastName().slice(0, 20);
-      const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ');
+        const phoneNumber = faker.phone.number('(###) ###-####').slice(0, 15);
+        const emailDomain = 'example.com';
 
-      const phoneNumber = faker.phone.number('(###) ###-####').slice(0, 15);
-      const emailDomain = 'example.com';
+        const totalCreditsBounds = [0, 15, 30, 45, 60];
+        const selectedIndex = faker.number.int({ min: 0, max: totalCreditsBounds.length - 2 });
+        const totalCredits = totalCreditsBounds[selectedIndex];
+        const grade = (selectedIndex + 1).toString(); 
 
-      const totalCreditsRanges = [
-        { min: 0, max: 3.5, grade: '1' },
-        { min: 4, max: 7.5, grade: '2' },
-        { min: 8, max: 11.5, grade: '3' },
-        { min: 12, max: 16, grade: '4' },
-      ];
-      const selectedRange = faker.helpers.arrayElement(totalCreditsRanges);
-      const totalCredits = faker.number.int({ min: selectedRange.min*2, max: selectedRange.max*2 }) / 2;
-      const grade = selectedRange.grade;
+        const result = await executeQuery(
+          `INSERT INTO student (StudentFirstName, StudentLastName, StudentFullName, StudentEmail, StudentPersonalEmail, DepartmentID, Grade, TotalCredits, GPA, StudentPhoto, StudentPhoneNumber, Advisor) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            firstName,
+            lastName,
+            fullName,
+            `${lastName.toLowerCase()}-s${i.toString().padStart(3, '0')}@${emailDomain}`,
+            `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${emailDomain}`,
+            department.DepartmentID,
+            grade,
+            totalCredits,
+            faker.number.float({ min: 1.5, max: 4, precision: 0.01 }),
+            faker.image.dataUri(),
+            phoneNumber,
+            advisor.InstructorID,
+          ]
+        );
 
-      const result = await executeQuery(
-        `INSERT INTO student (StudentFirstName, StudentLastName, StudentFullName, StudentEmail, StudentPersonalEmail, DepartmentID, Grade, TotalCredits, GPA, StudentPhoto, StudentPhoneNumber, Advisor) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          firstName,
-          lastName,
-          fullName,
-          `${lastName.toLowerCase()}-s${i.toString().padStart(3, '0')}@${emailDomain}`,
-          `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${emailDomain}`,
-          department.DepartmentID,
-          grade,
-          totalCredits,
-          faker.number.float({ min: 1.5, max: 4, precision: 0.01 }),
-          faker.image.dataUri(),
-          phoneNumber,
-          advisor.InstructorID,
-        ]
-      );
+        const studentId = result.insertId;
+        const email = `${lastName.toLowerCase()}${studentId}@${emailDomain}`;
+      
+        await executeQuery(
+          `UPDATE student SET StudentEmail = ? WHERE StudentID = ?`,
+          [email, studentId]
+        );
 
-      const studentId = result.insertId;
-      const email = `${lastName.toLowerCase()}${studentId}@${emailDomain}`;
-    
-      await executeQuery(
-        `UPDATE student SET StudentEmail = ? WHERE StudentID = ?`,
-        [email, studentId]
-      );
-
-      // Insert into user table
-      await executeQuery(
-        `INSERT INTO user (Email, Password, Role, StudentID) VALUES (?, ?, ?, ?)`,
-        [
-          email,
-          hashedPassword,
-          'STUDENT',
-          studentId,
-        ]
-      );
+        // Insert into user table
+        await executeQuery(
+          `INSERT INTO user (Email, Password, Role, StudentID) VALUES (?, ?, ?, ?)`,
+          [
+            email,
+            hashedPassword,
+            'STUDENT',
+            studentId,
+          ]
+        );
+      }
     }
 
     // Seed `admin`
