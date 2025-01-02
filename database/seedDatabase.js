@@ -924,6 +924,57 @@ const semesterData = [
       }
     }
 
+    // Seed `GPA` Update
+    console.log('Updating student `GPA` based on end-of-term grades...');
+
+    const gradeToGPA = {
+      'AA': 4.0,
+      'BA': 3.5,
+      'BB': 3.0,
+      'CB': 2.5,
+      'CC': 2.0,
+      'DC': 1.5,
+      'DD': 1.0,
+      'FF': 0.0,
+    };
+
+    const students = await executeQuery(`
+      SELECT DISTINCT StudentID 
+      FROM student
+    `);
+
+    for (const student of students) {
+      const { StudentID } = student;
+
+      const grades = await executeQuery(`
+        SELECT 
+          MAX(etg.CRN) AS CRN, 
+          MAX(etg.GradeOutOf100) AS GradeOutOf100, 
+          MAX(etg.LetterGrade) AS LetterGrade, 
+          cs.CourseID, 
+          MAX(e.EnrollmentApprovalDate) AS LatestApprovalDate
+        FROM end_of_term_grades etg
+        JOIN enrollment e ON etg.StudentID = e.StudentID AND etg.CRN = e.CRN
+        JOIN course_schedules cs ON e.CRN = cs.CRN
+        WHERE e.StudentID = ?
+        GROUP BY cs.CourseID
+      `, [StudentID]);    
+
+      if (grades.length === 0) continue;
+
+      const totalGPA = grades.reduce((sum, grade) => {
+        const gpaValue = gradeToGPA[grade.LetterGrade] || 0.0;
+        return sum + gpaValue;
+      }, 0);
+
+      const calculatedGPA = totalGPA / grades.length;
+
+      await executeQuery(
+        `UPDATE student SET GPA = ? WHERE StudentID = ?`,
+        [calculatedGPA.toFixed(2), StudentID]
+      );
+    }
+
     console.log('Seeding complete!');
   } catch (error) {
     console.error('An error occurred during seeding:', error.message || error);
