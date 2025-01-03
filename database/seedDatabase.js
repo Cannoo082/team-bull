@@ -176,10 +176,10 @@ const semesterData = [
     EnrollmentEndDate: '2024-06-26 17:00:00', EnrollmentApprovalDate: '2024-06-28 12:00:00', Active: false},
   {SemesterID: '24F', Year: 2024, Term: 'Fall',
     TermStartDate: '2024-09-30', EnrollmentStartDate: '2024-09-09 10:00:00',
-    EnrollmentEndDate: '2024-09-20 17:00:00', EnrollmentApprovalDate: '2024-09-23 12:00:00', Active: true},
+    EnrollmentEndDate: '2024-09-20 17:00:00', EnrollmentApprovalDate: '2024-09-23 12:00:00', Active: false},
   {SemesterID: '25S', Year: 2025, Term: 'Spring',
     TermStartDate: '2025-02-17', EnrollmentStartDate: '2025-01-27 10:00:00',
-    EnrollmentEndDate: '2025-02-07 17:00:00', EnrollmentApprovalDate: '2025-02-10 12:00:00', Active: false},
+    EnrollmentEndDate: '2025-02-07 17:00:00', EnrollmentApprovalDate: '2025-02-10 12:00:00', Active: true},
 ];
 
 (async function seedDatabase() {
@@ -891,51 +891,43 @@ const semesterData = [
       }
     }
 
-    // Seed `TotalCredits` update
-    console.log('Updating `TotalCredits` based on successful courses in the active term...');
+    // Seed `TotalCredits` update for 24F term
+    console.log("Updating `TotalCredits` based on successful courses in the 24F term...");
 
-    const activeSemester = await executeQuery(`
-      SELECT SemesterID 
-      FROM semester 
-      WHERE Active = true
-    `);
+    const targetSemesterID = '24F';
 
-    if (activeSemester.length === 0) {
-      console.warn('No active semester found. Skipping total credits update.');
+    const studentCredits = await executeQuery(`
+      SELECT 
+        e.StudentID,
+        SUM(c.Credits) AS TotalCreditsInTerm
+      FROM 
+        enrollment e
+      JOIN 
+        course_schedules cs ON e.CRN = cs.CRN
+      JOIN 
+        course c ON cs.CourseID = c.CourseID
+      JOIN 
+        end_of_term_grades etg ON e.StudentID = etg.StudentID AND e.CRN = etg.CRN
+      WHERE 
+        cs.SemesterID = ?
+        AND etg.LetterGrade != 'FF'
+      GROUP BY 
+        e.StudentID
+    `, [targetSemesterID]);
+
+    if (studentCredits.length > 0) {
+      const updates = studentCredits.map(({ StudentID, TotalCreditsInTerm }) => {
+        return executeQuery(
+          `UPDATE student 
+          SET TotalCredits = TotalCredits + ? 
+          WHERE StudentID = ?`,
+          [TotalCreditsInTerm, StudentID]
+        );
+      });
+
+      await Promise.all(updates);
     } else {
-      const { SemesterID } = activeSemester[0];
-
-      const studentCredits = await executeQuery(`
-        SELECT 
-          e.StudentID,
-          SUM(c.Credits) AS TotalCreditsInActiveTerm
-        FROM 
-          enrollment e
-        JOIN 
-          course_schedules cs ON e.CRN = cs.CRN
-        JOIN 
-          course c ON cs.CourseID = c.CourseID
-        JOIN 
-          end_of_term_grades etg ON e.StudentID = etg.StudentID AND e.CRN = etg.CRN
-        WHERE 
-          cs.SemesterID = ?
-          AND etg.LetterGrade != 'FF'
-        GROUP BY 
-          e.StudentID
-      `, [SemesterID]);
-
-      if (studentCredits.length > 0) {
-        const updates = studentCredits.map(({ StudentID, TotalCreditsInActiveTerm }) => {
-          return executeQuery(
-            `UPDATE student 
-            SET TotalCredits = TotalCredits + ? 
-            WHERE StudentID = ?`,
-            [TotalCreditsInActiveTerm, StudentID]
-          );
-        });
-
-        await Promise.all(updates);
-      }
+      console.warn("No enrollments found for the 24F term. No updates made.");
     }
 
     // Seed reenrollment
