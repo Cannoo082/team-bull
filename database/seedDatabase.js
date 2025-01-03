@@ -1105,8 +1105,7 @@ const semesterData = [
 
     // Seed `GPA` Update
     console.log('Updating student `GPA` based on end-of-term grades...');
-    const gradeToGPA = {'AA': 4.0, 'BA': 3.5, 'BB': 3.0, 'CB': 2.5,
-                        'CC': 2.0, 'DC': 1.5, 'DD': 1.0, 'FF': 0.0};
+    const gradeToGPA = { 'AA': 4.0, 'BA': 3.5, 'BB': 3.0, 'CB': 2.5, 'CC': 2.0, 'DC': 1.5, 'DD': 1.0, 'FF': 0.0 };
 
     const students = await executeQuery(`
       SELECT DISTINCT StudentID 
@@ -1118,17 +1117,21 @@ const semesterData = [
 
       const grades = await executeQuery(`
         SELECT 
-          MAX(etg.CRN) AS CRN, 
-          MAX(etg.GradeOutOf100) AS GradeOutOf100, 
-          MAX(etg.LetterGrade) AS LetterGrade, 
-          cs.CourseID, 
-          MAX(e.EnrollmentApprovalDate) AS LatestApprovalDate
+          etg.CRN,
+          etg.LetterGrade,
+          cs.CourseID
         FROM end_of_term_grades etg
         JOIN enrollment e ON etg.StudentID = e.StudentID AND etg.CRN = e.CRN
         JOIN course_schedules cs ON e.CRN = cs.CRN
         WHERE e.StudentID = ?
-        GROUP BY cs.CourseID
-      `, [StudentID]);    
+          AND e.EnrollmentApprovalDate = (
+            SELECT MAX(sub_e.EnrollmentApprovalDate)
+            FROM enrollment sub_e
+            JOIN course_schedules sub_cs ON sub_e.CRN = sub_cs.CRN
+            WHERE sub_e.StudentID = e.StudentID
+              AND sub_cs.CourseID = cs.CourseID
+          )
+      `, [StudentID]);
 
       if (grades.length === 0) continue;
 
