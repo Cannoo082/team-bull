@@ -1,9 +1,12 @@
 "use client";
-
+import styles from "@/styles/pages/HomePage.module.css";
 import { AuthContext } from "@/context/AuthContext";
 import { useContext, useEffect, useState } from "react";
 import { sendRequestGetNotifications } from "@/helpers/functions/http";
-export default function Home() {
+import Calendar from "@/components/app-wide/Calendar";
+import Notifications from "@/components/UI/Notifications";
+import Menu from "@/components/app-wide/Menu";
+export default function HomePage() {
   const authCtx = useContext(AuthContext);
   const [notifs, setNotifs] = useState(null);
 
@@ -19,11 +22,29 @@ export default function Home() {
       }
 
       setNotifs(data);
-    } 
+    }
 
-    handleGetNotifications(); 
+    handleGetNotifications();
   }, []);
-  console.log(authCtx); 
-  console.log(notifs); 
-  return <h1>Homepage </h1>;
+  console.log(notifs);
+
+  return (
+    <div className={styles.container}>
+      <h1>Homepage </h1>
+      <div className={styles.group}>
+        <div className={styles["notifs-container"]}>
+          <Notifications notifs={notifs} />
+        </div>
+        <div className={styles["calendar-container"]}>
+          <Calendar />
+        </div>
+      </div>
+      <div className={styles.group}>
+        <div className={styles["menu-container"]}>
+          <Menu />
+        </div>
+        <div className={styles["notifs-container"]}></div>
+      </div>
+    </div>
+  );
 }

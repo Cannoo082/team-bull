@@ -1,0 +1,30 @@
+.container               {
+    display: flex; 
+    flex-direction: column; 
+    margin-bottom: 1rem; 
+} 
+
+.group {
+    display: flex; 
+    justify-content: space-between; 
+} 
+
+.group > :first-child {
+    margin-right: 20rem; 
+}
+.notifs-container {
+    flex: 2; 
+} 
+
+.calendar-container {
+    flex: 1; 
+} 
+
+.menu-container {
+    box-shadow: 0px 0px 10px 5px rgba(128, 128, 128, 0.25);
+
+} 
+
+.container > :last-child {
+    margin-top: 1rem; 
+}
