@@ -20,7 +20,7 @@ CREATE TABLE `instructor` (
     `InstructorFirstName` VARCHAR(20) NULL,
     `InstructorLastName` VARCHAR(20) NULL,
     `InstructorFullName` VARCHAR(60) NULL,
-    `InstructorEmail` VARCHAR(50) NULL,
+    `InstructorEmail` VARCHAR(50) NOT NULL UNIQUE,
     `InstructorPersonalEmail` VARCHAR(50) NULL,
     `InstructorPhoto` LONGBLOB NULL,
     `WebsiteLink` VARCHAR(100) NULL,
@@ -31,12 +31,27 @@ CREATE TABLE `instructor` (
     PRIMARY KEY (`InstructorID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+CREATE TABLE `semester` (
+    `SemesterID` VARCHAR(5) NOT NULL,
+    `Year` INT NOT NULL,
+    `Term` ENUM('Fall', 'Spring', 'Summer') NOT NULL,
+    `TermStartDate` DATE NULL,
+    `EnrollmentStartDate` DATETIME NULL,
+    `EnrollmentEndDate` DATETIME NULL,
+    `EnrollmentApprovalDate` DATETIME NULL,
+    `Active` BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (`SemesterID`),
+    UNIQUE KEY `UniqueYearTerm` (`Year`, `Term`),
+    CHECK (`EnrollmentStartDate` < `EnrollmentEndDate` AND `EnrollmentEndDate` < `EnrollmentApprovalDate`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 CREATE TABLE `course` (
     `CourseID` INT NOT NULL AUTO_INCREMENT,
     `CourseCode` VARCHAR(10) NOT NULL UNIQUE,
     `CourseTitle` VARCHAR(50) NULL,
     `DepartmentID` INT NULL,
     `Credits` DECIMAL(2, 1) NULL,
+    `YearOfCourse` ENUM('1', '2', '3', '4') NULL,
     `CourseDescription` VARCHAR(191) NULL,
     INDEX `COURSE_DepartmentID_fkey`(`DepartmentID`),
     PRIMARY KEY (`CourseID`)
@@ -49,14 +64,14 @@ CREATE TABLE `course_schedules` (
     `ClassStartTime` TIME NULL,
     `ClassEndTime` TIME NULL,
     `InstructorID` INT NULL,
-    `Term` VARCHAR(10) NULL,
-    `Year` INTEGER NULL,
+    `SemesterID` VARCHAR(5) NULL,
     `TeachingMethod` ENUM('Online', 'InPerson', 'Hybrid') NULL,
     `Capacity` INTEGER NULL,
     `Enrolled` INTEGER NULL,
     `Location` VARCHAR(50) NULL,
     INDEX `COURSE_SCHEDULES_CourseID_fkey`(`CourseID`),
     INDEX `COURSE_SCHEDULES_InstructorID_fkey`(`InstructorID`),
+    INDEX `COURSE_SCHEDULES_SemesterID_fkey`(`SemesterID`),
     PRIMARY KEY (`CRN`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -65,7 +80,7 @@ CREATE TABLE `student` (
     `StudentFirstName` VARCHAR(20) NULL,
     `StudentLastName` VARCHAR(20) NULL,
     `StudentFullName` VARCHAR(60) NULL,
-    `StudentEmail` VARCHAR(50) NULL,
+    `StudentEmail` VARCHAR(50) NOT NULL UNIQUE,
     `StudentPersonalEmail` VARCHAR(50) NULL,
     `DepartmentID` INT NULL,
     `Grade` ENUM('1', '2', '3', '4') DEFAULT '1',
@@ -92,7 +107,7 @@ CREATE TABLE `admin` (
 
 CREATE TABLE `user` (
     `ID` INTEGER NOT NULL AUTO_INCREMENT,
-    `Email` VARCHAR(191) NOT NULL,
+    `Email` VARCHAR(191) NOT NULL UNIQUE,
     `Password` VARCHAR(191) NOT NULL,
     `Role` ENUM('STUDENT', 'INSTRUCTOR', 'ADMIN') NOT NULL,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -204,6 +219,11 @@ ALTER TABLE `course_schedules`
     FOREIGN KEY (`InstructorID`) REFERENCES `instructor`(`InstructorID`) 
     ON DELETE SET NULL ON UPDATE CASCADE;
 
+ALTER TABLE `course_schedules` 
+    ADD CONSTRAINT `COURSE_SCHEDULES_SemesterID_fkey` 
+    FOREIGN KEY (`SemesterID`) REFERENCES `semester`(`SemesterID`) 
+    ON DELETE SET NULL ON UPDATE CASCADE;
+
 ALTER TABLE `student` AUTO_INCREMENT = 100001;
 
 ALTER TABLE `student`
@@ -221,6 +241,8 @@ ALTER TABLE `student`
     ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE `admin` AUTO_INCREMENT = 300001;
+
+ALTER TABLE `user` AUTO_INCREMENT = 400001;
 
 ALTER TABLE `user` 
     ADD CONSTRAINT `USER_StudentID_fkey` 
@@ -291,21 +313,3 @@ ALTER TABLE `user_notification`
     ADD CONSTRAINT `USER_NOTIFICATION_UserID_fkey`
     FOREIGN KEY (`UserID`) REFERENCES `user`(`ID`) 
     ON DELETE CASCADE;
-
-CREATE TRIGGER `student_to_user_trigger`
-AFTER INSERT ON `student`
-FOR EACH ROW
-INSERT INTO `user` (`ID`, `Email`, `Password`, `Role`, `CreatedAt`, `StudentID`)
-VALUES (NEW.StudentID, NEW.StudentEmail, SHA2('password123', 256), 'STUDENT', CURRENT_TIMESTAMP, NEW.StudentID);
-
-CREATE TRIGGER `instructor_to_user_trigger`
-AFTER INSERT ON `instructor`
-FOR EACH ROW
-INSERT INTO `user` (`ID`, `Email`, `Password`, `Role`, `CreatedAt`, `InstructorID`)
-VALUES (NEW.InstructorID, NEW.InstructorEmail, SHA2('password123', 256), 'INSTRUCTOR', CURRENT_TIMESTAMP, NEW.InstructorID);
-
-CREATE TRIGGER `admin_to_user_trigger`
-AFTER INSERT ON `admin`
-FOR EACH ROW
-INSERT INTO `user` (`ID`, `Email`, `Password`, `Role`, `CreatedAt`, `AdminID`)
-VALUES (NEW.AdminID, NEW.AdminEmail, SHA2('password123', 256), 'ADMIN', CURRENT_TIMESTAMP, NEW.AdminID);
