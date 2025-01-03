@@ -892,7 +892,7 @@ const semesterData = [
     }
 
     // Seed `TotalCredits` update
-    console.log('Updating `TotalCredits` based on the active term...');
+    console.log('Updating `TotalCredits` based on successful courses in the active term...');
 
     const activeSemester = await executeQuery(`
       SELECT SemesterID 
@@ -915,8 +915,11 @@ const semesterData = [
           course_schedules cs ON e.CRN = cs.CRN
         JOIN 
           course c ON cs.CourseID = c.CourseID
+        JOIN 
+          end_of_term_grades etg ON e.StudentID = etg.StudentID AND e.CRN = etg.CRN
         WHERE 
           cs.SemesterID = ?
+          AND etg.LetterGrade != 'FF'
         GROUP BY 
           e.StudentID
       `, [SemesterID]);
@@ -932,8 +935,6 @@ const semesterData = [
         });
 
         await Promise.all(updates);
-      } else {
-        console.warn('No enrollments found for the active term. No updates made.');
       }
     }
 
