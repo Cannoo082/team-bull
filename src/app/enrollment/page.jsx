@@ -16,6 +16,7 @@ export default function EnrollmentPage() {
   const [courses, setCourses] = useState(null);
   const [selectedCrn, setSelectedCrn] = useState("");
   const [loading, setLoading] = useState(false);
+  const [refresh, setRefresh] = useState(true); 
   useEffect(() => {
     async function handleGetCourses() {
       const data = await sendRequestGetCoursesForEnrollment(
@@ -32,8 +33,11 @@ export default function EnrollmentPage() {
       setCourses(data);
     }
 
-    handleGetCourses();
-  }, []);
+    if (refresh) {
+      handleGetCourses(); 
+      setRefresh(false); 
+    }
+  }, [refresh]);
   function handleCourseChange(event) {
     setSelectedCrn(event.target.value);
   }
@@ -42,6 +46,9 @@ export default function EnrollmentPage() {
       return;
     }
     const temp = structuredClone(courses.find((c) => c.CRN === selectedCrn));
+    if (!temp) {
+      return; 
+    }
     const start = temp.ClassStartTime;
     const end = temp.ClassEndTime;
     temp.Time = undefined;
@@ -69,7 +76,9 @@ export default function EnrollmentPage() {
 
     if (response.error) {
       return alert(response.message);
-    }
+    } 
+    setSelectedCrn(""); 
+    setRefresh(true); 
     return alert("SUCCESS!");
   }
   return (
