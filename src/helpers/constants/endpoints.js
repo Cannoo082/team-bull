@@ -13,6 +13,7 @@ export const academic_exams_by_terms = "/api/academic_exams_by_terms";
 export const semester = "/api/semester"; 
 export const add_exam = "/api/add_exam"; 
 export const delete_exam = "/api/delete_exam";
+export const enrollment = "/api/enrollment";
 
 
 export const users = "/api/users"; 
