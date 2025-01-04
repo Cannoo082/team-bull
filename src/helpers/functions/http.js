@@ -51,18 +51,18 @@ export async function sendRequestLogin(email, password) {
   return await sendRequest(endpoint, options);
 }
 
-export async function sendRequestGetCourses(userId) {
-  const endpoint = `${endpoints.courses}?userId=${userId}`;
+export async function sendRequestGetCourses(userId, semesterId) {
+  const endpoint = `${endpoints.courses}?userId=${userId}&semesterId=${semesterId}`;
   return await sendRequest(endpoint);
 }
 
-export async function sendRequestGetGrades(userId, courseId) {
-  const endpoint = `${endpoints.grades}?userId=${userId}&courseId=${courseId}`;
+export async function sendRequestGetGrades(userId, courseId, semesterId) {
+  const endpoint = `${endpoints.grades}?userId=${userId}&courseId=${courseId}&semesterId=${semesterId}`;
   return await sendRequest(endpoint);
 }
 
-export async function sendRequestGetExams(userId, courseId) {
-  const endpoint = `${endpoints.exams}?userId=${userId}&courseId=${courseId}`;
+export async function sendRequestGetExams(userId, courseId, semesterId) {
+  const endpoint = `${endpoints.exams}?userId=${userId}&courseId=${courseId}&semesterId=${semesterId}`;
   return await sendRequest(endpoint);
 }
 
@@ -98,6 +98,28 @@ export async function sendRequestChangePassword(userId, password, newPassword) {
   const options = optionsFactory({
     method: "PATCH",
     body: { userId, password, newPassword },
+  });
+
+  return await sendRequest(endpoint, options);
+}
+
+export async function sendRequestGetAllSemesters() {
+  const endpoint = endpoints.semestersAll;
+  return await sendRequest(endpoint);
+}
+
+export async function sendRequestGetCoursesForEnrollment(userId) {
+  const endpoint = `${endpoints.enrollmentStudent}?userId=${userId}`;
+  return await sendRequest(endpoint);
+}
+
+export async function sendRequestEnrollStudent(userId, crn) {
+  const endpoint = endpoints.enrollmentStudent;
+  const options = optionsFactory({
+    body: {
+      userId,
+      crn,
+    },
   });
 
   return await sendRequest(endpoint, options);

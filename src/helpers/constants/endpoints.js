@@ -6,7 +6,10 @@ export const grades = "/api/grades";
 export const exams = "/api/exams";
 
 export const notifications = "/api/notifications";
-export const profile="/api/profile"; 
-export const attendance = "/api/attendance"; 
+export const profile = "/api/profile";
+export const attendance = "/api/attendance";
 
-export const users = "/api/users"; 
+export const users = "/api/users";
+
+export const semestersAll = "/api/all-semesters";
+export const enrollmentStudent = "/api/enrollment-student";
