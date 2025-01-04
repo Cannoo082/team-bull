@@ -1,7 +1,7 @@
 import { execute } from "@/backend/db";
 
 export async function GET() {
-  const sql = "SELECT * FROM semester ORDER BY TermStartDate";
+  const sql = "SELECT * FROM semester ORDER BY TermStartDate DESC";
   const params = [];
 
   const semesters = await execute(sql, params);
