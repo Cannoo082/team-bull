@@ -24,7 +24,7 @@ export const routeOptions = {
     },
     enrollment: {
       name: "Enroll",
-      path: "/enroll",
+      path: "/enrollment",
       icon: <AddCircleIcon />,
     },
     attendance: {
