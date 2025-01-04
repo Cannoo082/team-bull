@@ -102,3 +102,81 @@ export async function sendRequestChangePassword(userId, password, newPassword) {
 
   return await sendRequest(endpoint, options);
 }
+
+
+export async function sendRequestGetAcademicCourses(userId, semesterId = null) {
+  const endpoint = semesterId
+    ? `${endpoints.academic_courses_by_terms}?userId=${userId}&semesterId=${semesterId}`
+    : `${endpoints.academic_courses_by_terms}?userId=${userId}`;
+}
+
+export async function sendRequestGetExamsByCRN(crn) {
+  if (!crn) throw new Error("CRN value is required to fetch exams.");
+
+  const endpoint = `${endpoints.academic_exams_by_terms}?crn=${crn}`;
+
+  try {
+    const response = await fetch(endpoint);
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message || "Failed to fetch exams.");
+
+    return data;
+  } catch (error) {
+    throw new Error("Error fetching exams by CRN.");
+  }
+}
+
+export async function getSemesterStatus(semesterId) {
+  if (!semesterId) throw new Error("Semester ID is required to fetch semester status.");
+
+  const endpoint = `${endpoints.semester}?semesterId=${semesterId}`;
+
+  try {
+    const response = await fetch(endpoint);
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message || "Failed to fetch semester status.");
+
+    return data; // { semesterId: "25S", active: 1 }
+  } catch (error) {
+    throw new Error("Error fetching semester status.");
+  }
+}
+
+export async function addExam({ crn, examName, examDate, startTime, endTime, location }) {
+  try {
+    const response = await fetch("/api/add_exam", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ crn, examName, examDate, startTime, endTime, location }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message || "Failed to add exam.");
+
+    return data;
+  } catch (error) {
+    throw new Error("Error adding exam.");
+  }
+}
+
+export async function deleteExam({ examName, crn }) {
+  try {
+    const response = await fetch("/api/delete_exam", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ examName, crn }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message || "Failed to delete exam.");
+
+    return data;
+  } catch (error) {
+    throw new Error("Error deleting exam.");
+  }
+}
+
