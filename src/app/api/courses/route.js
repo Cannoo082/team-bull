@@ -4,7 +4,7 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
   const semesterId = searchParams.get("semesterId");
-  console.log(userId, semesterId); 
+
   if (userId === null || semesterId === null) {
     return Response.json(
       { message: "Provide a user id and a semester id" },
