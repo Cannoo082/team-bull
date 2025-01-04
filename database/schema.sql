@@ -36,9 +36,9 @@ CREATE TABLE `semester` (
     `Year` INT NOT NULL,
     `Term` ENUM('Fall', 'Spring', 'Summer') NOT NULL,
     `TermStartDate` DATE NULL,
-    `EnrollmentStartDate` DATETIME NULL,
-    `EnrollmentEndDate` DATETIME NULL,
-    `EnrollmentApprovalDate` DATETIME NULL,
+    `EnrollmentStartDate` DATETIME(3) NULL,
+    `EnrollmentEndDate` DATETIME(3) NULL,
+    `EnrollmentApprovalDate` DATETIME(3) NULL,
     `Active` BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (`SemesterID`),
     UNIQUE KEY `UniqueYearTerm` (`Year`, `Term`),
@@ -126,8 +126,8 @@ CREATE TABLE `user` (
 CREATE TABLE `enrollment` (
     `StudentID` INT NOT NULL,
     `CRN` VARCHAR(10) NOT NULL,
-    `EnrollmentDate` DATETIME(3) NULL,
-    `EnrollmentApprovalDate` DATETIME(3) NULL,
+    `EnrollmentDate` DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3),
+    `EnrollmentApprovalDate` DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3),
     INDEX `ENROLLMENT_CRN_fkey`(`CRN`),
     PRIMARY KEY (`StudentID`, `CRN`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
