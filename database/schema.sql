@@ -69,6 +69,8 @@ CREATE TABLE `course_schedules` (
     `Capacity` INTEGER NULL,
     `Enrolled` INTEGER NULL,
     `Location` VARCHAR(50) NULL,
+    UNIQUE (`CourseID`, `InstructorID`, `SemesterID`),
+    UNIQUE (`InstructorID`, `SemesterID`, `Day`, `ClassStartTime`),
     INDEX `COURSE_SCHEDULES_CourseID_fkey`(`CourseID`),
     INDEX `COURSE_SCHEDULES_InstructorID_fkey`(`InstructorID`),
     INDEX `COURSE_SCHEDULES_SemesterID_fkey`(`SemesterID`),
