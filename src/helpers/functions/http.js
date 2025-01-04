@@ -180,3 +180,34 @@ export async function deleteExam({ examName, crn }) {
   }
 }
 
+export async function fetchStudentsByCRN(crn) {
+  if (!crn) {
+    return new Response(
+      JSON.stringify({ message: "Provide a CRN" }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  const sql = `
+    SELECT e.StudentID, u.FirstName, u.LastName
+    FROM enrollment e
+    JOIN user u ON e.StudentID = u.ID
+    WHERE e.CRN = ?;
+  `;
+
+  const data = await execute(sql, [crn]);
+
+  if (!data || data.length === 0) {
+    return new Response(
+      JSON.stringify({ message: "No students found for this CRN" }),
+      { status: 404, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  return new Response(
+    JSON.stringify(data),
+    { status: 200, headers: { "Content-Type": "application/json" } }
+  );
+}
+
+
