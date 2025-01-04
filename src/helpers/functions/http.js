@@ -61,8 +61,8 @@ export async function sendRequestGetGrades(userId, courseId, semesterId) {
   return await sendRequest(endpoint);
 }
 
-export async function sendRequestGetExams(userId, courseId) {
-  const endpoint = `${endpoints.exams}?userId=${userId}&courseId=${courseId}`;
+export async function sendRequestGetExams(userId, courseId, semesterId) {
+  const endpoint = `${endpoints.exams}?userId=${userId}&courseId=${courseId}&semesterId=${semesterId}`;
   return await sendRequest(endpoint);
 }
 
