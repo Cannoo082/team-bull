@@ -107,3 +107,20 @@ export async function sendRequestGetAllSemesters() {
   const endpoint = endpoints.semestersAll;
   return await sendRequest(endpoint);
 }
+
+export async function sendRequestGetCoursesForEnrollment(userId) {
+  const endpoint = `${endpoints.enrollmentStudent}?userId=${userId}`;
+  return await sendRequest(endpoint);
+}
+
+export async function sendRequestEnrollStudent(userId, crn) {
+  const endpoint = endpoints.enrollmentStudent;
+  const options = optionsFactory({
+    body: {
+      userId,
+      crn,
+    },
+  });
+
+  return await sendRequest(endpoint, options);
+}
