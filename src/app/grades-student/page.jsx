@@ -4,6 +4,7 @@ import Button from "@/components/UI/Button";
 import {
   sendRequestGetCourses,
   sendRequestGetGrades,
+  sendRequestGetAllSemesters,
 } from "@/helpers/functions/http";
 import { error as errMsg } from "@/helpers/constants/messages";
 import { useContext, useEffect, useState } from "react";
@@ -11,18 +12,49 @@ import { AuthContext } from "@/context/AuthContext";
 import Dropdown from "@/components/UI/Dropdown";
 import Table from "@/components/UI/Table";
 import { formatString } from "@/helpers/functions/util";
-const selectedCourseIdDefault = "";
+let selectedSemesterIdDefault = "";
+let selectedCourseIdDefault = "";
 export default function GradesStudentPage() {
   const authCtx = useContext(AuthContext);
-  const [courses, setCourses] = useState(null);
+  const [selectedSemesterId, setSelectedSemesterId] = useState(
+    selectedSemesterIdDefault
+  );
   const [selectedCourseId, setSelectedCourseId] = useState(
     selectedCourseIdDefault
   );
+  const [semesters, setSemesters] = useState(null);
+  const [courses, setCourses] = useState(null);
   const [grades, setGrades] = useState(null);
   const [selectedGrade, setSelectedGrade] = useState(null);
   useEffect(() => {
+    selectedSemesterIdDefault = "";
+    selectedCourseIdDefault = "";
+  }, []);
+  useEffect(() => {
+    async function handleGetSemesters() {
+      const data = await sendRequestGetAllSemesters();
+      if (data === undefined) {
+        return alert(errMsg.default);
+      }
+
+      if (data.error) {
+        return alert(data.message);
+      }
+      const semesters = data.map((semester) => ({
+        id: semester.SemesterID,
+        name: semester.Term + " - " + semester.Year,
+      }));
+      setSemesters(semesters);
+    }
+
+    handleGetSemesters();
+  }, []);
+  useEffect(() => {
     async function handleGetCourses() {
-      const data = await sendRequestGetCourses(authCtx.userState.userId);
+      const data = await sendRequestGetCourses(
+        authCtx.userState.userId,
+        selectedSemesterId
+      );
       if (data === undefined) {
         return alert(errMsg.default);
       }
@@ -33,14 +65,19 @@ export default function GradesStudentPage() {
 
       setCourses(data);
     }
-
-    handleGetCourses();
-  }, []);
+    if (selectedSemesterId !== selectedSemesterIdDefault) {
+      handleGetCourses();
+    }
+  }, [selectedSemesterId]);
 
   useEffect(() => {
     async function handleGetGrades() {
       const userId = authCtx.userState.userId;
-      const data = await sendRequestGetGrades(userId, selectedCourseId);
+      const data = await sendRequestGetGrades(
+        userId,
+        selectedCourseId,
+        selectedSemesterId
+      );
       if (data === undefined) {
         return alert(errMsg.default);
       }
@@ -51,77 +88,106 @@ export default function GradesStudentPage() {
       setGrades(data);
     }
     if (selectedCourseId !== selectedCourseIdDefault) {
-      setSelectedGrade(null);
       handleGetGrades();
     }
   }, [selectedCourseId]);
 
+  function handleSemesterChange(event) {
+    setSelectedSemesterId(event.target.value);
+    setSelectedCourseId(selectedCourseIdDefault);
+    setSelectedGrade(null);
+  }
   function handleCourseChange(event) {
     setSelectedCourseId(event.target.value);
   }
-  console.log(grades);
+  console.log(semesters);
   return (
     <div className={styles.container}>
       <h1>Grades</h1>
-      {courses && (
-        <>
-          <h2>Courses</h2>
-          <Dropdown
-            sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
-            options={courses}
-            label="Course"
-            onChange={handleCourseChange}
-            currentValue={selectedCourseId}
-            optionKey="id"
-            optionValue="id"
-            optionFormattedValue="name"
-          />
-        </>
-      )}
-      {!grades ? null : (
-        <>
-          <div className={styles["grade-buttons-container"]}>
-            <Button
-              title="In Grade"
-              sx={{ width: "10rem" }}
-              onClick={() => {
-                if (selectedGrade !== "in_grade") {
-                  setSelectedGrade("in_grade");
-                }
-              }}
+      {semesters ? (
+        semesters.length ? (
+          <>
+            <h2>Semesters</h2>
+            <Dropdown
+              sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
+              options={semesters}
+              label="Semester"
+              onChange={handleSemesterChange}
+              currentValue={selectedSemesterId}
+              optionKey="id"
+              optionValue="id"
+              optionFormattedValue="name"
             />
-            <span style={{ width: "1rem" }}></span>
-            <Button
-              title="End Grade"
-              sx={{ width: "10rem" }}
-              onClick={() => {
-                if (selectedGrade !== "end_grade") {
-                  setSelectedGrade("end_grade");
-                }
-              }}
+          </>
+        ) : (
+          <p>No semesters found</p>
+        )
+      ) : null}
+      {courses ? (
+        courses.length ? (
+          <>
+            <h2>Courses</h2>
+            <Dropdown
+              sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
+              options={courses}
+              label="Course"
+              onChange={handleCourseChange}
+              currentValue={selectedCourseId}
+              optionKey="id"
+              optionValue="id"
+              optionFormattedValue="name"
             />
-          </div>
-          <br />
-          {selectedGrade === "in_grade" && (
-            <Table
-              columns={["name", "grade", "weight", "description"]}
-              rows={grades.inGrade.map((grade) => ({
-                ...grade,
-                weight: "%" + grade.weight,
-              }))}
-              rowKey="name"
-              emptyValue="-"
-              handleColumnFormat={(word) => formatString(word, ["_"])}
-            />
-          )}
-          {selectedGrade === "end_grade" && (
+          </>
+        ) : (
+          <p>No courses found</p>
+        )
+      ) : null}
+      {!grades
+        ? null
+        : selectedCourseId !== selectedCourseIdDefault && (
             <>
-              <p>grade: {grades.endGrade.grade}</p>
-              <p>letter grade: {grades.endGrade.letterGrade}</p>
+              <div className={styles["grade-buttons-container"]}>
+                <Button
+                  title="In Grade"
+                  sx={{ width: "10rem" }}
+                  onClick={() => {
+                    if (selectedGrade !== "in_grade") {
+                      setSelectedGrade("in_grade");
+                    }
+                  }}
+                />
+                <span style={{ width: "1rem" }}></span>
+                <Button
+                  title="End Grade"
+                  sx={{ width: "10rem" }}
+                  onClick={() => {
+                    if (selectedGrade !== "end_grade") {
+                      setSelectedGrade("end_grade");
+                    }
+                  }}
+                />
+              </div>
+              <br />
+              {selectedGrade === "in_grade" && (
+                <Table
+                  columns={["name", "grade", "weight", "description"]}
+                  rows={grades.inGrade.map((grade) => ({
+                    ...grade,
+                    weight: "%" + grade.weight,
+                  }))}
+                  rowKey="name"
+                  emptyValue="-"
+                  handleColumnFormat={(word) => formatString(word, ["_"])}
+                />
+              )}
+              {selectedGrade === "end_grade" && (
+                <>
+                  <p>grade: {grades.endGrade.grade}</p>
+                  <p>letter grade: {grades.endGrade.letterGrade}</p>
+                </>
+              )}
             </>
           )}
-        </>
-      )}
     </div>
   );
 }
