@@ -51,13 +51,13 @@ export async function sendRequestLogin(email, password) {
   return await sendRequest(endpoint, options);
 }
 
-export async function sendRequestGetCourses(userId) {
-  const endpoint = `${endpoints.courses}?userId=${userId}`;
+export async function sendRequestGetCourses(userId, semesterId) {
+  const endpoint = `${endpoints.courses}?userId=${userId}&semesterId=${semesterId}`;
   return await sendRequest(endpoint);
 }
 
-export async function sendRequestGetGrades(userId, courseId) {
-  const endpoint = `${endpoints.grades}?userId=${userId}&courseId=${courseId}`;
+export async function sendRequestGetGrades(userId, courseId, semesterId) {
+  const endpoint = `${endpoints.grades}?userId=${userId}&courseId=${courseId}&semesterId=${semesterId}`;
   return await sendRequest(endpoint);
 }
 
@@ -101,4 +101,9 @@ export async function sendRequestChangePassword(userId, password, newPassword) {
   });
 
   return await sendRequest(endpoint, options);
+}
+
+export async function sendRequestGetAllSemesters() {
+  const endpoint = endpoints.semestersAll;
+  return await sendRequest(endpoint);
 }
