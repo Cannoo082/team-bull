@@ -3,9 +3,10 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
   const courseId = searchParams.get("courseId");
-  if (userId === null || courseId === null) {
+  const semesterId = searchParams.get("semesterId");
+  if (userId === null || courseId === null || semesterId === null) {
     return Response.json(
-      { message: "Provide a user id and a course id" },
+      { message: "Provide a user id, course id and a semester id" },
       { status: 400 }
     );
   }
@@ -26,11 +27,10 @@ export async function GET(request) {
   const user = userArr[0];
   const role = user.Role.toLowerCase();
 
-  let sql;
-  let params;
-  let rows;
-  if (role === "student") {
-    sql = `
+  if (role !== "student") {
+    return Response.json({ message: "Students only" }, { status: 400 });
+  }
+  const sql = `
     (
       SELECT  
         "in" AS type, 
@@ -40,7 +40,7 @@ export async function GET(request) {
         GradeDescription AS in_grade_description , 
         null AS end_letter_grade , 
         null AS end_grade_out_of_100 
-      FROM in_term_grades WHERE StudentID=? AND CRN=(SELECT CRN FROM course_schedules WHERE CourseID=?) 
+      FROM in_term_grades WHERE StudentID=? AND CRN=(SELECT CRN FROM course_schedules WHERE CourseID=? AND SemesterID=?) 
     )
     UNION ALL 
     (
@@ -52,41 +52,41 @@ export async function GET(request) {
         null AS in_grade_description, 
         LetterGrade AS end_letter_grade, 
         GradeOutOf100 AS end_grade_out_of_100 
-      FROM end_of_term_grades WHERE StudentID=? AND CRN=(SELECT CRN FROM course_schedules WHERE CourseID=?)
+      FROM end_of_term_grades WHERE StudentID=? AND CRN=(SELECT CRN FROM course_schedules WHERE CourseID=? AND SemesterID=?)
     ) 
       `;
-    params = [user.StudentID, courseId, user.StudentID, courseId];
-    const data = await execute(sql, params);
-    if (data === undefined) {
-      return Response.json(
-        { message: "Failed to load grades" },
-        { status: 500 }
-      );
+  const params = [
+    user.StudentID,
+    courseId,
+    semesterId,
+    user.StudentID,
+    courseId,
+    semesterId,
+  ];
+  const data = await execute(sql, params);
+  if (data === undefined) {
+    return Response.json({ message: "Failed to load grades" }, { status: 500 });
+  }
+
+  const rows = {
+    inGrade: [],
+    endGrade: {},
+  };
+
+  data.forEach((row) => {
+    if (row.type === "in") {
+      const record = {
+        name: row.in_grade_name,
+        grade: row.in_grade_value,
+        weight: row.in_grade_percentage,
+        description: row.in_grade_description,
+      };
+      rows.inGrade.push(record);
+    } else {
+      rows.endGrade.letterGrade = row.end_letter_grade;
+      rows.endGrade.grade = row.end_grade_out_of_100;
     }
-
-    rows = {
-      inGrade: [],
-      endGrade: {},
-    };
-
-    data.forEach((row) => {
-      if (row.type === "in") {
-        const record = {
-          name: row.in_grade_name,
-          grade: row.in_grade_value,
-          weight: row.in_grade_percentage,
-          description: row.in_grade_description,
-        };
-        rows.inGrade.push(record);
-      } else {
-        rows.endGrade.letterGrade = row.end_letter_grade;
-        rows.endGrade.grade = row.end_grade_out_of_100;
-      }
-    });
-  }
-
-  if (role === "instructor") {
-  }
+  });
 
   const grades = [
     { type: "quiz", weight: 5, grade: 40, name: "Quiz 1" },
