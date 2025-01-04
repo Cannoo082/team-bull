@@ -12,3 +12,4 @@ export const attendance = "/api/attendance";
 export const users = "/api/users";
 
 export const semestersAll = "/api/all-semesters";
+export const enrollmentStudent = "/api/enrollment-student";
