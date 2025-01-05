@@ -17,8 +17,6 @@ export default function SettingsPage() {
         handleMainContentChange={(component) => setMainContent(component)}
       />
     ),
-    test1: <h1>Test 1 </h1>,
-    test2: <h1>Test 2 </h1>,
   };
   const SIDEBAR_OPTIONS = [
     {
@@ -27,22 +25,6 @@ export default function SettingsPage() {
       icon: <LockIcon fontSize="small" />,
       onClick: function () {
         setSetting("signInAndSecurity");
-      },
-    },
-    {
-      id: "test1",
-      name: "Test 1",
-      icon: <LockIcon fontSize="small" />,
-      onClick: function () {
-        setSetting("test1");
-      },
-    },
-    {
-      id: "test2",
-      name: "Test 2",
-      icon: <LockIcon fontSize="small" />,
-      onClick: function () {
-        setSetting("test2");
       },
     },
   ];
@@ -58,4 +40,4 @@ export default function SettingsPage() {
       )}
     </div>
   );
-} 
+}
