@@ -21,16 +21,25 @@ jobs:
         sudo su
         echo "$PRIVATE_KEY" > github-ec2.pem && chmod 600 github-ec2.pem
         ssh -o StrictHostKeyChecking=no -i github-ec2.pem ${USER}@${HOST} '
-        sudo su
+        echo "Current directory: $(pwd)"
+        echo "Listing home directory:"
+        ls -la ~
 
         REPO_URL="https://${USERNAME}:${ACCESS_TOKEN}@github.com/Cannoo082/team-bull.git"
         BRANCH="main"
         REPO_DIR="/var/www/team-bull"
-        
-        cd ${REPO_DIR}
-        echo "Current directory: $(pwd)
-        git pull ${REPO_URL}
-        echo ${REPO_URL}
+
+        if [ -d "$REPO_DIR/.git" ]; then
+          cd "$REPO_DIR"
+          # Update the remote origin URL to include authentication
+          git pull ${REPO_URL}
+        else
+          git clone "$REPO_URL" "$REPO_DIR"
+          cd "$REPO_DIR"
+        fi
+
+        sudo chown -R $USER:$USER $REPO_DIR
+        sudo chmod -R 755 $REPO_DIR
 
         cd "$REPO_DIR"
         npm install
