@@ -1,7 +1,5 @@
 import styles from "@/styles/components/Navbar.module.css";
-
 import { useContext, useState } from "react";
-import MenuIcon from "@mui/icons-material/Menu";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import IconButton from "@mui/material/IconButton";
 import PersonIcon from "@mui/icons-material/Person";
@@ -51,20 +49,8 @@ export default function Navbar({ handleDatetimeOpen }) {
   ];
   const authCtx = useContext(AuthContext);
   const router = useRouter();
-  const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuAnchorElement, setMenuAnchorElement] = useState(null);
-
-  function handleToggleDrawer(event, openValue) {
-    if (
-      event.type === "keydown" &&
-      (event.key === "Tab" || event.key === "Shift")
-    ) {
-      return;
-    }
-
-    setOpen(openValue);
-  }
 
   function handleOpenMenu(event) {
     setMenuAnchorElement(event.currentTarget);
@@ -75,50 +61,34 @@ export default function Navbar({ handleDatetimeOpen }) {
     setMenuAnchorElement(null);
     setMenuOpen(false);
   }
+
   return (
-    <div className={styles.container}>
-      <div className={styles["icons-container"]}>
-        <div className={styles.left}>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2, marginLeft: 1 }}
-            onClick={(event) => handleToggleDrawer(event, true)}
-          >
-            <MenuIcon sx={{ color: "white" }} />
-          </IconButton>
+      <div className={styles.container}>
+        <div className={styles["icons-container"]}>
+          <div className={styles.left}></div>
+          <div className={styles.right}>
+            <IconButton
+                id="account-menu"
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                aria-controls="account-menu"
+                sx={{ mr: 2 }}
+                onClick={handleOpenMenu}
+            >
+              <PersonIcon sx={{ color: "white" }} />
+            </IconButton>
+          </div>
         </div>
-        <div className={styles.right}>
-          <IconButton
-            id="account-menu"
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            aria-controls="account-menu"
-            sx={{ mr: 2 }}
-            onClick={handleOpenMenu}
-          >
-            <PersonIcon sx={{ color: "white" }} />
-          </IconButton>
-        </div>
+        <AccountMenu
+            menuAnchorElement={menuAnchorElement}
+            menuOpen={menuOpen}
+            items={ACCOUNT_MENU_ITEMS}
+            divider={[1]}
+            handleCloseMenu={handleCloseMenu}
+        />
+        <Drawer options={routeOptions[authCtx.userState.role] || routeOptions["student"]} />
       </div>
-      <AccountMenu
-        menuAnchorElement={menuAnchorElement}
-        menuOpen={menuOpen}
-        items={ACCOUNT_MENU_ITEMS}
-        divider={[1]}
-        handleCloseMenu={handleCloseMenu}
-      />
-      <Drawer
-        open={open}
-        handleToggleDrawer={handleToggleDrawer}
-        options={
-          routeOptions[authCtx.userState.role] || routeOptions["student"]
-        }
-      />
-    </div>
   );
 }
