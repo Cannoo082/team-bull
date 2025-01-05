@@ -15,7 +15,8 @@ export async function GET(request) {
   const sql = `
     SELECT 
         cs.CRN, 
-        cs.CourseID, 
+        cs.CourseID,
+        c.CourseCode, 
         cs.InstructorID,
         cs.SemesterID,
         c.CourseTitle

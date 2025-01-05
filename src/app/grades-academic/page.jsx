@@ -11,15 +11,19 @@ import { getSemesterStatus } from "@/helpers/functions/http";
 export default function GradesInstructorPage() {
   const authCtx = useContext(AuthContext);
   const [courses, setCourses] = useState(null);
-  const [semesterId, setSemesterId] = useState("25S"); // Varsayılan semester
-  const [expandedCourse, setExpandedCourse] = useState(null); // Expanded CRN
-  const [examData, setExamData] = useState({}); // { CRN: exams }
-  const [loadingCourses, setLoadingCourses] = useState(false); // Yükleme durumu
-  const [isActiveSemester, setIsActiveSemester] = useState(false); // Aktif semester bilgisi
-  const [studentsData, setStudentsData] = useState(null); // Öğrenci listesi verisi
-  const [expandedExam, setExpandedExam] = useState(null); // Expanded exam
+  const [semesterId, setSemesterId] = useState("25S"); 
+  const [expandedCourse, setExpandedCourse] = useState(null); 
+  const [examData, setExamData] = useState({}); 
+  const [loadingCourses, setLoadingCourses] = useState(false); 
+  const [isActiveSemester, setIsActiveSemester] = useState(false); 
+  const [studentsData, setStudentsData] = useState(null); 
+  const [expandedExam, setExpandedExam] = useState(null); 
+  const [grades, setGrades] = useState({}); 
+  const [semesters, setSemesters] = useState([]); 
+  const [loadingSemesters, setLoadingSemesters] = useState(true); 
 
-  // Aktif semester bilgisini kontrol et
+
+
   useEffect(() => {
     async function fetchSemesterStatus() {
       try {
@@ -42,7 +46,7 @@ export default function GradesInstructorPage() {
         const userId = authCtx.userState.userId;
         if (!userId || !semesterId) return;
 
-        setLoadingCourses(true); // Yükleme durumu başlatılır
+        setLoadingCourses(true); 
         const response = await fetch(
           `/api/academic_courses_by_terms?userId=${userId}&semesterId=${semesterId}`
         );
@@ -50,7 +54,7 @@ export default function GradesInstructorPage() {
 
         if (!response.ok) {
           console.warn(data.message || "Failed to fetch courses");
-          setCourses([]); // Boş kurs listesi ayarla
+          setCourses([]); 
           return;
         }
 
@@ -58,32 +62,70 @@ export default function GradesInstructorPage() {
       } catch (error) {
         console.error("Error fetching courses:", error);
         alert("An unexpected error occurred.");
-        setCourses([]); // Hata durumunda boş kurs listesi
+        setCourses([]); 
       } finally {
-        setLoadingCourses(false); // Yükleme durumu durdurulur
+        setLoadingCourses(false); 
       }
     }
 
     fetchCourses();
   }, [semesterId, authCtx]);
 
+  useEffect(() => {
+    async function fetchSemesters() {
+      try {
+        const response = await fetch("/api/all_semesters"); 
+        const data = await response.json();
+  
+        if (!response.ok) {
+          alert(data.message || "Failed to fetch semesters.");
+          setSemesters([]);
+          return;
+        }
+
+        const formattedSemesters = data.map((semester) => ({
+          id: semester.SemesterID,
+          name: `${semester.Term} - ${semester.Year}`,
+        }));
+  
+        setSemesters(formattedSemesters);
+      } catch (error) {
+        console.error("Error fetching semesters:", error);
+        alert("An unexpected error occurred.");
+        setSemesters([]);
+      } finally {
+        setLoadingSemesters(false); 
+      }
+    }
+  
+    fetchSemesters();
+  }, []);
+
+  useEffect(() => {
+    if (semesters.length > 0 && !semesterId) {
+      setSemesterId(semesters[0].id); 
+    }
+  }, [semesters, semesterId]);
+  
+  
+
   async function fetchExams(crn) {
     try {
-      if (examData[crn] !== undefined) return; // Daha önce alınmışsa yeniden almayın
+      if (examData[crn] !== undefined) return; 
 
       const response = await fetch(`/api/academic_exams_by_terms?crn=${crn}`);
       const data = await response.json();
 
       if (!response.ok) {
         console.warn(data.message || "Failed to fetch exams");
-        setExamData((prev) => ({ ...prev, [crn]: [] })); // Boş sınav listesi ayarla
+        setExamData((prev) => ({ ...prev, [crn]: [] }));
         return;
       }
 
       setExamData((prev) => ({ ...prev, [crn]: data }));
     } catch (error) {
       console.error("Error fetching exams:", error);
-      setExamData((prev) => ({ ...prev, [crn]: [] })); // Hata durumunda boş sınav listesi
+      setExamData((prev) => ({ ...prev, [crn]: [] })); 
     }
   }
 
@@ -112,9 +154,9 @@ export default function GradesInstructorPage() {
 
   function toggleExpand(crn) {
     if (expandedCourse === crn) {
-      setExpandedCourse(null); // Collapse
+      setExpandedCourse(null); 
     } else {
-      setExpandedCourse(crn); // Expand
+      setExpandedCourse(crn); 
       fetchExams(crn);
     }
   }
@@ -131,10 +173,59 @@ export default function GradesInstructorPage() {
 
   function handleSemesterChange(event) {
     setSemesterId(event.target.value || null);
-    setExpandedCourse(null); // Reset on semester change
+    setExpandedCourse(null); 
     setExamData({});
-    setIsActiveSemester(false); // Yeni semester seçildiğinde aktif bilgisi sıfırlanır
+    setIsActiveSemester(false); 
   }
+
+  function handleGradeChange(studentId, value) {
+    setGrades((prev) => ({ ...prev, [studentId]: value }));
+  }
+
+  async function saveGrades() {
+    const incompleteGrades = Object.values(grades).some((grade) => grade === "" || grade === undefined);
+    if (incompleteGrades || !grades.percentage) {
+      alert("Please ensure all grades and the percentage are entered.");
+      return;
+    }
+  
+    try {
+      const requests = Object.entries(grades).map(([studentId, gradeValue]) => {
+        if (studentId === "percentage") return null; 
+  
+        const payload = {
+          studentId,
+          crn: expandedCourse,
+          gradeName: expandedExam,
+          gradeValue,
+          gradePercentage: grades.percentage,
+        };
+  
+        console.log("Payload being sent:", payload);
+  
+        return fetch("/api/grade_control", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      });
+  
+      const responses = await Promise.all(requests.filter(Boolean)); 
+      const allSuccessful = responses.every((res) => res.ok);
+  
+      if (allSuccessful) {
+        alert("Grades have been saved successfully.");
+      } else {
+        alert("Some grades could not be saved. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error saving grades:", error.message);
+      alert("Failed to save grades. Please try again.");
+    }
+  }
+  
+  
+  
 
   const rowsWithButtons = courses
     ? courses.map((course) => ({
@@ -155,24 +246,23 @@ export default function GradesInstructorPage() {
     <div className={styles.container}>
       <h1>Instructor Courses</h1>
       <div className={styles.filters}>
-        <Dropdown
-          sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
-          options={[
-            { id: "23F", name: "Fall 2023" },
-            { id: "23S", name: "Spring 2023" },
-            { id: "24U", name: "Summer 2023" },
-            { id: "24F", name: "Fall 2024" },
-            { id: "24S", name: "Spring 2024" },
-            { id: "24U", name: "Summer 2024" },
-            { id: "25F", name: "Spring 2025" },
-          ]}
-          label="Semester"
-          onChange={handleSemesterChange}
-          currentValue={semesterId}
-          optionKey="id"
-          optionValue="id"
-          optionFormattedValue="name"
-        />
+      {loadingSemesters ? (
+          <p>Loading semesters...</p>
+        ) : semesters.length > 0 ? (
+          <Dropdown
+            sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
+            options={semesters}
+            label="Semester"
+            onChange={handleSemesterChange}
+            currentValue={semesterId}
+            optionKey="id"
+            optionValue="id"
+            optionFormattedValue="name"
+          />
+        ) : (
+          <p>No semesters available.</p>
+        )}
+
       </div>
 
       <p>
@@ -180,62 +270,111 @@ export default function GradesInstructorPage() {
         {isActiveSemester && <span style={{ color: "green" }}>(Active)</span>}
       </p>
 
+      {expandedCourse && !isActiveSemester && (
+  <p>You can only view exams for this semester.</p>
+)}
+
       {loadingCourses ? (
         <p>Loading courses...</p>
       ) : !courses || courses.length === 0 ? (
         <p>There are no courses for this term.</p>
       ) : (
         <Table
-          columns={["CRN", "CourseID", "CourseTitle", "Action"]}
+          columns={["CRN", "CourseCode", "CourseTitle", "Action"]}
           rows={rowsWithButtons}
           rowKey="CRN"
           emptyValue="-"
         />
       )}
 
-      {expandedCourse && (
-        <div className={styles.examTable}>
-          <h3>Exams for CRN: {expandedCourse}</h3>
-          {examData[expandedCourse] && examData[expandedCourse].length > 0 ? (
-            <Table
-              columns={["ExamName", "ExamDate", "StartTime", "EndTime", "Location", "Action"]}
-              rows={examData[expandedCourse].map((exam) => ({
-                ExamName: exam.ExamName || "-",
-                ExamDate: exam.ExamDate || "-",
-                StartTime: exam.ExamStartTime || "-",
-                EndTime: exam.ExamEndTime || "-",
-                Location: exam.ExamLocation || "-",
-                Action: (
-                  <Button
-                    title={expandedExam === exam.ExamName ? "Hide Students" : "Enter Grades"}
-                    onClick={() => toggleStudentView(expandedCourse, exam.ExamName)}
-                    sx={{ fontSize: "0.9rem", padding: "0.5rem", backgroundColor: "blue", color: "white" }}
-                  />
-                ),
-              }))}
-              rowKey="ExamName"
-              emptyValue="-"
-            />
-          ) : (
-            <p>No exams found for this course.</p>
-          )}
-        </div>
-      )}
 
-      {studentsData && expandedExam && (
+
+{expandedCourse && (
+  <div className={styles.examTable}>
+    <h3>Exams for CRN: {expandedCourse}</h3>
+    {examData[expandedCourse] && examData[expandedCourse].length > 0 ? (
+      <Table
+        columns={
+          isActiveSemester
+            ? ["ExamName", "ExamDate", "StartTime", "EndTime", "Location", "Action"]
+            : ["ExamName", "ExamDate", "StartTime", "EndTime", "Location"]
+        }
+        rows={examData[expandedCourse].map((exam) => {
+          const row = {
+            ExamName: exam.ExamName || "-",
+            ExamDate: exam.ExamDate || "-",
+            StartTime: exam.ExamStartTime || "-",
+            EndTime: exam.ExamEndTime || "-",
+            Location: exam.ExamLocation || "-",
+          };
+
+          
+          if (isActiveSemester) {
+            row.Action = (
+              <Button
+                title={expandedExam === exam.ExamName ? "Hide Students" : "Enter Grades"}
+                onClick={() => toggleStudentView(expandedCourse, exam.ExamName)}
+                sx={{ fontSize: "0.9rem", padding: "0.5rem", backgroundColor: "blue", color: "white" }}
+              />
+            );
+          }
+
+          return row;
+        })}
+        rowKey="ExamName"
+        emptyValue="-"
+      />
+    ) : (
+      <p>No exams found for this course.</p>
+    )}
+  </div>
+)}
+
+
+      {isActiveSemester && studentsData && expandedExam && (
         <div className={styles.studentsTable}>
           <h3>Students for Exam: {expandedExam}</h3>
           {studentsData.length > 0 ? (
-            <Table
-              columns={["StudentID", "FirstName", "LastName"]}
-              rows={studentsData.map((student) => ({
-                StudentID: student.StudentID,
-                FirstName: student.FirstName,
-                LastName: student.LastName,
-              }))}
-              rowKey="StudentID"
-              emptyValue="-"
-            />
+            <>
+              <Table
+                columns={["StudentID", "FirstName", "LastName", "Grade"]}
+                rows={studentsData.map((student) => ({
+                  StudentID: student.StudentID,
+                  FirstName: student.StudentFirstName,
+                  LastName: student.StudentLastName,
+                  Grade: (
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={grades[student.StudentID] || ""}
+                      onChange={(e) => handleGradeChange(student.StudentID, e.target.value)}
+                      style={{ width: "60px" }}
+                    />
+                  ),
+                }))}
+                rowKey="StudentID"
+                emptyValue="-"
+              />
+                 <p>
+                  Please enter percentage for the grade (0-100):
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={grades.percentage || ""}
+                    onChange={(e) => setGrades((prev) => ({ ...prev, percentage: e.target.value }))}
+                    style={{ marginLeft: "10px", width: "60px" }}
+                  />
+                </p>
+
+
+              <Button
+                title="Save Grades"
+                onClick={saveGrades}
+                sx={{ marginTop: "1rem", padding: "0.5rem 1rem", backgroundColor: "green", color: "white" }}
+              />
+            </>
           ) : (
             <p>No students found for this exam.</p>
           )}
@@ -244,4 +383,3 @@ export default function GradesInstructorPage() {
     </div>
   );
 }
-

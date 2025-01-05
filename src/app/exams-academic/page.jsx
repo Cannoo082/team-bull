@@ -11,12 +11,12 @@ import { getSemesterStatus, addExam, deleteExam } from "@/helpers/functions/http
 export default function ExamsInstructorPage() {
   const authCtx = useContext(AuthContext);
   const [courses, setCourses] = useState([]);
-  const [semesterId, setSemesterId] = useState("25S"); // Varsayılan semester
-  const [expandedCourse, setExpandedCourse] = useState(null); // Expanded CRN
-  const [examData, setExamData] = useState({}); // { CRN: exams }
-  const [loadingCourses, setLoadingCourses] = useState(false); // Yükleme durumu
-  const [isActiveSemester, setIsActiveSemester] = useState(false); // Aktif semester bilgisi
-  const [selectedCRN, setSelectedCRN] = useState(null); // Seçilen CRN
+  const [semesterId, setSemesterId] = useState("25S"); 
+  const [expandedCourse, setExpandedCourse] = useState(null); 
+  const [examData, setExamData] = useState({}); 
+  const [loadingCourses, setLoadingCourses] = useState(false); 
+  const [isActiveSemester, setIsActiveSemester] = useState(false); 
+  const [selectedCRN, setSelectedCRN] = useState(null); 
   const [form, setForm] = useState({
     examName: "",
     examDate: "",
@@ -24,8 +24,9 @@ export default function ExamsInstructorPage() {
     endTime: "",
     location: "",
   });
+  const [semesters, setSemesters] = useState([]); 
+  const [loadingSemesters, setLoadingSemesters] = useState(true); 
 
-  // Aktif semester bilgisini kontrol et
   useEffect(() => {
     async function fetchSemesterStatus() {
       try {
@@ -48,7 +49,7 @@ export default function ExamsInstructorPage() {
         const userId = authCtx.userState.userId;
         if (!userId || !semesterId) return;
 
-        setLoadingCourses(true); // Yükleme durumu başlatılır
+        setLoadingCourses(true);
         const response = await fetch(
           `/api/academic_courses_by_terms?userId=${userId}&semesterId=${semesterId}`
         );
@@ -66,16 +67,53 @@ export default function ExamsInstructorPage() {
         alert("An unexpected error occurred.");
         setCourses([]);
       } finally {
-        setLoadingCourses(false); // Yükleme durumu durdurulur
+        setLoadingCourses(false); 
       }
     }
 
     fetchCourses();
   }, [semesterId, authCtx]);
 
+  useEffect(() => {
+    async function fetchSemesters() {
+      try {
+        const response = await fetch("/api/all_semesters"); 
+        const data = await response.json();
+  
+        if (!response.ok) {
+          alert(data.message || "Failed to fetch semesters.");
+          setSemesters([]);
+          return;
+        }
+
+        const formattedSemesters = data.map((semester) => ({
+          id: semester.SemesterID,
+          name: `${semester.Term} - ${semester.Year}`,
+        }));
+  
+        setSemesters(formattedSemesters);
+      } catch (error) {
+        console.error("Error fetching semesters:", error);
+        alert("An unexpected error occurred.");
+        setSemesters([]);
+      } finally {
+        setLoadingSemesters(false); 
+      }
+    }
+  
+    fetchSemesters();
+  }, []);
+
+  useEffect(() => {
+    if (semesters.length > 0 && !semesterId) {
+      setSemesterId(semesters[0].id); 
+    }
+  }, [semesters, semesterId]);
+  
+
   async function fetchExams(crn) {
     try {
-      if (examData[crn] !== undefined) return; // Daha önce alınmışsa yeniden almayın
+      if (examData[crn] !== undefined) return; 
 
       const response = await fetch(`/api/academic_exams_by_terms?crn=${crn}`);
       const data = await response.json();
@@ -95,19 +133,20 @@ export default function ExamsInstructorPage() {
 
   function toggleExpand(crn) {
     if (expandedCourse === crn) {
-      setExpandedCourse(null); // Collapse
+      setExpandedCourse(null); 
     } else {
-      setExpandedCourse(crn); // Expand
-      fetchExams(crn); // Sınavları getir
+      setExpandedCourse(crn); 
+      fetchExams(crn); 
     }
   }
 
   function handleSemesterChange(event) {
     setSemesterId(event.target.value || null);
-    setExpandedCourse(null); // Reset on semester change
+    setExpandedCourse(null); 
     setExamData({});
     setIsActiveSemester(false);
   }
+
 
   async function handleAddExam() {
     try {
@@ -141,20 +180,28 @@ export default function ExamsInstructorPage() {
     if (!confirm(`Are you sure you want to delete the exam: ${examName}?`)) {
       return;
     }
-
+  
     try {
-      await deleteExam({ examName, crn });
-
-      alert("Exam deleted successfully.");
-
+      const response = await fetch(`/api/delete_exam?examName=${examName}&crn=${crn}`, {
+        method: "DELETE",
+      });
+  
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+  
+      alert("Exam and related grades deleted successfully.");
+  
       setExamData((prev) => ({
         ...prev,
         [crn]: prev[crn].filter((exam) => exam.ExamName !== examName),
       }));
     } catch (error) {
+      console.error("Error deleting exam:", error.message);
       alert(error.message || "Failed to delete exam.");
     }
   }
+  
 
   function handleInputChange(e) {
     const { name, value } = e.target;
@@ -194,24 +241,23 @@ export default function ExamsInstructorPage() {
     <div className={styles.container}>
       <h1>Instructor Courses</h1>
 
-      <Dropdown
-        sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
-        options={[
-          { id: "23S", name: "Spring 2023" },
-          { id: "23F", name: "Fall 2023" },
-          { id: "24U", name: "Summer 2023" },
-          { id: "24S", name: "Spring 2024" },
-          { id: "24F", name: "Fall 2024" },
-          { id: "24U", name: "Summer 2024" },
-          { id: "25S", name: "Spring 2025" },
-        ]}
-        label="Semester"
-        onChange={handleSemesterChange}
-        currentValue={semesterId}
-        optionKey="id"
-        optionValue="id"
-        optionFormattedValue="name"
-      />
+       {loadingSemesters ? (
+           <p>Loading semesters...</p>
+         ) : semesters.length > 0 ? (
+           <Dropdown
+             sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
+             options={semesters}
+             label="Semester"
+             onChange={handleSemesterChange}
+             currentValue={semesterId}
+             optionKey="id"
+             optionValue="id"
+             optionFormattedValue="name"
+           />
+         ) : (
+           <p>No semesters available.</p>
+         )}
+ 
 
       <p>
         Selected Semester: <strong>{semesterId}</strong>{" "}
@@ -224,7 +270,7 @@ export default function ExamsInstructorPage() {
         <p>There are no courses for this term.</p>
       ) : (
         <Table
-          columns={["CRN", "CourseID", "CourseTitle", "Action"]}
+          columns={["CRN", "CourseCode", "CourseTitle", "Action"]}
           rows={rowsWithButtons}
           rowKey="CRN"
           emptyValue="-"
@@ -284,24 +330,36 @@ export default function ExamsInstructorPage() {
           <h3>Exams for CRN: {expandedCourse}</h3>
           {examData[expandedCourse] && examData[expandedCourse].length > 0 ? (
             <Table
-              columns={["ExamName", "ExamDate", "StartTime", "EndTime", "Location", "Action"]}
-              rows={examData[expandedCourse].map((exam) => ({
-                ExamName: exam.ExamName || "-",
-                ExamDate: exam.ExamDate || "-",
-                StartTime: exam.ExamStartTime || "-",
-                EndTime: exam.ExamEndTime || "-",
-                Location: exam.ExamLocation || "-",
-                Action: isActiveSemester ? (
-                  <Button
-                    title="Delete"
-                    onClick={() => handleDeleteExam(exam.ExamName, expandedCourse)}
-                    sx={{ fontSize: "0.9rem", padding: "0.5rem", backgroundColor: "red", color: "white" }}
-                  />
-                ) : null,
-              }))}
+              columns={
+                isActiveSemester
+                  ? ["ExamName", "ExamDate", "StartTime", "EndTime", "Location", "Action"]
+                  : ["ExamName", "ExamDate", "StartTime", "EndTime", "Location"]
+              }
+              rows={examData[expandedCourse].map((exam) => {
+                const row = {
+                  ExamName: exam.ExamName || "-",
+                  ExamDate: exam.ExamDate || "-",
+                  StartTime: exam.ExamStartTime || "-",
+                  EndTime: exam.ExamEndTime || "-",
+                  Location: exam.ExamLocation || "-",
+                };
+
+                if (isActiveSemester) {
+                  row.Action = (
+                    <Button
+                      title="Delete"
+                      onClick={() => handleDeleteExam(exam.ExamName, expandedCourse)}
+                      sx={{ fontSize: "0.9rem", padding: "0.5rem", backgroundColor: "red", color: "white" }}
+                    />
+                  );
+                }
+
+                return row;
+              })}
               rowKey="ExamName"
               emptyValue="-"
             />
+
           ) : (
             <p>No exams found for this course.</p>
           )}

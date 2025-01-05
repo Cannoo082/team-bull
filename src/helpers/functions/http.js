@@ -210,4 +210,53 @@ export async function fetchStudentsByCRN(crn) {
   );
 }
 
+export async function saveGrade(studentId, crn, gradeName, gradeValue, gradePercentage) {
+  try {
+    const response = await fetch("/api/in_term_grades", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        studentId,
+        crn,
+        gradeName,
+        gradeValue,
+        gradePercentage,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Failed to save grade:", errorData.message);
+      throw new Error(errorData.message || "Failed to save grade.");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error in saveGrade:", error.message);
+    throw error;
+  }
+}
+
+
+
+export async function sendRequestGetAllSemesters() {
+  const endpoint = endpoints.all_semesters;
+  return await sendRequest(endpoint);
+}
+
+export async function fetchGrades(crn, gradeName) {
+  try {
+    const response = await fetch(`/api/get_grades?crn=${crn}&gradeName=${gradeName}`);
+    if (!response.ok) {
+      const error = await response.json();
+      console.error("Failed to fetch grades:", error.message);
+      throw new Error(error.message || "Failed to fetch grades");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error in fetchGrades:", error.message);
+    throw error;
+  }
+}
+
 

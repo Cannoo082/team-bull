@@ -1,38 +1,34 @@
 import { execute } from "@/backend/db";
 
-export async function POST(request) {
+export async function DELETE(req) {
+  const { searchParams } = new URL(req.url);
+  const examName = searchParams.get("examName");
+  const crn = searchParams.get("crn");
+
+  if (!examName || !crn) {
+    return new Response(
+      JSON.stringify({ message: "Missing required parameters" }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   try {
-    const body = await request.json();
-    const { examName, crn } = body;
+    const deleteExamSql = `DELETE FROM exams WHERE ExamName = ? AND CRN = ?`;
+    await execute(deleteExamSql, [examName, crn]);
 
-    if (!examName || !crn) {
-      return new Response(
-        JSON.stringify({ message: "Exam name and CRN are required." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    const sql = `DELETE FROM exams WHERE ExamName = ? AND CRN = ?`;
-    const params = [examName, crn];
-
-    const result = await execute(sql, params);
-
-    if (result.affectedRows === 0) {
-      return new Response(
-        JSON.stringify({ message: "No exam found to delete." }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
-    }
+    const deleteGradesSql = `DELETE FROM in_term_grades WHERE GradeName = ? AND CRN = ?`;
+    await execute(deleteGradesSql, [examName, crn]);
 
     return new Response(
-      JSON.stringify({ message: "Exam deleted successfully." }),
+      JSON.stringify({ message: "Exam and related grades deleted successfully" }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Error deleting exam:", error);
+    console.error("Error deleting exam and grades:", error.message);
     return new Response(
-      JSON.stringify({ message: "Failed to delete exam." }),
+      JSON.stringify({ message: "Internal server error" }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 }
+
