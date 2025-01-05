@@ -14,7 +14,7 @@ export default function RootLayout({ children }) {
         <html lang="en">
         <body className={inter.className} style={{ margin: 0 }}>
         <Provider>
-            <div className="main-content">{children}</div> {/* Apply the class here */}
+            <div>{children}</div> {/* Apply the class here */}
         </Provider>
         </body>
         </html>
