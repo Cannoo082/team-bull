@@ -211,11 +211,7 @@ export default function GradesStudentPage() {
               </div>
             ))}
         </>
-      ) : selectedCourseId ? (
-        <div className={styles.box}>
-          <p>No grades found</p>
-        </div>
-      ) : null}
+      ) : null }
     </div>
   );
 }
