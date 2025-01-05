@@ -107,21 +107,27 @@ export default function GradesStudentPage() {
           <p>Welcome to the Grades Page!</p>
           <p>Here you can view your grades for the selected semester and course. Use the dropdown menus to select a semester and course to see the grades.</p>
         </div>
-        {semesters && semesters.length > 0 && (
-            <div className={styles.box}>
-              <h2>Semesters</h2>
-              <Dropdown
-                  sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
-                  options={semesters}
-                  label="Semester"
-                  onChange={handleSemesterChange}
-                  currentValue={selectedSemesterId}
-                  optionKey="id"
-                  optionValue="id"
-                  optionFormattedValue="name"
-              />
-            </div>
-        )}
+        {semesters ? (
+            semesters.length > 0 ? (
+                <div className={styles.box}>
+                  <h2>Semesters</h2>
+                  <Dropdown
+                      sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
+                      options={semesters}
+                      label="Semester"
+                      onChange={handleSemesterChange}
+                      currentValue={selectedSemesterId}
+                      optionKey="id"
+                      optionValue="id"
+                      optionFormattedValue="name"
+                  />
+                </div>
+            ) : (
+                <div className={styles.box}>
+                  <p>No semesters found</p>
+                </div>
+            )
+        ) : null}
         {courses ? (
             courses.length > 0 ? (
                 <div className={styles.box}>
@@ -143,52 +149,58 @@ export default function GradesStudentPage() {
                 </div>
             )
         ) : null}
-        {selectedCourseId && grades && (
-            <>
-              <div className={styles["grade-buttons-container"]}>
-                <Button
-                    title="In Grade"
-                    sx={{ width: "10rem" }}
-                    onClick={() => {
-                      if (selectedGrade !== "in_grade") {
-                        setSelectedGrade("in_grade");
-                      }
-                    }}
-                />
-                <span style={{ width: "1rem" }}></span>
-                <Button
-                    title="End Grade"
-                    sx={{ width: "10rem" }}
-                    onClick={() => {
-                      if (selectedGrade !== "end_grade") {
-                        setSelectedGrade("end_grade");
-                      }
-                    }}
-                />
-              </div>
-              <br />
-              {selectedGrade === "in_grade" && (
-                  <div className={`${styles.info} ${styles.box}`}>
-                    <Table
-                        columns={["name", "grade", "weight", "description"]}
-                        rows={grades.inGrade.map((grade) => ({
-                          ...grade,
-                          weight: "%" + grade.weight,
-                        }))}
-                        rowKey="name"
-                        emptyValue="-"
-                        handleColumnFormat={(word) => formatString(word, ["_"])}
+        {selectedCourseId && grades ? (
+            grades.length > 0 ? (
+                <>
+                  <div className={styles["grade-buttons-container"]}>
+                    <Button
+                        title="In Grade"
+                        sx={{ width: "10rem" }}
+                        onClick={() => {
+                          if (selectedGrade !== "in_grade") {
+                            setSelectedGrade("in_grade");
+                          }
+                        }}
+                    />
+                    <span style={{ width: "1rem" }}></span>
+                    <Button
+                        title="End Grade"
+                        sx={{ width: "10rem" }}
+                        onClick={() => {
+                          if (selectedGrade !== "end_grade") {
+                            setSelectedGrade("end_grade");
+                          }
+                        }}
                     />
                   </div>
-              )}
-              {selectedGrade === "end_grade" && (
-                  <div className={`${styles.info} ${styles.box}`}>
-                    <p>grade: {grades.endGrade.grade}</p>
-                    <p>letter grade: {grades.endGrade.letterGrade}</p>
-                  </div>
-              )}
-            </>
-        )}
+                  <br />
+                  {selectedGrade === "in_grade" && (
+                      <div className={`${styles.info} ${styles.box}`}>
+                        <Table
+                            columns={["name", "grade", "weight", "description"]}
+                            rows={grades.inGrade.map((grade) => ({
+                              ...grade,
+                              weight: "%" + grade.weight,
+                            }))}
+                            rowKey="name"
+                            emptyValue="-"
+                            handleColumnFormat={(word) => formatString(word, ["_"])}
+                        />
+                      </div>
+                  )}
+                  {selectedGrade === "end_grade" && (
+                      <div className={`${styles.info} ${styles.box}`}>
+                        <p>grade: {grades.endGrade.grade}</p>
+                        <p>letter grade: {grades.endGrade.letterGrade}</p>
+                      </div>
+                  )}
+                </>
+            ) : (
+                <div className={styles.box}>
+                  <p>No grades found</p>
+                </div>
+            )
+        ) : null}
       </div>
   );
 }
