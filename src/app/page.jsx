@@ -26,7 +26,6 @@ export default function HomePage() {
 
     handleGetNotifications();
   }, []);
-  console.log(notifs);
 
   return (
     <div className={styles.container}>
@@ -38,12 +37,9 @@ export default function HomePage() {
         <div className={styles["calendar-container"]}>
           <Calendar />
         </div>
-      </div>
-      <div className={styles.group}>
         <div className={styles["menu-container"]}>
           <Menu />
         </div>
-        <div className={styles["notifs-container"]}></div>
       </div>
     </div>
   );
