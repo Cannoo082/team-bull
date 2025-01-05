@@ -17,19 +17,19 @@
   flex: 3;
   box-shadow: 0px 0px 10px 5px rgba(128, 128, 128, 0.25);
   border-radius: 10px;
-  overflow: hidden;
+  overflow: clip;
 }
 
 .calendar-container {
   box-shadow: 0px 0px 10px 5px rgba(128, 128, 128, 0.25);
   border-radius: 10px;
   flex: 3;
-  overflow: hidden;
+  overflow: clip;
 }
 
 .menu-container {
   box-shadow: 0px 0px 10px 5px rgba(128, 128, 128, 0.25);
   border-radius: 10px;
   flex: 2;
-  overflow: hidden;
+  overflow: clip;
 }
