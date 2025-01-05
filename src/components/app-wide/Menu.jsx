@@ -129,7 +129,7 @@ export default function Menu() {
       {}
       {isWeekend ? (
         <p className={styles.weekendMessage}>
-          There is no service on weekends, please select for weekdays.
+          There is no service on the weekends, please select weekdays.
         </p>
       ) : loading ? (
         <p className={styles.loadingMessage}>Loading...</p>

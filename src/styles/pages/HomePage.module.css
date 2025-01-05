@@ -15,14 +15,21 @@
 
 .notifs-container {
   flex: 3;
+  box-shadow: 0px 0px 10px 5px rgba(128, 128, 128, 0.25);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .calendar-container {
   box-shadow: 0px 0px 10px 5px rgba(128, 128, 128, 0.25);
+  border-radius: 10px;
   flex: 3;
+  overflow: hidden;
 }
 
 .menu-container {
   box-shadow: 0px 0px 10px 5px rgba(128, 128, 128, 0.25);
+  border-radius: 10px;
   flex: 2;
+  overflow: hidden;
 }

@@ -1,17 +1,19 @@
 .container {
   display: flex;
   height: 100vh;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
 }
 
 .login-form-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100%;
+  width: 100%; /* Ensure it takes full width */
+  max-width: 500px; /* Set a max-width to center it */
+  margin: auto; /* Center horizontally */
 }
+
 .login-form {
   display: flex;
   flex-direction: column;
@@ -26,7 +28,7 @@
 }
 
 .forgot-password {
-  font-weight: bold; 
-  align-self: flex-end; 
-  cursor: pointer; 
-} 
+  font-weight: bold;
+  align-self: flex-end;
+  cursor: pointer;
+}

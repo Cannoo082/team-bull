@@ -89,7 +89,7 @@ export default function Notifications({ notifs }) {
               </b>
             </p>
             <p className={styles["notif-detail"]}>
-              <b>Send at: </b>
+              <b>Sent at: </b>
               {new Date(selectedNotif.CreatedAt).toLocaleString()}
             </p>
           </div>
