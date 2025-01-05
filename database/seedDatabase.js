@@ -862,8 +862,12 @@ const semesterData = [
 
     // Seed `notification`
     console.log('Seeding `notification`...');
-    for (let i = 1; i <= 20; i++) {
-      const type = faker.helpers.arrayElement(['GRADE', 'ANNOUNCEMENT', 'EVENT', 'EXAM']);
+    const notificationBatchSize = 50;
+    const notificationTypes = ['GRADE', 'ANNOUNCEMENT', 'EVENT', 'EXAM'];
+
+    const notificationBatch = [];
+    for (let i = 1; i <= notificationBatchSize; i++) {
+      const type = faker.helpers.arrayElement(notificationTypes);
       const priority =
         type === 'EXAM'
           ? 'HIGH'
@@ -871,37 +875,51 @@ const semesterData = [
           ? 'MEDIUM'
           : faker.helpers.arrayElement(['LOW', 'MEDIUM', 'HIGH']);
 
+      notificationBatch.push([
+        faker.lorem.words(5),
+        faker.lorem.paragraph(),
+        type,
+        priority,
+      ]);
+    }
+
+    if (notificationBatch.length > 0) {
       await executeQuery(
-        `INSERT INTO notification (Title, Message, Type, Priority) VALUES (?, ?, ?, ?)`,
-        [
-          faker.lorem.words(5),
-          faker.lorem.paragraph(),
-          type,
-          priority,
-        ]
+        `INSERT INTO notification (Title, Message, Type, Priority) VALUES ?`,
+        [notificationBatch]
       );
     }
 
     // Seed `user_notification`
     console.log('Seeding `user_notification`...');
     const notifications = await executeQuery(`SELECT NotificationID FROM notification`);
-    const users = await executeQuery(`SELECT ID FROM user`);
-    for (let i = 1; i <= 50; i++) {
-      const userId = users[i % users.length]?.ID;
-      const notificationId = notifications[i % notifications.length]?.NotificationID;
-      if (userId && notificationId) {
+    const student_ids = await executeQuery(`SELECT ID FROM user WHERE Role = 'STUDENT'`);
+    const instructor_ids = await executeQuery(`SELECT ID FROM user WHERE Role = 'INSTRUCTOR'`);
+    const users = [...student_ids, ...instructor_ids];
+
+    const userNotificationBatch = [];
+    const notificationsPerUser = 10;
+
+    for (const user of users) {
+      for (let i = 0; i < notificationsPerUser; i++) {
+        const notification = faker.helpers.arrayElement(notifications);
         const isRead = faker.helpers.arrayElement([0, 1]);
         const readAt = isRead === 1 ? faker.date.recent() : null;
-        await executeQuery(
-          `INSERT INTO user_notification (NotificationID, UserID, IsRead, ReadAt) VALUES (?, ?, ?, ?)`,
-          [
-            notificationId,
-            userId,
-            isRead,
-            readAt,
-          ]
-        );
+
+        userNotificationBatch.push([
+          notification.NotificationID,
+          user.ID,
+          isRead,
+          readAt,
+        ]);
       }
+    }
+
+    if (userNotificationBatch.length > 0) {
+      await executeQuery(
+        `INSERT INTO user_notification (NotificationID, UserID, IsRead, ReadAt) VALUES ?`,
+        [userNotificationBatch]
+      );
     }
 
     // Seed `TotalCredits` update for 24F term
