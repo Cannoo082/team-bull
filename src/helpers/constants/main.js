@@ -1,9 +1,9 @@
 import HomeIcon from "@mui/icons-material/Home";
-import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import GradeIcon from "@mui/icons-material/Grade";
 import BeenhereIcon from "@mui/icons-material/Beenhere";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 const homeIcon = <HomeIcon />;
 export const routeOptions = {
   student: {
@@ -21,6 +21,11 @@ export const routeOptions = {
       name: "Exams",
       path: "/exams-student",
       icon: <BorderColorIcon />,
+    },
+    enrollment: {
+      name: "Enroll",
+      path: "/enrollment",
+      icon: <AddCircleIcon />,
     },
     attendance: {
       name: "Attendance",

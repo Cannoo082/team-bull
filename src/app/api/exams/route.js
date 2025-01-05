@@ -3,13 +3,17 @@ import { execute } from "@/backend/db";
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const courseId = searchParams.get("courseId");
-  if (courseId === null) {
-    return Response.json({ message: "Provide a course id" }, { status: 400 });
+  const semesterId = searchParams.get("semesterId");
+  if (courseId === null || semesterId === null) {
+    return Response.json(
+      { message: "Provide a course id and a semester id  " },
+      { status: 400 }
+    );
   }
 
   const sql =
-    "SELECT e.* FROM course_schedules cs JOIN exams e ON cs.CRN=e.CRN WHERE cs.CourseID=?";
-  const params = [courseId];
+    "SELECT e.* FROM course_schedules cs JOIN exams e ON cs.CRN=e.CRN WHERE cs.CourseID=? AND cs.SemesterID=?";
+  const params = [courseId, semesterId];
 
   const exams = await execute(sql, params);
   if (exams === undefined) {

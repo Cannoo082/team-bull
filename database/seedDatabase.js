@@ -463,7 +463,7 @@ const semesterData = [
 
     for (const semester of semesters) {
       for (const selectedCourse of courses) {
-        const { DepartmentID, YearOfCourse } = selectedCourse;
+        const { CourseID, DepartmentID, YearOfCourse } = selectedCourse;
 
         const departmentYearKey = `${DepartmentID}-${YearOfCourse}`;
         if (!scheduleMap.has(departmentYearKey)) {
@@ -489,20 +489,33 @@ const semesterData = [
             const formattedEndTime = endTimeCandidate.toTimeString().slice(0, 8);
 
             const timeSlotKey = `${day}-${time}`;
-            if (!scheduleMap.get(departmentYearKey).has(timeSlotKey)) {
-              startTime = time;
-              endTime = formattedEndTime;
-              assignedDay = day;
-              scheduleMap.get(departmentYearKey).add(timeSlotKey);
-              break;
+
+            if (scheduleMap.get(departmentYearKey).has(timeSlotKey)) {
+              continue;
             }
+
+            const conflictCheck = await executeQuery(`
+              SELECT 1
+              FROM course_schedules
+              WHERE InstructorID = ? AND SemesterID = ? AND Day = ? AND ClassStartTime = ?
+            `, [selectedInstructor.InstructorID, semester.SemesterID, day, time]);
+
+            if (conflictCheck.length > 0) {
+              continue;
+            }
+
+            assignedDay = day;
+            startTime = time;
+            endTime = formattedEndTime;
+            scheduleMap.get(departmentYearKey).add(timeSlotKey);
+            break;
           }
-          if (startTime && endTime && assignedDay) break;
+          if (assignedDay && startTime && endTime) break;
         }
 
         if (!startTime || !endTime || !assignedDay) {
           console.warn(
-            `No available time slot for CourseID ${selectedCourse.CourseID} in Semester ${semester.SemesterID}`
+            `No available time slot for CourseID ${CourseID} in Semester ${semester.SemesterID}`
           );
           continue;
         }
@@ -525,7 +538,7 @@ const semesterData = [
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             crn,
-            selectedCourse.CourseID,
+            CourseID,
             assignedDay,
             startTime,
             endTime,
