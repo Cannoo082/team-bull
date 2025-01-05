@@ -18,62 +18,62 @@ describe('GET /courses (Black-box)', () => {
 
     it('should return 400 if userId or semesterId is missing', async () => {
         const response = await request(app)
-            .get('/api/courses') // Missing userId and semesterId
+            .get('/api/courses') 
             .expect(400);
 
         expect(response.body.message).toBe('Provide a user id and a semester id');
     });
 
     it('should return 500 if database execution fails while checking user info', async () => {
-        execute.mockResolvedValueOnce(undefined); // Mock DB failure
+        execute.mockResolvedValueOnce(undefined); 
 
         const response = await request(app)
-            .get('/api/courses?userId=1&semesterId=2025') // Valid parameters
+            .get('/api/courses?userId=1&semesterId=2025') 
             .expect(500);
 
         expect(response.body.message).toBe('Failed to check user info');
     });
 
     it('should return 400 if user is not found', async () => {
-        execute.mockResolvedValueOnce([]); // Mock user not found
+        execute.mockResolvedValueOnce([]); 
 
         const response = await request(app)
-            .get('/api/courses?userId=1&semesterId=2025') // Valid parameters
+            .get('/api/courses?userId=1&semesterId=2025') 
             .expect(400);
 
         expect(response.body.message).toBe('User not found ');
     });
 
     it('should return 400 if user is not a student', async () => {
-        execute.mockResolvedValueOnce([{ ID: 1, Role: 'instructor' }]); // Mock non-student user
+        execute.mockResolvedValueOnce([{ ID: 1, Role: 'instructor' }]); 
 
         const response = await request(app)
-            .get('/api/courses?userId=1&semesterId=2025') // Valid parameters
+            .get('/api/courses?userId=1&semesterId=2025') 
             .expect(400);
 
         expect(response.body.message).toBe('Only students');
     });
 
     it('should return 500 if database execution fails while loading courses', async () => {
-        execute.mockResolvedValueOnce([{ ID: 1, Role: 'student', StudentID: 123 }]); // Mock valid student user
-        execute.mockResolvedValueOnce(undefined); // Mock DB failure for courses query
+        execute.mockResolvedValueOnce([{ ID: 1, Role: 'student', StudentID: 123 }]); 
+        execute.mockResolvedValueOnce(undefined); 
 
         const response = await request(app)
-            .get('/api/courses?userId=1&semesterId=2025') // Valid parameters
+            .get('/api/courses?userId=1&semesterId=2025') 
             .expect(500);
 
         expect(response.body.message).toBe('Failed to load courses');
     });
 
     it('should return 200 with a list of courses for a student', async () => {
-        execute.mockResolvedValueOnce([{ ID: 1, Role: 'student', StudentID: 123 }]); // Mock valid student user
+        execute.mockResolvedValueOnce([{ ID: 1, Role: 'student', StudentID: 123 }]); 
         execute.mockResolvedValueOnce([
             { CourseID: 'C101', CourseTitle: 'Mathematics 101' },
             { CourseID: 'C102', CourseTitle: 'Physics 101' },
-        ]); // Mock courses for the student
+        ]); 
 
         const response = await request(app)
-            .get('/api/courses?userId=1&semesterId=2025') // Valid parameters
+            .get('/api/courses?userId=1&semesterId=2025') 
             .expect(200);
 
         expect(response.body).toEqual([
@@ -83,13 +83,13 @@ describe('GET /courses (Black-box)', () => {
     });
 
     it('should return 200 with an empty list if no courses are found for the student', async () => {
-        execute.mockResolvedValueOnce([{ ID: 1, Role: 'student', StudentID: 123 }]); // Mock valid student user
-        execute.mockResolvedValueOnce([]); // Mock no courses found
+        execute.mockResolvedValueOnce([{ ID: 1, Role: 'student', StudentID: 123 }]); 
+        execute.mockResolvedValueOnce([]); 
 
         const response = await request(app)
-            .get('/api/courses?userId=1&semesterId=2025') // Valid parameters
+            .get('/api/courses?userId=1&semesterId=2025') 
             .expect(200);
 
-        expect(response.body).toEqual([]); // Expect an empty array
+        expect(response.body).toEqual([]); 
     });
 });

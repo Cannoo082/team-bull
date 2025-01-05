@@ -14,7 +14,7 @@ describe("DELETE /delete_exam (White-box)", () => {
   });
 
   it("should return 400 if required parameters are missing", async () => {
-    const request = { url: "http://localhost:3000/api/delete_exam" }; // Missing parameters
+    const request = { url: "http://localhost:3000/api/delete_exam" }; 
 
     const response = await DELETE(request);
     const jsonResponse = await response.json();
@@ -28,8 +28,8 @@ describe("DELETE /delete_exam (White-box)", () => {
       url: "http://localhost:3000/api/delete_exam?examName=Midterm&crn=12345",
     };
 
-    execute.mockResolvedValueOnce(); // Mock successful exam deletion
-    execute.mockResolvedValueOnce(); // Mock successful grades deletion
+    execute.mockResolvedValueOnce(); 
+    execute.mockResolvedValueOnce();
 
     const response = await DELETE(request);
     const jsonResponse = await response.json();
@@ -53,7 +53,7 @@ describe("DELETE /delete_exam (White-box)", () => {
       url: "http://localhost:3000/api/delete_exam?examName=Midterm&crn=12345",
     };
 
-    execute.mockRejectedValueOnce(new Error("Database error")); // Mock database error
+    execute.mockRejectedValueOnce(new Error("Database error")); 
 
     const response = await DELETE(request);
     const jsonResponse = await response.json();

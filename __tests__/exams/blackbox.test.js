@@ -18,17 +18,17 @@ describe('GET /exams (Black-box)', () => {
 
     it('should return 400 if courseId or semesterId is missing', async () => {
         const response = await request(app)
-            .get('/api/exams') // Missing parameters
+            .get('/api/exams') 
             .expect(400);
 
         expect(response.body.message).toBe('Provide a course id and a semester id  ');
     });
 
     it('should return 500 if database execution fails while loading exams', async () => {
-        execute.mockResolvedValueOnce(undefined); // Mock DB failure
+        execute.mockResolvedValueOnce(undefined); 
 
         const response = await request(app)
-            .get('/api/exams?courseId=101&semesterId=2025') // Valid parameters
+            .get('/api/exams?courseId=101&semesterId=2025') 
             .expect(500);
 
         expect(response.body.message).toBe('Failed to load exams');
@@ -44,10 +44,10 @@ describe('GET /exams (Black-box)', () => {
                 ExamEndTime: '12:00',
                 ExamLocation: 'Room 101',
             },
-        ]); // Mock valid exams data
+        ]); 
 
         const response = await request(app)
-            .get('/api/exams?courseId=101&semesterId=2025') // Valid parameters
+            .get('/api/exams?courseId=101&semesterId=2025') 
             .expect(200);
 
         expect(response.body).toEqual([
@@ -63,13 +63,13 @@ describe('GET /exams (Black-box)', () => {
     });
 
     it('should return 200 with an empty list if no exams are found', async () => {
-        execute.mockResolvedValueOnce([]); // Mock no exams found
+        execute.mockResolvedValueOnce([]); 
 
         const response = await request(app)
-            .get('/api/exams?courseId=101&semesterId=2025') // Valid parameters
+            .get('/api/exams?courseId=101&semesterId=2025') 
             .expect(200);
 
-        expect(response.body).toEqual([]); // Expect an empty array
+        expect(response.body).toEqual([]); 
     });
 
     it('should handle invalid dates gracefully', async () => {
@@ -77,22 +77,22 @@ describe('GET /exams (Black-box)', () => {
             {
                 CRN: '12345',
                 ExamName: 'Midterm',
-                ExamDate: null, // Invalid date
+                ExamDate: null,
                 ExamStartTime: '10:00',
                 ExamEndTime: '12:00',
                 ExamLocation: 'Room 101',
             },
-        ]); // Mock exams data with an invalid date
+        ]); 
 
         const response = await request(app)
-            .get('/api/exams?courseId=101&semesterId=2025') // Valid parameters
+            .get('/api/exams?courseId=101&semesterId=2025') 
             .expect(200);
 
         expect(response.body).toEqual([
             {
                 CRN: '12345',
                 name: 'Midterm',
-                date: undefined, // No formatted date should be returned
+                date: undefined, 
                 start_time: '10:00',
                 end_time: '12:00',
                 location: 'Room 101',

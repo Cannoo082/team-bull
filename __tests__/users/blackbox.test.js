@@ -37,7 +37,7 @@ describe('PATCH /users (Black-box)', () => {
   });
 
   it('should return 200 for a successful change-email operation', async () => {
-    execute.mockResolvedValueOnce(true); // Mock successful DB operation
+    execute.mockResolvedValueOnce(true); 
 
     const response = await request(app)
       .patch('/api/users?operation=change-email')
@@ -52,7 +52,7 @@ describe('PATCH /users (Black-box)', () => {
   });
 
   it('should return 500 if database fails during change-email', async () => {
-    execute.mockResolvedValueOnce(undefined); // Mock DB failure
+    execute.mockResolvedValueOnce(undefined); 
 
     const response = await request(app)
       .patch('/api/users?operation=change-email')
@@ -72,7 +72,7 @@ describe('PATCH /users (Black-box)', () => {
   });
 
   it('should return 404 if user is not found during change-password', async () => {
-    execute.mockResolvedValueOnce([]); // Mock user not found
+    execute.mockResolvedValueOnce([]); 
 
     const response = await request(app)
       .patch('/api/users?operation=change-password')
@@ -83,8 +83,8 @@ describe('PATCH /users (Black-box)', () => {
   });
 
   it('should return 400 for incorrect password during change-password', async () => {
-    execute.mockResolvedValueOnce([{ Password: 'hashedPassword' }]); // Mock existing password
-    bcrypt.compare.mockResolvedValueOnce(false); // Mock password mismatch
+    execute.mockResolvedValueOnce([{ Password: 'hashedPassword' }]);
+    bcrypt.compare.mockResolvedValueOnce(false); 
 
     const response = await request(app)
       .patch('/api/users?operation=change-password')
@@ -95,11 +95,11 @@ describe('PATCH /users (Black-box)', () => {
   });
 
   it('should return 200 for a successful change-password operation', async () => {
-    execute.mockResolvedValueOnce([{ Password: 'hashedPassword' }]); // Mock existing password
-    bcrypt.compare.mockResolvedValueOnce(true); // Mock password match
-    bcrypt.genSalt.mockResolvedValueOnce('salt'); // Mock salt generation
-    bcrypt.hash.mockResolvedValueOnce('newHashedPassword'); // Mock hashed password
-    execute.mockResolvedValueOnce(true); // Mock successful password update
+    execute.mockResolvedValueOnce([{ Password: 'hashedPassword' }]); 
+    bcrypt.compare.mockResolvedValueOnce(true);
+    bcrypt.genSalt.mockResolvedValueOnce('salt'); 
+    bcrypt.hash.mockResolvedValueOnce('newHashedPassword'); 
+    execute.mockResolvedValueOnce(true); 
 
     const response = await request(app)
       .patch('/api/users?operation=change-password')
@@ -114,11 +114,11 @@ describe('PATCH /users (Black-box)', () => {
   });
 
   it('should return 500 if database fails during change-password', async () => {
-    execute.mockResolvedValueOnce([{ Password: 'hashedPassword' }]); // Mock existing password
-    bcrypt.compare.mockResolvedValueOnce(true); // Mock password match
-    bcrypt.genSalt.mockResolvedValueOnce('salt'); // Mock salt generation
-    bcrypt.hash.mockResolvedValueOnce('newHashedPassword'); // Mock hashed password
-    execute.mockResolvedValueOnce(undefined); // Mock DB failure during update
+    execute.mockResolvedValueOnce([{ Password: 'hashedPassword' }]); 
+    bcrypt.compare.mockResolvedValueOnce(true); 
+    bcrypt.genSalt.mockResolvedValueOnce('salt'); 
+    bcrypt.hash.mockResolvedValueOnce('newHashedPassword'); 
+    execute.mockResolvedValueOnce(undefined); 
 
     const response = await request(app)
       .patch('/api/users?operation=change-password')
@@ -129,9 +129,9 @@ describe('PATCH /users (Black-box)', () => {
   });
 
   it('should return 500 if bcrypt operations fail during change-password', async () => {
-    execute.mockResolvedValueOnce([{ Password: 'hashedPassword' }]); // Mock existing password
-    bcrypt.compare.mockResolvedValueOnce(true); // Mock password match
-    bcrypt.genSalt.mockRejectedValueOnce(new Error('Bcrypt error')); // Mock bcrypt failure
+    execute.mockResolvedValueOnce([{ Password: 'hashedPassword' }]); 
+    bcrypt.compare.mockResolvedValueOnce(true); 
+    bcrypt.genSalt.mockRejectedValueOnce(new Error('Bcrypt error')); 
 
     const response = await request(app)
       .patch('/api/users?operation=change-password')

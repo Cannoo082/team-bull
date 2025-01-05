@@ -18,45 +18,45 @@ describe('GET /grades (Black-box)', () => {
 
     it('should return 400 if userId, courseId, or semesterId is missing', async () => {
         const response = await request(app)
-            .get('/api/grades') // Missing parameters
+            .get('/api/grades') 
             .expect(400);
 
         expect(response.body.message).toBe('Provide a user id, course id and a semester id');
     });
 
     it('should return 400 if user is not found', async () => {
-        execute.mockResolvedValueOnce([]); // No user found
+        execute.mockResolvedValueOnce([]); 
 
         const response = await request(app)
-            .get('/api/grades?userId=1&courseId=101&semesterId=2025') // Valid parameters
+            .get('/api/grades?userId=1&courseId=101&semesterId=2025') 
             .expect(400);
 
         expect(response.body.message).toBe('User not found ');
     });
 
     it('should return 500 if database execution fails while checking user info', async () => {
-        execute.mockResolvedValueOnce(undefined); // Mock DB failure for user check
+        execute.mockResolvedValueOnce(undefined); 
 
         const response = await request(app)
-            .get('/api/grades?userId=1&courseId=101&semesterId=2025') // Valid parameters
+            .get('/api/grades?userId=1&courseId=101&semesterId=2025') 
             .expect(500);
 
         expect(response.body.message).toBe('Failed to check user info');
     });
 
     it('should return 500 if database execution fails while loading grades', async () => {
-        execute.mockResolvedValueOnce([{ ID: 1, Role: 'student', StudentID: 1001 }]); // Mock valid user
-        execute.mockResolvedValueOnce(undefined); // Mock DB failure for grades
+        execute.mockResolvedValueOnce([{ ID: 1, Role: 'student', StudentID: 1001 }]); 
+        execute.mockResolvedValueOnce(undefined); 
 
         const response = await request(app)
-            .get('/api/grades?userId=1&courseId=101&semesterId=2025') // Valid parameters
+            .get('/api/grades?userId=1&courseId=101&semesterId=2025') 
             .expect(500);
 
         expect(response.body.message).toBe('Failed to load grades');
     });
 
     it('should return 200 with in-term and end-of-term grades for a valid student', async () => {
-        execute.mockResolvedValueOnce([{ ID: 1, Role: 'student', StudentID: 1001 }]); // Mock valid user
+        execute.mockResolvedValueOnce([{ ID: 1, Role: 'student', StudentID: 1001 }]);
         execute.mockResolvedValueOnce([
             {
                 type: 'in',
@@ -76,10 +76,10 @@ describe('GET /grades (Black-box)', () => {
                 end_letter_grade: 'A',
                 end_grade_out_of_100: 95,
             },
-        ]); // Mock grades data
+        ]); 
 
         const response = await request(app)
-            .get('/api/grades?userId=1&courseId=101&semesterId=2025') // Valid parameters
+            .get('/api/grades?userId=1&courseId=101&semesterId=2025') 
             .expect(200);
 
         expect(response.body).toEqual({

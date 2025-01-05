@@ -32,7 +32,7 @@ describe('POST /login (Black-box)', () => {
 
     const response = await request(app)
       .post('/api/login')
-      .send({ email: 'invalid@example.com', password: 'password123' }) // Invalid email
+      .send({ email: 'invalid@example.com', password: 'password123' }) 
       .expect(400); 
 
     expect(response.body.message).toBe('User not found ');
@@ -87,12 +87,12 @@ describe('POST /login (Black-box)', () => {
     execute.mockResolvedValueOnce([
       { ID: 1, Email: 'test@example.com', Password: 'hashedPassword', Role: 'student' },
     ]);
-    bcrypt.compare.mockRejectedValueOnce(new Error('Bcrypt error')); // Mock bcrypt failure
+    bcrypt.compare.mockRejectedValueOnce(new Error('Bcrypt error')); 
 
     const response = await request(app)
       .post('/api/login')
       .send({ email: 'test@example.com', password: 'password123' })
-      .expect(500); // Expect HTTP status 500
+      .expect(500); 
 
     expect(response.body.message).toBe('Bcrypt error');
   });

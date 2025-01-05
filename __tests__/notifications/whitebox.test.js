@@ -1,10 +1,8 @@
 import { GET } from '../../src/app/api/notifications/route';
 import { execute } from '@/backend/db';
 
-// Jest mockları
 jest.mock('@/backend/db');
 
-// Global Response mocku
 global.Response = {
   json: (body, options = {}) => ({
     status: options.status || 200,
@@ -14,7 +12,7 @@ global.Response = {
 
 describe('GET /notifications', () => {
   afterEach(() => {
-    jest.clearAllMocks(); // Mock'ları temizle
+    jest.clearAllMocks(); 
   });
 
   it('should return an error when userId is not provided', async () => {
@@ -34,7 +32,7 @@ describe('GET /notifications', () => {
       url: 'http://example.com/api/notifications?userId=1',
     };
 
-    execute.mockResolvedValueOnce(undefined); // Veritabanı hatası simüle edildi
+    execute.mockResolvedValueOnce(undefined); 
 
     const response = await GET(request);
     const jsonResponse = await response.json();

@@ -44,7 +44,6 @@ describe("Dropdown Component", () => {
   
     console.log("Mock Calls:", mockOnChange.mock.calls);
   
-    // Adjust expectation based on actual arguments
     const [firstCallArgs] = mockOnChange.mock.calls;
     const selectedValue = firstCallArgs[1]?.props?.value || firstCallArgs[1];
     expect(selectedValue).toBe("Option 1");

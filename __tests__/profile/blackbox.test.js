@@ -13,22 +13,22 @@ global.Response = {
 
 describe('GET /profile (Black-box)', () => {
   afterEach(() => {
-    jest.clearAllMocks(); // Clear mock calls after each test
+    jest.clearAllMocks(); 
   });
 
   it('should return 400 if userId is missing', async () => {
     const response = await request(app)
-      .get('/api/profile') // Missing userId
+      .get('/api/profile') 
       .expect(400);
 
     expect(response.body.message).toBe('Provide a user id ');
   });
 
   it('should return 400 if user is not found', async () => {
-    execute.mockResolvedValueOnce([]); // Mock no user found
+    execute.mockResolvedValueOnce([]); 
 
     const response = await request(app)
-      .get('/api/profile?userId=1') // Valid userId
+      .get('/api/profile?userId=1') 
       .expect(400);
 
     expect(response.body.message).toBe('User not found ');
@@ -36,7 +36,7 @@ describe('GET /profile (Black-box)', () => {
   });
 
   it('should return 500 if there is a database error while checking user info', async () => {
-    execute.mockResolvedValueOnce(undefined); // Mock DB failure
+    execute.mockResolvedValueOnce(undefined); 
 
     const response = await request(app)
       .get('/api/profile?userId=1')
@@ -47,7 +47,7 @@ describe('GET /profile (Black-box)', () => {
   });
 
   it('should return student profile data for a valid student', async () => {
-    execute.mockResolvedValueOnce([{ ID: 1, Role: 'student', StudentID: 1 }]); // Mock user role
+    execute.mockResolvedValueOnce([{ ID: 1, Role: 'student', StudentID: 1 }]);
     execute.mockResolvedValueOnce([
       {
         UserID: 1,
@@ -58,7 +58,7 @@ describe('GET /profile (Black-box)', () => {
         DepartmentID: 10,
         BuildingID: 5,
       },
-    ]); // Mock student profile data
+    ]); 
 
     const response = await request(app)
       .get('/api/profile?userId=1')
@@ -76,7 +76,7 @@ describe('GET /profile (Black-box)', () => {
   });
 
   it('should return instructor profile data for a valid instructor', async () => {
-    execute.mockResolvedValueOnce([{ ID: 2, Role: 'instructor', InstructorID: 2 }]); // Mock user role
+    execute.mockResolvedValueOnce([{ ID: 2, Role: 'instructor', InstructorID: 2 }]); 
     execute.mockResolvedValueOnce([
       {
         UserID: 2,
@@ -86,7 +86,7 @@ describe('GET /profile (Black-box)', () => {
         DepartmentID: 20,
         BuildingID: 10,
       },
-    ]); // Mock instructor profile data
+    ]); 
 
     const response = await request(app)
       .get('/api/profile?userId=2')
@@ -103,14 +103,14 @@ describe('GET /profile (Black-box)', () => {
   });
 
   it('should return admin profile data for a valid admin', async () => {
-    execute.mockResolvedValueOnce([{ ID: 3, Role: 'admin', AdminID: 3 }]); // Mock user role
+    execute.mockResolvedValueOnce([{ ID: 3, Role: 'admin', AdminID: 3 }]); 
     execute.mockResolvedValueOnce([
       {
         UserID: 3,
         Email: 'admin@example.com',
         AdminID: 3,
       },
-    ]); // Mock admin profile data
+    ]); 
 
     const response = await request(app)
       .get('/api/profile?userId=3')
@@ -124,8 +124,8 @@ describe('GET /profile (Black-box)', () => {
   });
 
   it('should return 500 if there is a database error while loading profile data', async () => {
-    execute.mockResolvedValueOnce([{ ID: 1, Role: 'student', StudentID: 1 }]); // Mock user role
-    execute.mockResolvedValueOnce(undefined); // Mock DB failure for profile data
+    execute.mockResolvedValueOnce([{ ID: 1, Role: 'student', StudentID: 1 }]); 
+    execute.mockResolvedValueOnce(undefined);
 
     const response = await request(app)
       .get('/api/profile?userId=1')

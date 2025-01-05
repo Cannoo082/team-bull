@@ -19,8 +19,6 @@ import { GET as enrollmentGetRoute, POST as enrollmentPostRoute } from '../app/a
 import { GET as semesterRoute } from "../app/api/semester/route";
 
 
-
-// Utility to register routes
 const registerRoute = (method, path, routeHandler) => {
   app[method](path, async (req, res) => {
     const requestUrl = `http://localhost:3000${req.originalUrl}`; 

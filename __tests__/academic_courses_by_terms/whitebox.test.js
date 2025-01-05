@@ -10,7 +10,7 @@ global.Response = jest.fn((body, options) => ({
 
 describe("GET /academic_courses_by_terms (White-box)", () => {
   afterEach(() => {
-    jest.clearAllMocks(); // Mock'ları temizle
+    jest.clearAllMocks();
   });
 
   it("should return courses for valid userId and semesterId", async () => {
@@ -60,7 +60,7 @@ describe("GET /academic_courses_by_terms (White-box)", () => {
       url: "http://localhost:3000/api/academic_courses_by_terms?userId=999&semesterId=2025",
     };
 
-    execute.mockResolvedValueOnce([]); // Kurs bulunamadığında boş array mocklama
+    execute.mockResolvedValueOnce([]); 
 
     const response = await GET(request);
     const jsonResponse = await response.json();
@@ -76,7 +76,7 @@ describe("GET /academic_courses_by_terms (White-box)", () => {
       url: "http://localhost:3000/api/academic_courses_by_terms?userId=1&semesterId=2025",
     };
 
-    execute.mockRejectedValueOnce(new Error("Database error")); // Mock veritabanı hatası
+    execute.mockRejectedValueOnce(new Error("Database error"));
 
     const response = await GET(request);
     const jsonResponse = await response.json();

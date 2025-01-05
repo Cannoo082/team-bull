@@ -1,10 +1,8 @@
 import { GET } from '../../src/app/api/profile/route';
 import { execute } from '@/backend/db';
 
-// Jest mockları
 jest.mock('@/backend/db');
 
-// Global Response mocku
 global.Response = {
   json: (body, options = {}) => ({
     status: options.status || 200,
@@ -14,7 +12,7 @@ global.Response = {
 
 describe('GET /profile', () => {
   afterEach(() => {
-    jest.clearAllMocks(); // Mock'ları temizle
+    jest.clearAllMocks(); 
   });
 
   it('should return an error when userId is not provided', async () => {

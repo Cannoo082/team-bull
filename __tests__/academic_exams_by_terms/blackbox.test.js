@@ -13,7 +13,7 @@ describe("GET /academic_exams_by_terms (Black-box)", () => {
 
   it("should return 400 if CRN is missing", async () => {
     const response = await request(app)
-      .get("/api/academic_exams_by_terms") // Missing CRN
+      .get("/api/academic_exams_by_terms") 
       .expect(400);
 
     expect(response.body.message).toBe("Provide a CRN value");
@@ -21,7 +21,7 @@ describe("GET /academic_exams_by_terms (Black-box)", () => {
 
   it("should return 404 if no exams are found for the provided CRN", async () => {
     const response = await request(app)
-      .get("/api/academic_exams_by_terms?crn=99999") // Valid but no data
+      .get("/api/academic_exams_by_terms?crn=99999") 
       .expect(404);
 
     expect(response.body.message).toBe("No exams found for the provided CRN");

@@ -12,7 +12,7 @@ global.Response = {
 
 describe('GET /exams', () => {
     afterEach(() => {
-        jest.clearAllMocks(); // Clear mocks after each test
+        jest.clearAllMocks(); 
     });
 
     it('should return an error when courseId or semesterId is not provided', async () => {

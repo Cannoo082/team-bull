@@ -17,7 +17,7 @@ describe("enrollment-student Route (White-box)", () => {
 
   describe("GET /enrollment-student", () => {
     it("should return 500 if data retrieval fails", async () => {
-      execute.mockResolvedValueOnce(undefined); // Mock failure
+      execute.mockResolvedValueOnce(undefined);
 
       const request = {
         url: "http://localhost:3000/api/enrollment-student?userId=1",
@@ -33,7 +33,7 @@ describe("enrollment-student Route (White-box)", () => {
       const mockData = [
         { ID: 1, CourseTitle: "Sample Course", Instructor: "Dr. Smith" },
       ];
-      execute.mockResolvedValueOnce(mockData); // Mock successful data retrieval
+      execute.mockResolvedValueOnce(mockData); 
 
       const request = {
         url: "http://localhost:3000/api/enrollment-student?userId=1",
@@ -58,7 +58,7 @@ describe("enrollment-student Route (White-box)", () => {
     });
 
     it("should return 404 if no record is found", async () => {
-      execute.mockResolvedValueOnce([]); // Mock no records found
+      execute.mockResolvedValueOnce([]); 
 
       const request = { json: jest.fn().mockResolvedValueOnce({ userId: 1, crn: "123" }) };
       const response = await POST(request);
@@ -69,7 +69,7 @@ describe("enrollment-student Route (White-box)", () => {
     });
 
     it("should return 400 if capacity is full", async () => {
-      execute.mockResolvedValueOnce([{ Capacity: 10, Enrolled: 10 }]); // Mock full capacity
+      execute.mockResolvedValueOnce([{ Capacity: 10, Enrolled: 10 }]); 
 
       const request = { json: jest.fn().mockResolvedValueOnce({ userId: 1, crn: "123" }) };
       const response = await POST(request);
@@ -81,8 +81,8 @@ describe("enrollment-student Route (White-box)", () => {
 
     it("should return 500 if enrollment fails", async () => {
       execute
-        .mockResolvedValueOnce([{ Capacity: 10, Enrolled: 5 }]) // Mock capacity check
-        .mockResolvedValueOnce(undefined); // Mock enrollment failure
+        .mockResolvedValueOnce([{ Capacity: 10, Enrolled: 5 }]) 
+        .mockResolvedValueOnce(undefined); 
 
       const request = { json: jest.fn().mockResolvedValueOnce({ userId: 1, crn: "123" }) };
       const response = await POST(request);
@@ -94,9 +94,9 @@ describe("enrollment-student Route (White-box)", () => {
 
     it("should return 200 if enrollment is successful", async () => {
       execute
-        .mockResolvedValueOnce([{ Capacity: 10, Enrolled: 5 }]) // Mock capacity check
-        .mockResolvedValueOnce(true) // Mock successful enrollment
-        .mockResolvedValueOnce(true); // Mock enrollment update
+        .mockResolvedValueOnce([{ Capacity: 10, Enrolled: 5 }]) 
+        .mockResolvedValueOnce(true) 
+        .mockResolvedValueOnce(true); 
 
       const request = { json: jest.fn().mockResolvedValueOnce({ userId: 1, crn: "123" }) };
       const response = await POST(request);

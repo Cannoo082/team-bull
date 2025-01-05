@@ -14,7 +14,7 @@ describe("GET /academic_exams_by_terms (White-box)", () => {
   });
 
   it("should return 400 if CRN is missing", async () => {
-    const request = { url: "http://localhost:3000/api/academic_exams_by_terms" }; // Missing CRN
+    const request = { url: "http://localhost:3000/api/academic_exams_by_terms" }; 
 
     const response = await GET(request);
     const jsonResponse = await response.json();
@@ -28,7 +28,7 @@ describe("GET /academic_exams_by_terms (White-box)", () => {
       url: "http://localhost:3000/api/academic_exams_by_terms?crn=99999",
     };
 
-    execute.mockResolvedValueOnce([]); // Mock no results
+    execute.mockResolvedValueOnce([]);
 
     const response = await GET(request);
     const jsonResponse = await response.json();
@@ -55,7 +55,7 @@ describe("GET /academic_exams_by_terms (White-box)", () => {
         },
     ];
 
-    execute.mockResolvedValueOnce(mockData); // Mock valid results
+    execute.mockResolvedValueOnce(mockData); 
 
     const response = await GET(request);
     const jsonResponse = await response.json();
@@ -66,7 +66,7 @@ describe("GET /academic_exams_by_terms (White-box)", () => {
             ExamID: 1,
             CRN: "12345",
             ExamName: "Midterm",
-            ExamDate: "15.01.2025", // Formatted date
+            ExamDate: "15.01.2025", 
             ExamStartTime: "10:00:00",
             ExamEndTime: "12:00:00",
             ExamLocation: "Room 101",
@@ -80,7 +80,7 @@ describe("GET /academic_exams_by_terms (White-box)", () => {
       url: "http://localhost:3000/api/academic_exams_by_terms?crn=12345",
     };
 
-    execute.mockRejectedValueOnce(new Error("Database error")); // Mock DB error
+    execute.mockRejectedValueOnce(new Error("Database error")); 
 
     const response = await GET(request);
     const jsonResponse = await response.json();

@@ -2,21 +2,19 @@ import { PATCH } from '../../src/app/api/users/route';
 import { execute } from '@/backend/db';
 import bcrypt from 'bcrypt';
 
-// Jest mockları
 jest.mock('@/backend/db');
 jest.mock('bcrypt');
 
-// Response objesini global olarak mockla
 global.Response = {
   json: (body, options = {}) => ({
-    status: options.status || 200, // Varsayılan olarak 200 kullan
+    status: options.status || 200, 
     json: async () => body,
   }),
 };
 
 describe('PATCH /user', () => {
   afterEach(() => {
-    jest.clearAllMocks(); // Mock'ları temizle
+    jest.clearAllMocks(); 
   });
 
   it('should return an error for invalid operation', async () => {

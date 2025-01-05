@@ -21,7 +21,7 @@ describe("GET /attendance (Black-box)", () => {
   });
 
   it("should return 400 if user is not found", async () => {
-    execute.mockResolvedValueOnce([]); // Mock no user found
+    execute.mockResolvedValueOnce([]); 
     const response = await request(app)
       .get("/api/attendance?userId=999&semesterId=1")
       .expect(400);
@@ -30,11 +30,11 @@ describe("GET /attendance (Black-box)", () => {
   });
 
   it("should return attendance data for students", async () => {
-    execute.mockResolvedValueOnce([{ ID: 1, Role: "student" }]); // Mock valid user
+    execute.mockResolvedValueOnce([{ ID: 1, Role: "student" }]); 
     execute.mockResolvedValueOnce([
       { Week: 1, Status: "Present", CourseCode: "CS101", CourseTitle: "Intro to CS" },
       { Week: 2, Status: "Absent", CourseCode: "CS101", CourseTitle: "Intro to CS" },
-    ]); // Mock attendance query
+    ]); 
 
     const response = await request(app)
       .get("/api/attendance?userId=1&semesterId=1")

@@ -26,11 +26,11 @@ describe("GET /attendance (White-box)", () => {
       url: "http://localhost/api/attendance?userId=1&semesterId=1",
     };
 
-    execute.mockResolvedValueOnce([{ ID: 1, Role: "student" }]); // Mock valid user
+    execute.mockResolvedValueOnce([{ ID: 1, Role: "student" }]); 
     execute.mockResolvedValueOnce([
       { Week: 1, Status: "Present", CourseCode: "CS101", CourseTitle: "Intro to CS" },
       { Week: 2, Status: "Absent", CourseCode: "CS101", CourseTitle: "Intro to CS" },
-    ]); // Mock attendance query
+    ]); 
 
     const response = await GET(request);
 
@@ -48,7 +48,7 @@ describe("GET /attendance (White-box)", () => {
       url: "http://localhost/api/attendance?userId=999&semesterId=1",
     };
 
-    execute.mockResolvedValueOnce([]); // Mock no user found
+    execute.mockResolvedValueOnce([]); 
     const response = await GET(request);
 
     expect(response.status).toBe(400);

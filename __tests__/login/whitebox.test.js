@@ -2,21 +2,19 @@ import { POST } from '../../src/app/api/login/route';
 import { execute } from '@/backend/db';
 import bcrypt from 'bcrypt';
 
-// Jest mockları
 jest.mock('@/backend/db');
 jest.mock('bcrypt');
 
-// Global Response mocku
 global.Response = {
   json: (body, options = {}) => ({
-    status: options.status || 200, // Varsayılan olarak 200 kullan
+    status: options.status || 200, 
     json: async () => body,
   }),
 };
 
 describe('POST /login', () => {
   afterEach(() => {
-    jest.clearAllMocks(); // Mock'ları temizle
+    jest.clearAllMocks(); 
   });
 
   it('should return an error for invalid JSON format', async () => {
@@ -84,7 +82,7 @@ describe('POST /login', () => {
     };
 
     execute.mockResolvedValueOnce([{ ID: 1, Email: 'test@example.com', Password: 'hashedPassword', Role: 'student' }]);
-    bcrypt.compare.mockResolvedValueOnce(false); // Şifre yanlış
+    bcrypt.compare.mockResolvedValueOnce(false); 
 
     const response = await POST(request);
     const jsonResponse = await response.json();
@@ -99,7 +97,7 @@ describe('POST /login', () => {
     };
 
     execute.mockResolvedValueOnce([{ ID: 1, Email: 'test@example.com', Password: 'hashedPassword', Role: 'student' }]);
-    bcrypt.compare.mockResolvedValueOnce(true); // Şifre doğru
+    bcrypt.compare.mockResolvedValueOnce(true); 
 
     const response = await POST(request);
     const jsonResponse = await response.json();

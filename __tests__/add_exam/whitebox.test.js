@@ -20,7 +20,6 @@ describe("POST /add_exam (White-box)", () => {
         examName: "Midterm",
         examDate: "2025-01-15",
         startTime: "10:00",
-        // Missing endTime and location
       }),
     };
 

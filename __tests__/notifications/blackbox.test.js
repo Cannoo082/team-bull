@@ -18,30 +18,30 @@ describe('GET /notifications (Black-box)', () => {
 
   it('should return 400 if userId is missing', async () => {
     const response = await request(app)
-      .get('/api/notifications') // Missing userId
-      .expect(400); // Expect HTTP status 400
+      .get('/api/notifications') 
+      .expect(400); 
 
     expect(response.body.message).toBe('Provide a user id');
   });
 
   it('should return 500 if database execution fails', async () => {
-    execute.mockResolvedValueOnce(undefined); // Mock DB failure
+    execute.mockResolvedValueOnce(undefined); 
 
     const response = await request(app)
-      .get('/api/notifications?userId=1') // Valid userId
-      .expect(500); // Expect HTTP status 500
+      .get('/api/notifications?userId=1') 
+      .expect(500); 
 
     expect(response.body.message).toBe('Failed to load notifications');
   });
 
   it('should return 200 with an empty array if no notifications are found', async () => {
-    execute.mockResolvedValueOnce([]); // Mock no notifications found
+    execute.mockResolvedValueOnce([]); 
 
     const response = await request(app)
-      .get('/api/notifications?userId=1') // Valid userId
-      .expect(200); // Expect HTTP status 200
+      .get('/api/notifications?userId=1') 
+      .expect(200); 
 
-    expect(response.body).toEqual([]); // Expect empty array
+    expect(response.body).toEqual([]);
   });
 
   it('should return 200 with notifications if data exists', async () => {
@@ -64,12 +64,12 @@ describe('GET /notifications (Black-box)', () => {
       },
     ];
 
-    execute.mockResolvedValueOnce(mockNotifications); // Mock notifications data
+    execute.mockResolvedValueOnce(mockNotifications); 
 
     const response = await request(app)
-      .get('/api/notifications?userId=1') // Valid userId
-      .expect(200); // Expect HTTP status 200
+      .get('/api/notifications?userId=1') 
+      .expect(200);
 
-    expect(response.body).toEqual(mockNotifications); // Expect notifications data
+    expect(response.body).toEqual(mockNotifications);
   });
 });

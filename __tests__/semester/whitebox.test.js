@@ -24,7 +24,7 @@ describe("semester Route (White-box)", () => {
   });
 
   it("should return 404 if the semester is not found", async () => {
-    execute.mockResolvedValueOnce([]); // Mock no results found
+    execute.mockResolvedValueOnce([]); 
 
     const request = {
       url: "http://localhost:3000/api/semester?semesterId=999",
@@ -38,7 +38,7 @@ describe("semester Route (White-box)", () => {
   });
 
   it("should return 200 with the semester's active status", async () => {
-    execute.mockResolvedValueOnce([{ active: true }]); // Mock active semester
+    execute.mockResolvedValueOnce([{ active: true }]);
 
     const request = {
       url: "http://localhost:3000/api/semester?semesterId=1",
@@ -52,7 +52,7 @@ describe("semester Route (White-box)", () => {
   });
 
   it("should return 500 if a database error occurs", async () => {
-    execute.mockRejectedValueOnce(new Error("Database error")); // Mock DB error
+    execute.mockRejectedValueOnce(new Error("Database error")); 
 
     const request = {
       url: "http://localhost:3000/api/semester?semesterId=1",

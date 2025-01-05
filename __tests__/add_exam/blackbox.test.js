@@ -22,7 +22,6 @@ describe("POST /add_exam (Black-box)", () => {
         examName: "Midterm",
         examDate: "2025-01-15",
         startTime: "10:00",
-        // Missing endTime and location
       })
       .expect(400);
 
