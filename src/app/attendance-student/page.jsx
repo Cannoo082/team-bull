@@ -1,96 +1,135 @@
 "use client";
 
 import styles from "@/styles/pages/AttendanceStudent.module.css";
-import {formatString} from "@/helpers/functions/util";
+import { formatString } from "@/helpers/functions/util";
 import Table from "@/components/UI/Table";
-import {useEffect, useState, useContext} from "react";
-import {AuthContext} from "@/context/AuthContext";
-import {sendRequestGetAttendance} from "@/helpers/functions/http";
+import { useEffect, useState, useContext } from "react";
+import { error as errMsg } from "@/helpers/constants/messages";
+import { AuthContext } from "@/context/AuthContext";
+import {
+  sendRequestGetAttendance,
+  sendRequestGetAllSemesters,
+} from "@/helpers/functions/http";
 import Dropdown from "@/components/UI/Dropdown";
-
 const defaultVal = "";
+let selectedSemesterIdDefault = "";
+
 export default function AttendanceStudent() {
-    const authCtx = useContext(AuthContext);
-    const [attendance, setAttendance] = useState(null);
-    const [selected, setSelected] = useState(defaultVal);
-    useEffect(() => {
-        async function handleAttendance() {
-            const data = await sendRequestGetAttendance(authCtx.userState.userId);
-            if (data === undefined) {
-                return alert(errMsg.default);
-            }
+  const authCtx = useContext(AuthContext);
+  const [selectedSemesterId, setSelectedSemesterId] = useState(
+    selectedSemesterIdDefault
+  );
 
-            if (data.error) {
-                return alert(data.message);
-            }
+  const [semesters, setSemesters] = useState(null);
 
-            setAttendance(data);
-        }
+  const [attendance, setAttendance] = useState(null);
+  const [selected, setSelected] = useState(defaultVal);
+  useEffect(() => {
+    selectedSemesterIdDefault = "";
+  }, []);
+  useEffect(() => {
+    async function handleGetSemesters() {
+      const data = await sendRequestGetAllSemesters();
+      if (data === undefined) {
+        return alert(errMsg.default);
+      }
 
-        handleAttendance();
-    }, []);
-
-    function handleAttendanceChange(event) {
-        setSelected(event.target.value);
+      if (data.error) {
+        return alert(data.message);
+      }
+      const semesters = data.map((semester) => ({
+        id: semester.SemesterID,
+        name: semester.Term + " - " + semester.Year,
+      }));
+      setSemesters(semesters);
     }
 
-    if (!attendance) {
-        return null;
-    }
+    handleGetSemesters();
+  }, []);
 
-    if (!Object.keys(attendance).length) {
-        return (
-            <>
-                <h1>Attendance</h1>
-                <div className={styles.welcome}>
-                    <p>Welcome to the Attendance Page!</p>
-                    <p>Here you can view your attendance records for the selected course. Use the dropdown menu to
-                        select a
-                        course to see the attendance details.</p>
-                </div>
-                <div className={styles.box}>
-                    <p>No records found</p>
-                </div>
-            </>
-        );
+  useEffect(() => {
+    async function handleAttendance() {
+      const data = await sendRequestGetAttendance(
+        authCtx.userState.userId,
+        selectedSemesterId
+      );
+      if (data === undefined) {
+        return alert(errMsg.default);
+      }
+
+      if (data.error) {
+        return alert(data.message);
+      }
+
+      setAttendance(data);
     }
-    console.log(attendance);
-    return (
-        <div className={styles.container}>
-            <h1>Attendance</h1>
-            <div className={styles.welcome}>
-                <p>Welcome to the Attendance Page!</p>
-                <p>Here you can view your attendance records for the selected course. Use the dropdown menu to select a
-                    course to see the attendance details.</p>
-            </div>
-            {Object.keys(attendance).length > 0 && (
-                <div className={styles.box}>
-                    <Dropdown
-                        sx={{maxWidth: 180, marginTop: "1rem", marginBottom: "2rem"}}
-                        options={Object.keys(attendance).map((each) => ({
-                            name: each,
-                        }))}
-                        label="Attendance"
-                        onChange={handleAttendanceChange}
-                        currentValue={selected}
-                        optionKey="name"
-                        optionValue="name"
-                        optionFormattedValue="name"
-                    />
-                </div>
-            )}
-            {selected && (
-                <div className={`${styles.info} ${styles.box}`}>
-                    <Table
-                        columns={["CourseCode", "Week", "Status"]}
-                        rows={attendance[selected]}
-                        rowKey="Week"
-                        emptyValue="-"
-                        handleColumnFormat={(word) => formatString(word, ["_"])}
-                        sx={{width: "40%"}}
-                    />
-                </div>
-            )}
-        </div>
-    );
+    if (selectedSemesterId !== selectedSemesterIdDefault) {
+      handleAttendance();
+    }
+  }, [selectedSemesterId]);
+  function handleAttendanceChange(event) {
+    setSelected(event.target.value);
+  }
+
+  function handleSemesterChange(event) {
+    setSelectedSemesterId(event.target.value);
+    setSelected("");
+  }
+
+  return (
+    <div className={styles.container}>
+      <h1>Attendance</h1>
+      {semesters ? (
+        semesters.length ? (
+          <>
+            <h2>Semesters</h2>
+            <Dropdown
+              sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
+              options={semesters}
+              label="Semester"
+              onChange={handleSemesterChange}
+              currentValue={selectedSemesterId}
+              optionKey="id"
+              optionValue="id"
+              optionFormattedValue="name"
+            />
+          </>
+        ) : (
+          <p>No semesters found</p>
+        )
+      ) : null}
+
+      {attendance ? (
+        Object.keys(attendance).length ? (
+          <>
+            <h2>Course</h2>
+            <Dropdown
+              sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
+              options={Object.keys(attendance).map((each) => ({
+                name: each,
+              }))}
+              label="Course"
+              onChange={handleAttendanceChange}
+              currentValue={selected}
+              optionKey="name"
+              optionValue="name"
+              optionFormattedValue="name"
+            />
+          </>
+        ) : (
+          <p>No records found</p>
+        )
+      ) : null}
+      {selected && (
+        <Table
+          columns={["CourseCode", "Week", "Status"]}
+          rows={attendance[selected]}
+          rowKey="Week"
+          emptyValue="-"
+          handleColumnFormat={(word) => formatString(word, ["_"])}
+          sx={{ width: "40%" }}
+        />
+      )}
+    </div>
+  );
 }

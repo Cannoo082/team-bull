@@ -2,8 +2,12 @@ import { execute } from "@/backend/db";
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
-  if (userId === null) {
-    return Response.json({ message: "Provide a user id " }, { status: 400 });
+  const semesterId = searchParams.get("semesterId");
+  if (userId === null || semesterId === null) {
+    return Response.json(
+      { message: "Provide a semester id and a user id" },
+      { status: 400 }
+    );
   }
 
   const userArr = await execute("SELECT * FROM user WHERE ID=?", [userId]);
@@ -22,11 +26,10 @@ export async function GET(request) {
   const user = userArr[0];
   const role = user.Role.toLowerCase();
 
-  let sql;
-  let params;
-  let data;
-  if (role === "student") {
-    sql = `
+  if (role !== "student") {
+    return Response.json({ message: "Students only" }, { status: 400 });
+  }
+  const sql = `
       SELECT  
         a.Week, 
         a.Status, 
@@ -42,35 +45,30 @@ export async function GET(request) {
         AND cs.CourseID=c.CourseID 
         AND u.StudentID=a.StudentID 
         AND cs.SemesterID=s.SemesterID 
-        AND s.Active=1 
         AND u.StudentID=(SELECT StudentID FROM user WHERE ID=?)
+        AND cs.SemesterID=? 
     `;
-    params = [userId];
-    const rows = await execute(sql, params);
-    if (rows === undefined) {
-      return Response.json(
-        { message: "Failed to load attendace" },
-        { status: 500 }
-      );
+  const params = [userId, semesterId];
+  const rows = await execute(sql, params);
+  if (rows === undefined) {
+    return Response.json(
+      { message: "Failed to load attendace" },
+      { status: 500 }
+    );
+  }
+
+  const data = {};
+  rows.forEach((row) => {
+    const object = {
+      ...row,
+      CourseTitle: undefined,
+    };
+    if (data[row.CourseTitle] === undefined) {
+      data[row.CourseTitle] = [object];
+    } else {
+      data[row.CourseTitle].push(object);
     }
-
-    data = {};
-    rows.forEach((row) => {
-      const object = {
-        ...row,
-        CourseTitle: undefined,
-      };
-      if (data[row.CourseTitle] === undefined) {
-        data[row.CourseTitle] = [object];
-      } else {
-        data[row.CourseTitle].push(object);
-      }
-    });
-  }
-
-  if (role === "instructor") {
-    
-  }
+  });
 
   return Response.json(data);
 }
