@@ -5,11 +5,19 @@ import { formatString } from "@/helpers/functions/util";
 import Table from "@/components/UI/Table";
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "@/context/AuthContext";
-import { sendRequestGetAttendance } from "@/helpers/functions/http";
+import {
+  sendRequestGetAttendance,
+  sendRequestGetAllSemesters,
+} from "@/helpers/functions/http";
 import Dropdown from "@/components/UI/Dropdown";
 const defaultVal = "";
+let selectedSemesterIdDefault = "";
 export default function AttendanceStudent() {
   const authCtx = useContext(AuthContext);
+  const [selectedSemesterId, setSelectedSemesterId] = useState(
+    selectedSemesterIdDefault
+  ); 
+  const [semesters, setSemesters] = useState(null); 
   const [attendance, setAttendance] = useState(null);
   const [selected, setSelected] = useState(defaultVal);
   useEffect(() => {
