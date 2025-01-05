@@ -17,7 +17,7 @@ let selectedSemesterIdDefault = "";
 export default function AttendanceStudent() {
   const authCtx = useContext(AuthContext);
   const [selectedSemesterId, setSelectedSemesterId] = useState(
-    selectedSemesterIdDefault
+      selectedSemesterIdDefault
   );
 
   const [semesters, setSemesters] = useState(null);
@@ -50,8 +50,8 @@ export default function AttendanceStudent() {
   useEffect(() => {
     async function handleAttendance() {
       const data = await sendRequestGetAttendance(
-        authCtx.userState.userId,
-        selectedSemesterId
+          authCtx.userState.userId,
+          selectedSemesterId
       );
       if (data === undefined) {
         return alert(errMsg.default);
@@ -77,59 +77,67 @@ export default function AttendanceStudent() {
   }
 
   return (
-    <div className={styles.container}>
-      <h1>Attendance</h1>
-      {semesters ? (
-        semesters.length ? (
-          <>
-            <h2>Semesters</h2>
-            <Dropdown
-              sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
-              options={semesters}
-              label="Semester"
-              onChange={handleSemesterChange}
-              currentValue={selectedSemesterId}
-              optionKey="id"
-              optionValue="id"
-              optionFormattedValue="name"
-            />
-          </>
-        ) : (
-          <p>No semesters found</p>
-        )
-      ) : null}
+      <div className={styles.container}>
+        <h1>Attendance</h1>
+        <div className={styles.welcome}>
+          <p>Welcome to the Attendance Page!</p>
+          <p>Here you can view your attendance records for the selected semester and course. Use the dropdown menus to select a semester and course to see the attendance records.</p>
+        </div>
+        {semesters ? (
+            semesters.length ? (
+                <div className={styles.box}>
+                  <h2>Semesters</h2>
+                  <Dropdown
+                      sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
+                      options={semesters}
+                      label="Semester"
+                      onChange={handleSemesterChange}
+                      currentValue={selectedSemesterId}
+                      optionKey="id"
+                      optionValue="id"
+                      optionFormattedValue="name"
+                  />
+                </div>
+            ) : (
+                <div className={styles.box}>
+                  <p>No semesters found</p>
+                </div>
+            )
+        ) : null}
 
-      {attendance ? (
-        Object.keys(attendance).length ? (
-          <>
-            <h2>Course</h2>
-            <Dropdown
-              sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
-              options={Object.keys(attendance).map((each) => ({
-                name: each,
-              }))}
-              label="Course"
-              onChange={handleAttendanceChange}
-              currentValue={selected}
-              optionKey="name"
-              optionValue="name"
-              optionFormattedValue="name"
+        {attendance ? (
+            Object.keys(attendance).length ? (
+                <div className={styles.box}>
+                  <h2>Course</h2>
+                  <Dropdown
+                      sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
+                      options={Object.keys(attendance).map((each) => ({
+                        name: each,
+                      }))}
+                      label="Course"
+                      onChange={handleAttendanceChange}
+                      currentValue={selected}
+                      optionKey="name"
+                      optionValue="name"
+                      optionFormattedValue="name"
+                  />
+                </div>
+            ) : (
+                <div className={styles.box}>
+                  <p>No records found</p>
+                </div>
+            )
+        ) : null}
+        {selected && (
+            <Table
+                columns={["CourseCode", "Week", "Status"]}
+                rows={attendance[selected]}
+                rowKey="Week"
+                emptyValue="-"
+                handleColumnFormat={(word) => formatString(word, ["_"])}
+                sx={{ width: "40%" }}
             />
-          </>
-        ) : (
-          <p>No records found</p>
-        )
-      ) : null}
-      {selected && (
-        <Table
-          columns={["CourseCode", "Week", "Status"]}
-          rows={attendance[selected]}
-          rowKey="Week"
-          emptyValue="-"
-          handleColumnFormat={(word) => formatString(word, ["_"])}
-          sx={{ width: "40%" }}
-        />
-      )}
-    </div>
+        )}
+      </div>
   );
 }
