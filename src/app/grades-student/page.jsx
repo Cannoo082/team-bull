@@ -150,56 +150,54 @@ export default function GradesStudentPage() {
             )
         ) : null}
         {selectedCourseId && grades ? (
-            grades.length > 0 ? (
-                <>
-                  <div className={styles["grade-buttons-container"]}>
-                    <Button
-                        title="In Grade"
-                        sx={{ width: "10rem" }}
-                        onClick={() => {
-                          if (selectedGrade !== "in_grade") {
-                            setSelectedGrade("in_grade");
-                          }
-                        }}
-                    />
-                    <span style={{ width: "1rem" }}></span>
-                    <Button
-                        title="End Grade"
-                        sx={{ width: "10rem" }}
-                        onClick={() => {
-                          if (selectedGrade !== "end_grade") {
-                            setSelectedGrade("end_grade");
-                          }
-                        }}
+            <>
+              <div className={styles["grade-buttons-container"]}>
+                <Button
+                    title="In Grade"
+                    sx={{ width: "10rem" }}
+                    onClick={() => {
+                      if (selectedGrade !== "in_grade") {
+                        setSelectedGrade("in_grade");
+                      }
+                    }}
+                />
+                <span style={{ width: "1rem" }}></span>
+                <Button
+                    title="End Grade"
+                    sx={{ width: "10rem" }}
+                    onClick={() => {
+                      if (selectedGrade !== "end_grade") {
+                        setSelectedGrade("end_grade");
+                      }
+                    }}
+                />
+              </div>
+              <br />
+              {selectedGrade === "in_grade" && grades.inGrade && (
+                  <div className={`${styles.info} ${styles.box}`}>
+                    <Table
+                        columns={["name", "grade", "weight", "description"]}
+                        rows={grades.inGrade.map((grade) => ({
+                          ...grade,
+                          weight: "%" + grade.weight,
+                        }))}
+                        rowKey="name"
+                        emptyValue="-"
+                        handleColumnFormat={(word) => formatString(word, ["_"])}
                     />
                   </div>
-                  <br />
-                  {selectedGrade === "in_grade" && (
-                      <div className={`${styles.info} ${styles.box}`}>
-                        <Table
-                            columns={["name", "grade", "weight", "description"]}
-                            rows={grades.inGrade.map((grade) => ({
-                              ...grade,
-                              weight: "%" + grade.weight,
-                            }))}
-                            rowKey="name"
-                            emptyValue="-"
-                            handleColumnFormat={(word) => formatString(word, ["_"])}
-                        />
-                      </div>
-                  )}
-                  {selectedGrade === "end_grade" && (
-                      <div className={`${styles.info} ${styles.box}`}>
-                        <p>grade: {grades.endGrade.grade}</p>
-                        <p>letter grade: {grades.endGrade.letterGrade}</p>
-                      </div>
-                  )}
-                </>
-            ) : (
-                <div className={styles.box}>
-                  <p>No grades found</p>
-                </div>
-            )
+              )}
+              {selectedGrade === "end_grade" && grades.endGrade && (
+                  <div className={`${styles.info} ${styles.box}`}>
+                    <p>Grade: {grades.endGrade.grade}</p>
+                    <p>Letter Grade: {grades.endGrade.letterGrade}</p>
+                  </div>
+              )}
+            </>
+        ) : selectedCourseId ? (
+            <div className={styles.box}>
+              <p>No grades found</p>
+            </div>
         ) : null}
       </div>
   );
