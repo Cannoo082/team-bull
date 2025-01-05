@@ -16,3 +16,20 @@
     padding: 1rem; 
     width: 100%; 
 } 
+
+.notif-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: white;
+  width: 40%; 
+  padding: 1rem;
+  font-size: 1.2rem; 
+}
+.notif-detail  {
+  margin-bottom: 1rem;
+}
+
+.notif-container > h3 {
+  align-self: center; 
+}
