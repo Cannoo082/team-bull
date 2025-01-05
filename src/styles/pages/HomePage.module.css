@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.group {
+  display: flex;
+  width: 80%;
+}
+
+.group > *:not(:last-child) {
+  margin-right: 2rem;
+}
+
+.notifs-container {
+  flex: 3;
+}
+
+.calendar-container {
+  box-shadow: 0px 0px 10px 5px rgba(128, 128, 128, 0.25);
+  flex: 3;
+}
+
+.menu-container {
+  box-shadow: 0px 0px 10px 5px rgba(128, 128, 128, 0.25);
+  flex: 2;
+}
