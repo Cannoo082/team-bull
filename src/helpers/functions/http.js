@@ -71,6 +71,27 @@ export async function sendRequestGetNotifications(userId) {
   return await sendRequest(endpoint);
 }
 
+export async function sendRequestGetAllExams(userId) {
+  if (!userId) {
+    console.error("User ID is required");
+    return {
+      error: true,
+      message: "User ID is required",
+    };
+  }
+
+  const endpoint = `${endpoints.examsByUser}?userId=${userId}`;
+  const options = {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  };
+
+  return await sendRequest(endpoint, options);
+}
+
 export async function sendRequestGetProfile(userId) {
   const endpoint = `${endpoints.profile}?userId=${userId}`;
   return await sendRequest(endpoint);
