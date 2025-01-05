@@ -67,6 +67,12 @@ export default function Navbar({ handleDatetimeOpen }) {
         <div className={styles["icons-container"]}>
           <div className={styles.left}></div>
           <div className={styles.right}>
+            <div className={styles.userInfo}>
+              <span className={styles.userName}>{authCtx.userState?.email || "Guest"}</span>
+              <span className={styles.userRole}>
+            {authCtx.userState?.role === "academic" ? "Instructor" : "Student"}
+          </span>
+            </div>
             <IconButton
                 id="account-menu"
                 size="large"

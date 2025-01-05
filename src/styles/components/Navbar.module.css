@@ -2,10 +2,10 @@
   display: flex;
   align-items: center;
   width: 100%;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding: 0.5rem 1rem;
   margin: 0;
-  background-color: rgb(247, 139, 44);
+  background: linear-gradient(90deg, rgba(247, 139, 44, 1) 0%, rgba(255, 94, 0, 1) 100%);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .icons-container {
@@ -13,4 +13,42 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  margin-right: 1rem;
+}
+
+.userName {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 0.25rem;
+}
+
+.userRole {
+  font-size: 1rem;
+  color: white;
+  opacity: 0.9;
+  align-self: flex-end;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+}
+
+#account-menu {
+  transition: transform 0.2s;
+}
+
+#account-menu:hover {
+  transform: scale(1.1);
 }
