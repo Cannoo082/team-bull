@@ -17,10 +17,10 @@ let selectedCourseIdDefault = "";
 export default function GradesStudentPage() {
   const authCtx = useContext(AuthContext);
   const [selectedSemesterId, setSelectedSemesterId] = useState(
-    selectedSemesterIdDefault
+      selectedSemesterIdDefault
   );
   const [selectedCourseId, setSelectedCourseId] = useState(
-    selectedCourseIdDefault
+      selectedCourseIdDefault
   );
   const [semesters, setSemesters] = useState(null);
   const [courses, setCourses] = useState(null);
@@ -52,8 +52,8 @@ export default function GradesStudentPage() {
   useEffect(() => {
     async function handleGetCourses() {
       const data = await sendRequestGetCourses(
-        authCtx.userState.userId,
-        selectedSemesterId
+          authCtx.userState.userId,
+          selectedSemesterId
       );
       if (data === undefined) {
         return alert(errMsg.default);
@@ -74,9 +74,9 @@ export default function GradesStudentPage() {
     async function handleGetGrades() {
       const userId = authCtx.userState.userId;
       const data = await sendRequestGetGrades(
-        userId,
-        selectedCourseId,
-        selectedSemesterId
+          userId,
+          selectedCourseId,
+          selectedSemesterId
       );
       if (data === undefined) {
         return alert(errMsg.default);
@@ -100,94 +100,95 @@ export default function GradesStudentPage() {
   function handleCourseChange(event) {
     setSelectedCourseId(event.target.value);
   }
-  console.log(semesters);
   return (
-    <div className={styles.container}>
-      <h1>Grades</h1>
-      {semesters ? (
-        semesters.length ? (
-          <>
-            <h2>Semesters</h2>
-            <Dropdown
-              sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
-              options={semesters}
-              label="Semester"
-              onChange={handleSemesterChange}
-              currentValue={selectedSemesterId}
-              optionKey="id"
-              optionValue="id"
-              optionFormattedValue="name"
-            />
-          </>
-        ) : (
-          <p>No semesters found</p>
-        )
-      ) : null}
-      {courses ? (
-        courses.length ? (
-          <>
-            <h2>Courses</h2>
-            <Dropdown
-              sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
-              options={courses}
-              label="Course"
-              onChange={handleCourseChange}
-              currentValue={selectedCourseId}
-              optionKey="id"
-              optionValue="id"
-              optionFormattedValue="name"
-            />
-          </>
-        ) : (
-          <p>No courses found</p>
-        )
-      ) : null}
-      {!grades
-        ? null
-        : selectedCourseId !== selectedCourseIdDefault && (
+      <div className={styles.container}>
+        <h1>Grades</h1>
+        <div className={styles.welcome}>
+          <p>Welcome to the Grades Page!</p>
+          <p>Here you can view your grades for the selected semester and course. Use the dropdown menus to select a semester and course to see the grades.</p>
+        </div>
+        {semesters && semesters.length > 0 && (
+            <div className={styles.box}>
+              <h2>Semesters</h2>
+              <Dropdown
+                  sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
+                  options={semesters}
+                  label="Semester"
+                  onChange={handleSemesterChange}
+                  currentValue={selectedSemesterId}
+                  optionKey="id"
+                  optionValue="id"
+                  optionFormattedValue="name"
+              />
+            </div>
+        )}
+        {courses ? (
+            courses.length > 0 ? (
+                <div className={styles.box}>
+                  <h2>Courses</h2>
+                  <Dropdown
+                      sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
+                      options={courses}
+                      label="Course"
+                      onChange={handleCourseChange}
+                      currentValue={selectedCourseId}
+                      optionKey="id"
+                      optionValue="id"
+                      optionFormattedValue="name"
+                  />
+                </div>
+            ) : (
+                <div className={styles.box}>
+                  <p>No courses found</p>
+                </div>
+            )
+        ) : null}
+        {selectedCourseId && grades && (
             <>
               <div className={styles["grade-buttons-container"]}>
                 <Button
-                  title="In Grade"
-                  sx={{ width: "10rem" }}
-                  onClick={() => {
-                    if (selectedGrade !== "in_grade") {
-                      setSelectedGrade("in_grade");
-                    }
-                  }}
+                    title="In Grade"
+                    sx={{ width: "10rem" }}
+                    onClick={() => {
+                      if (selectedGrade !== "in_grade") {
+                        setSelectedGrade("in_grade");
+                      }
+                    }}
                 />
                 <span style={{ width: "1rem" }}></span>
                 <Button
-                  title="End Grade"
-                  sx={{ width: "10rem" }}
-                  onClick={() => {
-                    if (selectedGrade !== "end_grade") {
-                      setSelectedGrade("end_grade");
-                    }
-                  }}
+                    title="End Grade"
+                    sx={{ width: "10rem" }}
+                    onClick={() => {
+                      if (selectedGrade !== "end_grade") {
+                        setSelectedGrade("end_grade");
+                      }
+                    }}
                 />
               </div>
               <br />
               {selectedGrade === "in_grade" && (
-                <Table
-                  columns={["name", "grade", "weight", "description"]}
-                  rows={grades.inGrade.map((grade) => ({
-                    ...grade,
-                    weight: "%" + grade.weight,
-                  }))}
-                  rowKey="name"
-                  emptyValue="-"
-                  handleColumnFormat={(word) => formatString(word, ["_"])}
-                />
+                  <div className={`${styles.info} ${styles.box}`}>
+                    <Table
+                        columns={["name", "grade", "weight", "description"]}
+                        rows={grades.inGrade.map((grade) => ({
+                          ...grade,
+                          weight: "%" + grade.weight,
+                        }))}
+                        rowKey="name"
+                        emptyValue="-"
+                        handleColumnFormat={(word) => formatString(word, ["_"])}
+                    />
+                  </div>
               )}
               {selectedGrade === "end_grade" && (
-                <>
-                  <p>grade: {grades.endGrade.grade}</p>
-                  <p>letter grade: {grades.endGrade.letterGrade}</p>
-                </>
+                  <div className={`${styles.info} ${styles.box}`}>
+                    <p>grade: {grades.endGrade.grade}</p>
+                    <p>letter grade: {grades.endGrade.letterGrade}</p>
+                  </div>
               )}
             </>
-          )}
-    </div>
+        )}
+      </div>
   );
 }

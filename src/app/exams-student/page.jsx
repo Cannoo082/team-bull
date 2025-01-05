@@ -17,10 +17,10 @@ let selectedCourseIdDefault = "";
 export default function ExamsStudentPage() {
   const authCtx = useContext(AuthContext);
   const [selectedSemesterId, setSelectedSemesterId] = useState(
-    selectedSemesterIdDefault
+      selectedSemesterIdDefault
   );
   const [selectedCourseId, setSelectedCourseId] = useState(
-    selectedCourseIdDefault
+      selectedCourseIdDefault
   );
   const [semesters, setSemesters] = useState(null);
   const [courses, setCourses] = useState(null);
@@ -51,8 +51,8 @@ export default function ExamsStudentPage() {
   useEffect(() => {
     async function handleGetCourses() {
       const data = await sendRequestGetCourses(
-        authCtx.userState.userId,
-        selectedSemesterId
+          authCtx.userState.userId,
+          selectedSemesterId
       );
       if (data === undefined) {
         return alert(errMsg.default);
@@ -73,9 +73,9 @@ export default function ExamsStudentPage() {
     async function handleGetExams() {
       const userId = authCtx.userState.userId;
       const data = await sendRequestGetExams(
-        userId,
-        selectedCourseId,
-        selectedSemesterId
+          userId,
+          selectedCourseId,
+          selectedSemesterId
       );
       if (data === undefined) {
         return alert(errMsg.default);
@@ -100,59 +100,65 @@ export default function ExamsStudentPage() {
     setSelectedCourseId(event.target.value);
   }
   return (
-    <div className={styles.container}>
-      <h1>Exams</h1>
-      {semesters ? (
-        semesters.length ? (
-          <>
-            <h2>Semesters</h2>
-            <Dropdown
-              sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
-              options={semesters}
-              label="Semester"
-              onChange={handleSemesterChange}
-              currentValue={selectedSemesterId}
-              optionKey="id"
-              optionValue="id"
-              optionFormattedValue="name"
-            />
-          </>
-        ) : (
-          <p>No semesters found</p>
-        )
-      ) : null}
-      {courses ? (
-        courses.length ? (
-          <>
-            <h2>Courses</h2>
-            <Dropdown
-              sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
-              options={courses}
-              label="Course"
-              onChange={handleCourseChange}
-              currentValue={selectedCourseId}
-              optionKey="id"
-              optionValue="id"
-              optionFormattedValue="name"
-            />
-          </>
-        ) : (
-          <p>No courses found</p>
-        )
-      ) : null}
-      {!exams ? null : !exams.length ? (
-        <p>No exams found</p>
-      ) : (
-        selectedCourseId !== selectedCourseIdDefault && (
-          <Table
-            columns={["name", "date", "start_time", "end_time", "location"]}
-            rows={exams}
-            rowKey="name"
-            emptyValue="-"
-            handleColumnFormat={(word) => formatString(word, ["_"])}
-          />
-        )
-      )}
-    </div>
+      <div className={styles.container}>
+        <h1>Exams</h1>
+        <div className={styles.welcome}>
+          <p>Welcome to the Exams Page!</p>
+          <p>Here you can view your exams for the selected semester and course. Use the dropdown menus to select a semester and course to see the exams.</p>
+        </div>
+        {semesters ? (
+            semesters.length ? (
+                <div className={styles.box}>
+                  <h2>Semesters</h2>
+                  <Dropdown
+                      sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
+                      options={semesters}
+                      label="Semester"
+                      onChange={handleSemesterChange}
+                      currentValue={selectedSemesterId}
+                      optionKey="id"
+                      optionValue="id"
+                      optionFormattedValue="name"
+                  />
+                </div>
+            ) : (
+                <div className={styles.box}>
+                  <p>No semesters found</p>
+                </div>
+            )
+        ) : null}
+        {courses ? (
+            courses.length ? (
+                <div className={styles.box}>
+                  <h2>Courses</h2>
+                  <Dropdown
+                      sx={{ maxWidth: 180, marginTop: "1rem", marginBottom: "2rem" }}
+                      options={courses}
+                      label="Course"
+                      onChange={handleCourseChange}
+                      currentValue={selectedCourseId}
+                      optionKey="id"
+                      optionValue="id"
+                      optionFormattedValue="name"
+                  />
+                </div>
+            ) : (
+                <div className={styles.box}>
+                  <p>No courses found</p>
+                </div>
+            )
+        ) : null}
+        {selectedCourseId && exams && exams.length > 0 && (
+            <div className={`${styles.info} ${styles.box}`}>
+              <Table
+                  columns={["name", "date", "start_time", "end_time", "location"]}
+                  rows={exams}
+                  rowKey="name"
+                  emptyValue="-"
+                  handleColumnFormat={(word) => formatString(word, ["_"])}
+              />
+            </div>
+        )}
+      </div>
   );
 }
