@@ -120,7 +120,7 @@ export default function ExamDatesPage() {
                     <ul className={styles.examList}>
                       {examsOnThisDay.map((exam, index) => (
                         <li key={index} className={styles.examItem}>
-                          <strong>{exam.ExamName}</strong>
+                          <strong>{exam.ExamCourseCode} - {exam.ExamName}</strong>
                           <div>{exam.ExamStartTime} - {exam.ExamEndTime}</div>
                           <div>{exam.ExamLocation}</div>
                         </li>
