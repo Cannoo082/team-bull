@@ -58,7 +58,7 @@ export default function ChangeEmail() {
       cookieUser.email = newEmail;
       setCookie(cookies.user, JSON.stringify(cookieUser));
     }
-    setSuccess(true);
+    return alert("Email has been changed successfully!"); 
   }
 
   return (

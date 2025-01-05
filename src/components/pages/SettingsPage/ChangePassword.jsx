@@ -91,7 +91,7 @@ export default function ChangePassword() {
     if (response.error) {
       return alert(response.message);
     }
-    setSuccess(true);
+    return alert("Password has been changed successfully!");
   }
 
   function handleVisibilityChange(name) {
