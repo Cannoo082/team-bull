@@ -1,10 +1,15 @@
-/* src/styles/components/Calendar.module.css */
-/* src/styles/components/Calendar.module.css */
 .calendarWrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 50vh;
+}
+
+.days .today {
+  background: #c3d7ef;
+  color: #0055b0;
+  font-weight: bold;
+  border-radius: 15px;
 }
 
 .calendarContainer {

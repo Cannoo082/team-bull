@@ -58,7 +58,9 @@ const Calendar = () => {
                     key={index}
                     className={`${styles.day} ${
                         day?.toDateString() === new Date().toDateString() ? styles.today : ""
-                    } ${day && (day.getDay() === 6 || day.getDay() === 0) ? styles.weekend : ""}`}
+                    } ${day && (day.getDay() === 6 || day.getDay() === 0) ? styles.weekend : ""} ${
+                        day?.toDateString() === currentDate.toDateString() ? styles.currentDay : ""
+                    }`}
                 >
                   {day ? day.getDate() : ""}
                 </div>
