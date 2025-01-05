@@ -9,6 +9,7 @@ export async function GET(request) {
       c.*, 
       cs.*, 
       i.InstructorFullName AS Instructor ,   
+      i.InstructorEmail, 
       s.Active  
     FROM course_schedules cs 
       JOIN course c ON cs.CourseID=c.CourseID 

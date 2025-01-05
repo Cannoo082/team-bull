@@ -74,7 +74,7 @@ export default function GradesInstructorPage() {
   useEffect(() => {
     async function fetchSemesters() {
       try {
-        const response = await fetch("/api/all_semesters"); 
+        const response = await fetch("/api/all-semesters"); 
         const data = await response.json();
   
         if (!response.ok) {
