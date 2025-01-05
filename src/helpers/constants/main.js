@@ -4,6 +4,7 @@ import GradeIcon from "@mui/icons-material/Grade";
 import BeenhereIcon from "@mui/icons-material/Beenhere";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 const homeIcon = <HomeIcon />;
 export const routeOptions = {
   student: {
@@ -32,6 +33,11 @@ export const routeOptions = {
       path: "/attendance-student",
       icon: <BeenhereIcon />,
     },
+    calendar: {
+      name: "Calendar",
+      path: "/calendar-student",
+      icon: <CalendarMonthOutlinedIcon />,
+    },
   },
   academic: {
     home: {
@@ -48,11 +54,6 @@ export const routeOptions = {
       name: "Schedule Exam",
       path: "/exams-academic",
       icon: <BorderColorIcon />,
-    },
-    attendance: {
-      name: "Enter Attendance",
-      path: "/attendance-academic",
-      icon: <BeenhereIcon />,
     },
   },
   admin: {
