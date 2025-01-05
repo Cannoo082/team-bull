@@ -148,17 +148,23 @@ export default function ExamsStudentPage() {
                 </div>
             )
         ) : null}
-        {selectedCourseId && exams && exams.length > 0 && (
-            <div className={`${styles.info} ${styles.box}`}>
-              <Table
-                  columns={["name", "date", "start_time", "end_time", "location"]}
-                  rows={exams}
-                  rowKey="name"
-                  emptyValue="-"
-                  handleColumnFormat={(word) => formatString(word, ["_"])}
-              />
-            </div>
-        )}
+        {selectedCourseId && exams ? (
+            exams.length > 0 ? (
+                <div className={`${styles.info} ${styles.box}`}>
+                  <Table
+                      columns={["name", "date", "start_time", "end_time", "location"]}
+                      rows={exams}
+                      rowKey="name"
+                      emptyValue="-"
+                      handleColumnFormat={(word) => formatString(word, ["_"])}
+                  />
+                </div>
+            ) : (
+                <div className={styles.box}>
+                  <p>No exams found</p>
+                </div>
+            )
+        ) : null}
       </div>
   );
 }
