@@ -21,6 +21,7 @@ jobs:
         sudo su
         echo "$PRIVATE_KEY" > github-ec2.pem && chmod 600 github-ec2.pem
         ssh -o StrictHostKeyChecking=no -i github-ec2.pem ${USER}@${HOST} '
+        sudo su
 
         REPO_URL="https://${USERNAME}:${ACCESS_TOKEN}@github.com/Cannoo082/team-bull.git"
         BRANCH="main"
