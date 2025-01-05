@@ -16,6 +16,7 @@ export default function DisplayCourse({ handleEnroll, loading, course }) {
           "CourseTitle",
           "TeachingMethod",
           "Instructor",
+          "InstructorEmail", 
           "Day",
           "Time",
           "Capacity",
