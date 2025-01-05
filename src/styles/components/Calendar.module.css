@@ -1,22 +1,23 @@
+/* src/styles/components/Calendar.module.css */
+/* src/styles/components/Calendar.module.css */
+.calendarWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+}
+
 .calendarContainer {
   display: flex;
   flex-direction: column;
   width: 340px;
-  margin: 0 auto;
   font-family: Arial, sans-serif;
   background-color: #fff;
-  border: 1px solid #fff;
+  border: 1px solid #ddd;
   border-radius: 10px;
   padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-
-.days .today {
-  background: #c3d7ef;
-  color: #0055b0;
-  font-weight: bold;
-  border-radius: 15px;
-}
-
 
 .header {
   display: flex;
@@ -24,8 +25,8 @@
   align-items: center;
   font-size: 18px;
   margin-bottom: 20px;
-  padding-bottom: 10px; 
-  border-bottom: 1px solid #ccc; 
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ccc;
 }
 
 .header button {
@@ -46,7 +47,6 @@
   text-align: center;
   color: #282828;
 }
-
 
 .daysOfWeek {
   display: grid;
@@ -77,16 +77,19 @@
 }
 
 .day:hover {
-  background: #ffff;
-  color: #fff;
+  background: #f0f0f0;
+  color: #000;
 }
 
-
+.today {
+  background: #c3d7ef;
+  color: #0055b0;
+  font-weight: bold;
+  border-radius: 15px;
+}
 
 .weekend {
   background: #fff;
   color: #3e71a8;
   font-weight: bold;
 }
-
-
