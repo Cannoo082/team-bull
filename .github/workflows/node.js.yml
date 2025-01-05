@@ -28,16 +28,8 @@ jobs:
         REPO_URL="https://${USERNAME}:${ACCESS_TOKEN}@github.com/Cannoo082/team-bull.git"
         BRANCH="main"
         REPO_DIR="/var/www/team-bull"
-
-        if [ -d "$REPO_DIR/.git" ]; then
-          cd "$REPO_DIR"
-          # Update the remote origin URL to include authentication
-          git remote set-url origin "$REPO_URL"
-          git pull origin "$BRANCH"
-        else
-          git clone "$REPO_URL" "$REPO_DIR"
-          cd "$REPO_DIR"
-        fi
+        cd ${REPO_DIR}
+        git pull ${REPO_URL}
 
         sudo chown -R $USER:$USER $REPO_DIR
         sudo chmod -R 755 $REPO_DIR
