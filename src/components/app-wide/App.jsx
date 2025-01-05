@@ -46,7 +46,7 @@ export default function App({ children }) {
   return (
     <>
       {authCtx.userState.isSignedIn && pathname !== "/login" && <TopMenu />}
-      <div style={pathname!=="/settings" ? { margin: "0 1rem 1rem 1rem" } : {}}>{children}</div>
+      <div className={pathname!=="/login" && "main-content"}>{children}</div>
     </>
   );
 }
