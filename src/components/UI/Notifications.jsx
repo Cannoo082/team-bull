@@ -28,16 +28,16 @@ export default function Notifications({ notifs }) {
     }
     setSelectedNotif(object);
   }
-  console.log(selectedNotif);
+  console.log(notifs);
   return (
     <div className={styles.container}>
       <h3>Notifications{notifs.length ? ` (${notifs.length})` : ""}</h3>
       {notifs.length ? (
         <div className={styles.notifs}>
-          {notifs.map((notif) => {
+          {notifs.map((notif, index) => {
             return (
               <div
-                key={notif.NotificationID}
+                key={index}
                 className={styles.notif}
                 onClick={() => handleNotifSelect(notif.NotificationID)}
                 style={{
