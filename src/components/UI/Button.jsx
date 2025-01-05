@@ -14,10 +14,10 @@ export default function Button({
   thickness = 3,
 }) {
   return (
-    <Btn variant={variant} onClick={onClick} sx={{ ...sx }}>
+    <Btn variant={variant} onClick={onClick} sx={{ height: "3rem", ...sx }}>
       {loading ? (
         <Box sx={{ display: "flex", ...boxSx }}>
-          <CircularProgress sx={{ ...loadingSx }} thickness={thickness} />
+          <CircularProgress size="1.5rem" sx={{ ...loadingSx }} thickness={thickness} />
         </Box>
       ) : (
         title

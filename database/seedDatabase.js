@@ -171,12 +171,15 @@ const semesterData = [
   {SemesterID: '24S', Year: 2024, Term: 'Spring',
     TermStartDate: '2024-02-12', EnrollmentStartDate: '2024-01-22 10:00:00',
     EnrollmentEndDate: '2024-02-02 17:00:00', EnrollmentApprovalDate: '2024-02-05 12:00:00', Active: false},
+  {SemesterID: '24U', Year: 2024, Term: 'Summer',
+    TermStartDate: '2024-07-01', EnrollmentStartDate: '2024-06-24 10:00:00',
+    EnrollmentEndDate: '2024-06-26 17:00:00', EnrollmentApprovalDate: '2024-06-28 12:00:00', Active: false},
   {SemesterID: '24F', Year: 2024, Term: 'Fall',
     TermStartDate: '2024-09-30', EnrollmentStartDate: '2024-09-09 10:00:00',
-    EnrollmentEndDate: '2024-09-20 17:00:00', EnrollmentApprovalDate: '2024-09-23 12:00:00', Active: true},
+    EnrollmentEndDate: '2024-09-20 17:00:00', EnrollmentApprovalDate: '2024-09-23 12:00:00', Active: false},
   {SemesterID: '25S', Year: 2025, Term: 'Spring',
     TermStartDate: '2025-02-17', EnrollmentStartDate: '2025-01-27 10:00:00',
-    EnrollmentEndDate: '2025-02-07 17:00:00', EnrollmentApprovalDate: '2025-02-10 12:00:00', Active: false},
+    EnrollmentEndDate: '2025-02-07 17:00:00', EnrollmentApprovalDate: '2025-02-10 12:00:00', Active: true},
 ];
 
 (async function seedDatabase() {
@@ -460,7 +463,7 @@ const semesterData = [
 
     for (const semester of semesters) {
       for (const selectedCourse of courses) {
-        const { DepartmentID, YearOfCourse } = selectedCourse;
+        const { CourseID, DepartmentID, YearOfCourse } = selectedCourse;
 
         const departmentYearKey = `${DepartmentID}-${YearOfCourse}`;
         if (!scheduleMap.has(departmentYearKey)) {
@@ -486,20 +489,33 @@ const semesterData = [
             const formattedEndTime = endTimeCandidate.toTimeString().slice(0, 8);
 
             const timeSlotKey = `${day}-${time}`;
-            if (!scheduleMap.get(departmentYearKey).has(timeSlotKey)) {
-              startTime = time;
-              endTime = formattedEndTime;
-              assignedDay = day;
-              scheduleMap.get(departmentYearKey).add(timeSlotKey);
-              break;
+
+            if (scheduleMap.get(departmentYearKey).has(timeSlotKey)) {
+              continue;
             }
+
+            const conflictCheck = await executeQuery(`
+              SELECT 1
+              FROM course_schedules
+              WHERE InstructorID = ? AND SemesterID = ? AND Day = ? AND ClassStartTime = ?
+            `, [selectedInstructor.InstructorID, semester.SemesterID, day, time]);
+
+            if (conflictCheck.length > 0) {
+              continue;
+            }
+
+            assignedDay = day;
+            startTime = time;
+            endTime = formattedEndTime;
+            scheduleMap.get(departmentYearKey).add(timeSlotKey);
+            break;
           }
-          if (startTime && endTime && assignedDay) break;
+          if (assignedDay && startTime && endTime) break;
         }
 
         if (!startTime || !endTime || !assignedDay) {
           console.warn(
-            `No available time slot for CourseID ${selectedCourse.CourseID} in Semester ${semester.SemesterID}`
+            `No available time slot for CourseID ${CourseID} in Semester ${semester.SemesterID}`
           );
           continue;
         }
@@ -522,7 +538,7 @@ const semesterData = [
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             crn,
-            selectedCourse.CourseID,
+            CourseID,
             assignedDay,
             startTime,
             endTime,
@@ -699,13 +715,13 @@ const semesterData = [
     console.log('Seeding `exams`...');
 
     const courseDetails = await executeQuery(`
-      SELECT cs.CRN, cs.Location, cs.Day, cs.ClassStartTime, cs.TeachingMethod, s.TermStartDate 
+      SELECT cs.CRN, cs.Location, cs.Day, cs.ClassStartTime, cs.TeachingMethod, s.TermStartDate, s.Term
       FROM course_schedules cs
       JOIN semester s ON cs.SemesterID = s.SemesterID
-      WHERE s.SemesterID IN ('23F', '24S', '24F')
+      WHERE s.SemesterID IN ('23F', '24S', '24U', '24F')
     `);
 
-    const examDetails = [
+    const examDetailsDefault = [
       { name: 'Quiz1', type: 'Quiz', offsetWeeks: 3 },
       { name: 'Quiz2', type: 'Quiz', offsetWeeks: 5 },
       { name: 'Midterm1', type: 'Midterm', offsetWeeks: 7 },
@@ -715,8 +731,16 @@ const semesterData = [
       { name: 'Final', type: 'Final', offsetWeeks: 15 },
     ];
 
+    const examDetailsSummer = [
+      { name: 'Quiz1', type: 'Quiz', offsetWeeks: 3 },
+      { name: 'Quiz2', type: 'Quiz', offsetWeeks: 4 },
+      { name: 'Midterm', type: 'Midterm', offsetWeeks: 5 },
+      { name: 'Quiz3', type: 'Quiz', offsetWeeks: 6 },
+      { name: 'Final', type: 'Final', offsetWeeks: 8 },
+    ];
+
     const examInsertBatch = [];
-    for (const { CRN, Location, Day, ClassStartTime, TeachingMethod, TermStartDate } of courseDetails) {
+    for (const { CRN, Location, Day, ClassStartTime, TeachingMethod, TermStartDate, Term } of courseDetails) {
       if (!TermStartDate) {
         console.warn(`Skipping CRN: ${CRN} due to missing TermStartDate`);
         continue;
@@ -729,6 +753,8 @@ const semesterData = [
       const quizStartTime = new Date(`1970-01-01T${ClassStartTime || '08:30:00'}`);
       const quizEndTime = new Date(quizStartTime);
       quizEndTime.setMinutes(quizEndTime.getMinutes() + 30);
+
+      const examDetails = Term === 'Summer' ? examDetailsSummer : examDetailsDefault;
 
       for (const { name, type, offsetWeeks } of examDetails) {
         const examDate = new Date(startDate);
@@ -878,65 +904,213 @@ const semesterData = [
       }
     }
 
-    // Seed `TotalCredits` update
-    console.log('Updating `TotalCredits` based on the active term...');
+    // Seed `TotalCredits` update for 24F term
+    console.log("Updating `TotalCredits` based on successful courses in the 24F term...");
 
-    const activeSemester = await executeQuery(`
-      SELECT SemesterID 
-      FROM semester 
-      WHERE Active = true
+    const targetSemesterID = '24F';
+
+    const studentCredits = await executeQuery(`
+      SELECT 
+        e.StudentID,
+        SUM(c.Credits) AS TotalCreditsInTerm
+      FROM 
+        enrollment e
+      JOIN 
+        course_schedules cs ON e.CRN = cs.CRN
+      JOIN 
+        course c ON cs.CourseID = c.CourseID
+      JOIN 
+        end_of_term_grades etg ON e.StudentID = etg.StudentID AND e.CRN = etg.CRN
+      WHERE 
+        cs.SemesterID = ?
+        AND etg.LetterGrade != 'FF'
+      GROUP BY 
+        e.StudentID
+    `, [targetSemesterID]);
+
+    if (studentCredits.length > 0) {
+      const updates = studentCredits.map(({ StudentID, TotalCreditsInTerm }) => {
+        return executeQuery(
+          `UPDATE student 
+          SET TotalCredits = TotalCredits + ? 
+          WHERE StudentID = ?`,
+          [TotalCreditsInTerm, StudentID]
+        );
+      });
+
+      await Promise.all(updates);
+    } else {
+      console.warn("No enrollments found for the 24F term. No updates made.");
+    }
+
+    // Seed reenrollment
+    console.log('Processing reenrollment for failed courses...');
+    const summerTerm = await executeQuery(`
+      SELECT SemesterID, EnrollmentStartDate, EnrollmentEndDate, EnrollmentApprovalDate
+      FROM semester
+      WHERE SemesterID = '24U'
+      LIMIT 1
     `);
 
-    if (activeSemester.length === 0) {
-      console.warn('No active semester found. Skipping total credits update.');
-    } else {
-      const { SemesterID } = activeSemester[0];
+    if (!summerTerm || summerTerm.length === 0) {
+      console.error('24U semester not found. Aborting reenrollment.');
+      return;
+    }
 
-      const studentCredits = await executeQuery(`
-        SELECT 
-          e.StudentID,
-          SUM(c.Credits) AS TotalCreditsInActiveTerm
-        FROM 
-          enrollment e
-        JOIN 
-          course_schedules cs ON e.CRN = cs.CRN
-        JOIN 
-          course c ON cs.CourseID = c.CourseID
-        WHERE 
-          cs.SemesterID = ?
-        GROUP BY 
-          e.StudentID
-      `, [SemesterID]);
+    const { EnrollmentStartDate, EnrollmentEndDate, EnrollmentApprovalDate } = summerTerm[0];  
 
-      if (studentCredits.length > 0) {
-        const updates = studentCredits.map(({ StudentID, TotalCreditsInActiveTerm }) => {
-          return executeQuery(
-            `UPDATE student 
-            SET TotalCredits = TotalCredits + ? 
-            WHERE StudentID = ?`,
-            [TotalCreditsInActiveTerm, StudentID]
-          );
+    const failedCourses = await executeQuery(`
+      SELECT 
+        e.StudentID, 
+        e.CRN, 
+        cs.CourseID,
+        cs.SemesterID
+      FROM 
+        enrollment e
+      JOIN 
+        end_of_term_grades etg ON e.StudentID = etg.StudentID AND e.CRN = etg.CRN
+      JOIN 
+        course_schedules cs ON e.CRN = cs.CRN
+      WHERE 
+        etg.LetterGrade = 'FF'
+        AND cs.SemesterID IN ('23F', '24S')
+    `);
+
+    const attendanceBatch = [];
+    const inTermGradeBatch = [];
+    const endOfTermGradeBatch = [];
+    const reenrollmentBatch = [];
+    const enrolledUpdates = [];
+
+    const groupedFailures = failedCourses.reduce((acc, course) => {
+      if (!acc[course.StudentID]) acc[course.StudentID] = [];
+      acc[course.StudentID].push(course);
+      return acc;
+    }, {});
+
+    for (const [studentID, courses] of Object.entries(groupedFailures)) {
+      for (const course of courses) {
+        const { CourseID } = course;
+    
+        const summerCRN = await executeQuery(`
+          SELECT cs.CRN, cs.Enrolled
+          FROM course_schedules cs
+          WHERE cs.CourseID = ? AND cs.SemesterID = '24U'
+          LIMIT 1
+        `, [CourseID]);
+    
+        if (summerCRN.length === 0) {
+          console.warn(`No CRN available for CourseID: ${CourseID} in 24U`);
+          continue;
+        }
+    
+        const { CRN, Enrolled } = summerCRN[0];
+    
+        const enrollmentDate = faker.date.between({
+          from: new Date(EnrollmentStartDate),
+          to: new Date(EnrollmentEndDate),
         });
+    
+        reenrollmentBatch.push([
+          studentID,
+          CRN,
+          enrollmentDate,
+          new Date(EnrollmentApprovalDate),
+        ]);
+    
+        const weeks = Array.from({ length: 7 }, (_, i) => i + 1);
+        for (const week of weeks) {
+          attendanceBatch.push([
+            studentID,
+            CRN,
+            week,
+            faker.helpers.arrayElement(['Present', 'Absent', 'Late']),
+          ]);
+        }
 
-        await Promise.all(updates);
-      } else {
-        console.warn('No enrollments found for the active term. No updates made.');
+        const exams = [
+          { name: 'Midterm', percentage: 30 },
+          { name: 'Quiz1', percentage: 10 },
+          { name: 'Quiz2', percentage: 10 },
+          { name: 'Quiz3', percentage: 10 },
+          { name: 'Final', percentage: 40 },
+        ];
+    
+        let totalGrade = 0;
+        for (const exam of exams) {
+          const gradeValue = faker.number.int({ min: 80, max: 200 }) / 2;
+          totalGrade += (gradeValue * exam.percentage) / 100;
+      
+          inTermGradeBatch.push([
+            studentID,
+            CRN,
+            exam.name,
+            gradeValue,
+            exam.percentage,
+            `${exam.name} Score: ${gradeValue}, Weight: ${exam.percentage}%`,
+          ]);
+        }
+    
+        const letterGrade =
+          totalGrade >= 90 ? 'AA' : totalGrade >= 80 ? 'BA': totalGrade >= 70 ? 'BB' : totalGrade >= 60 ? 'CB'
+          : totalGrade >= 50 ? 'CC' : totalGrade >= 45 ? 'DC' : totalGrade >= 30 ? 'DD': 'FF';
+
+        endOfTermGradeBatch.push([
+          studentID,
+          CRN,
+          letterGrade,
+          totalGrade,
+        ]);
+
+        enrolledUpdates.push(CRN);
+      }
+    }
+
+    if (reenrollmentBatch.length > 0) {
+      await executeQuery(
+        `INSERT INTO enrollment (StudentID, CRN, EnrollmentDate, EnrollmentApprovalDate) VALUES ?`,
+        [reenrollmentBatch]
+      );
+    }
+
+    if (attendanceBatch.length > 0) {
+      await executeQuery(
+        `INSERT INTO attendance (StudentID, CRN, Week, Status) VALUES ?`,
+        [attendanceBatch]
+      );
+    }
+    
+    if (inTermGradeBatch.length > 0) {
+      await executeQuery(
+        `INSERT INTO in_term_grades (StudentID, CRN, GradeName, GradeValue, GradePercentage, GradeDescription) VALUES ?`,
+        [inTermGradeBatch]
+      );
+    }
+    
+    if (endOfTermGradeBatch.length > 0) {
+      await executeQuery(
+        `INSERT INTO end_of_term_grades (StudentID, CRN, LetterGrade, GradeOutOf100) VALUES ?`,
+        [endOfTermGradeBatch]
+      );
+    }
+
+    if (enrolledUpdates.length > 0) {
+      const enrollmentCounts = enrolledUpdates.reduce((map, CRN) => {
+        map[CRN] = (map[CRN] || 0) + 1;
+        return map;
+      }, {});
+    
+      for (const [CRN, count] of Object.entries(enrollmentCounts)) {
+        await executeQuery(
+          `UPDATE course_schedules SET Enrolled = Enrolled + ? WHERE CRN = ?`,
+          [count, CRN]
+        );
       }
     }
 
     // Seed `GPA` Update
     console.log('Updating student `GPA` based on end-of-term grades...');
-
-    const gradeToGPA = {
-      'AA': 4.0,
-      'BA': 3.5,
-      'BB': 3.0,
-      'CB': 2.5,
-      'CC': 2.0,
-      'DC': 1.5,
-      'DD': 1.0,
-      'FF': 0.0,
-    };
+    const gradeToGPA = { 'AA': 4.0, 'BA': 3.5, 'BB': 3.0, 'CB': 2.5, 'CC': 2.0, 'DC': 1.5, 'DD': 1.0, 'FF': 0.0 };
 
     const students = await executeQuery(`
       SELECT DISTINCT StudentID 
@@ -948,17 +1122,21 @@ const semesterData = [
 
       const grades = await executeQuery(`
         SELECT 
-          MAX(etg.CRN) AS CRN, 
-          MAX(etg.GradeOutOf100) AS GradeOutOf100, 
-          MAX(etg.LetterGrade) AS LetterGrade, 
-          cs.CourseID, 
-          MAX(e.EnrollmentApprovalDate) AS LatestApprovalDate
+          etg.CRN,
+          etg.LetterGrade,
+          cs.CourseID
         FROM end_of_term_grades etg
         JOIN enrollment e ON etg.StudentID = e.StudentID AND etg.CRN = e.CRN
         JOIN course_schedules cs ON e.CRN = cs.CRN
         WHERE e.StudentID = ?
-        GROUP BY cs.CourseID
-      `, [StudentID]);    
+          AND e.EnrollmentApprovalDate = (
+            SELECT MAX(sub_e.EnrollmentApprovalDate)
+            FROM enrollment sub_e
+            JOIN course_schedules sub_cs ON sub_e.CRN = sub_cs.CRN
+            WHERE sub_e.StudentID = e.StudentID
+              AND sub_cs.CourseID = cs.CourseID
+          )
+      `, [StudentID]);
 
       if (grades.length === 0) continue;
 
