@@ -97,8 +97,8 @@ export async function sendRequestGetProfile(userId) {
   return await sendRequest(endpoint);
 }
 
-export async function sendRequestGetAttendance(userId) {
-  const endpoint = `${endpoints.attendance}?userId=${userId}`;
+export async function sendRequestGetAttendance(userId, semesterId) {
+  const endpoint = `${endpoints.attendance}?userId=${userId}&semesterId=${semesterId}`;
   return await sendRequest(endpoint);
 }
 
@@ -148,7 +148,8 @@ export async function sendRequestGetExamsByCRN(crn) {
 }
 
 export async function getSemesterStatus(semesterId) {
-  if (!semesterId) throw new Error("Semester ID is required to fetch semester status.");
+  if (!semesterId)
+    throw new Error("Semester ID is required to fetch semester status.");
 
   const endpoint = `${endpoints.semester}?semesterId=${semesterId}`;
 
@@ -156,7 +157,8 @@ export async function getSemesterStatus(semesterId) {
     const response = await fetch(endpoint);
     const data = await response.json();
 
-    if (!response.ok) throw new Error(data.message || "Failed to fetch semester status.");
+    if (!response.ok)
+      throw new Error(data.message || "Failed to fetch semester status.");
 
     return data; // { semesterId: "25S", active: 1 }
   } catch (error) {
@@ -164,12 +166,26 @@ export async function getSemesterStatus(semesterId) {
   }
 }
 
-export async function addExam({ crn, examName, examDate, startTime, endTime, location }) {
+export async function addExam({
+  crn,
+  examName,
+  examDate,
+  startTime,
+  endTime,
+  location,
+}) {
   try {
     const response = await fetch("/api/add_exam", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ crn, examName, examDate, startTime, endTime, location }),
+      body: JSON.stringify({
+        crn,
+        examName,
+        examDate,
+        startTime,
+        endTime,
+        location,
+      }),
     });
 
     const data = await response.json();
@@ -202,10 +218,10 @@ export async function deleteExam({ examName, crn }) {
 
 export async function fetchStudentsByCRN(crn) {
   if (!crn) {
-    return new Response(
-      JSON.stringify({ message: "Provide a CRN" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ message: "Provide a CRN" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const sql = `
@@ -224,13 +240,19 @@ export async function fetchStudentsByCRN(crn) {
     );
   }
 
-  return new Response(
-    JSON.stringify(data),
-    { status: 200, headers: { "Content-Type": "application/json" } }
-  );
+  return new Response(JSON.stringify(data), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
-export async function saveGrade(studentId, crn, gradeName, gradeValue, gradePercentage) {
+export async function saveGrade(
+  studentId,
+  crn,
+  gradeName,
+  gradeValue,
+  gradePercentage
+) {
   try {
     const response = await fetch("/api/in_term_grades", {
       method: "POST",
@@ -259,7 +281,9 @@ export async function saveGrade(studentId, crn, gradeName, gradeValue, gradePerc
 
 export async function fetchGrades(crn, gradeName) {
   try {
-    const response = await fetch(`/api/get_grades?crn=${crn}&gradeName=${gradeName}`);
+    const response = await fetch(
+      `/api/get_grades?crn=${crn}&gradeName=${gradeName}`
+    );
     if (!response.ok) {
       const error = await response.json();
       console.error("Failed to fetch grades:", error.message);
@@ -292,4 +316,4 @@ export async function sendRequestEnrollStudent(userId, crn) {
   });
 
   return await sendRequest(endpoint, options);
-} 
+}
