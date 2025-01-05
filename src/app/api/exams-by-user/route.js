@@ -12,9 +12,10 @@ export async function GET(request) {
   }
 
   const sql = `
-    SELECT e.*
-    FROM exams e
-    JOIN course_schedules cs ON e.CRN = cs.CRN
+    SELECT e.* , c.CourseCode  
+    FROM exams e 
+    JOIN course_schedules cs ON e.CRN = cs.CRN 
+    JOIN course c ON cs.CourseID=c.CourseID 
     JOIN enrollment en ON cs.CRN = en.CRN
     JOIN user u ON en.StudentID = u.StudentID
     WHERE u.ID = ?;
@@ -48,7 +49,8 @@ export async function GET(request) {
         ExamDate: formattedDate,
         ExamStartTime: exam.ExamStartTime,
         ExamEndTime: exam.ExamEndTime,
-        ExamLocation: exam.ExamLocation,
+        ExamLocation: exam.ExamLocation, 
+        ExamCourseCode: exam.CourseCode  
       };
     });
 

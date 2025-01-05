@@ -36,11 +36,14 @@ export async function GET(request) {
         user u, 
         attendance a, 
         course_schedules cs, 
+        semester s, 
         course c 
       WHERE a.CRN=cs.CRN 
         AND cs.CourseID=c.CourseID 
         AND u.StudentID=a.StudentID 
-        AND u.StudentID=?  
+        AND cs.SemesterID=s.SemesterID 
+        AND s.Active=1 
+        AND u.StudentID=(SELECT StudentID FROM user WHERE ID=?)
     `;
     params = [userId];
     const rows = await execute(sql, params);
@@ -66,6 +69,7 @@ export async function GET(request) {
   }
 
   if (role === "instructor") {
+    
   }
 
   return Response.json(data);
