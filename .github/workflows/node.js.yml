@@ -32,8 +32,7 @@ jobs:
         if [ -d "$REPO_DIR/.git" ]; then
           cd "$REPO_DIR"
           # Update the remote origin URL to include authentication
-          git remote set-url origin "$REPO_URL"
-          git pull origin "$BRANCH"
+          git pull ${REPO_URL}
         else
           git clone "$REPO_URL" "$REPO_DIR"
           cd "$REPO_DIR"
