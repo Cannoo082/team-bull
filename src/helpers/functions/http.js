@@ -103,6 +103,154 @@ export async function sendRequestChangePassword(userId, password, newPassword) {
   return await sendRequest(endpoint, options);
 }
 
+export async function sendRequestGetAcademicCourses(userId, semesterId = null) {
+  const endpoint = semesterId
+    ? `${endpoints.academic_courses_by_terms}?userId=${userId}&semesterId=${semesterId}`
+    : `${endpoints.academic_courses_by_terms}?userId=${userId}`;
+}
+
+export async function sendRequestGetExamsByCRN(crn) {
+  if (!crn) throw new Error("CRN value is required to fetch exams.");
+
+  const endpoint = `${endpoints.academic_exams_by_terms}?crn=${crn}`;
+
+  try {
+    const response = await fetch(endpoint);
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message || "Failed to fetch exams.");
+
+    return data;
+  } catch (error) {
+    throw new Error("Error fetching exams by CRN.");
+  }
+}
+
+export async function getSemesterStatus(semesterId) {
+  if (!semesterId) throw new Error("Semester ID is required to fetch semester status.");
+
+  const endpoint = `${endpoints.semester}?semesterId=${semesterId}`;
+
+  try {
+    const response = await fetch(endpoint);
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message || "Failed to fetch semester status.");
+
+    return data; // { semesterId: "25S", active: 1 }
+  } catch (error) {
+    throw new Error("Error fetching semester status.");
+  }
+}
+
+export async function addExam({ crn, examName, examDate, startTime, endTime, location }) {
+  try {
+    const response = await fetch("/api/add_exam", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ crn, examName, examDate, startTime, endTime, location }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message || "Failed to add exam.");
+
+    return data;
+  } catch (error) {
+    throw new Error("Error adding exam.");
+  }
+}
+
+export async function deleteExam({ examName, crn }) {
+  try {
+    const response = await fetch("/api/delete_exam", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ examName, crn }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message || "Failed to delete exam.");
+
+    return data;
+  } catch (error) {
+    throw new Error("Error deleting exam.");
+  }
+}
+
+export async function fetchStudentsByCRN(crn) {
+  if (!crn) {
+    return new Response(
+      JSON.stringify({ message: "Provide a CRN" }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  const sql = `
+    SELECT e.StudentID, u.FirstName, u.LastName
+    FROM enrollment e
+    JOIN user u ON e.StudentID = u.ID
+    WHERE e.CRN = ?;
+  `;
+
+  const data = await execute(sql, [crn]);
+
+  if (!data || data.length === 0) {
+    return new Response(
+      JSON.stringify({ message: "No students found for this CRN" }),
+      { status: 404, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  return new Response(
+    JSON.stringify(data),
+    { status: 200, headers: { "Content-Type": "application/json" } }
+  );
+}
+
+export async function saveGrade(studentId, crn, gradeName, gradeValue, gradePercentage) {
+  try {
+    const response = await fetch("/api/in_term_grades", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        studentId,
+        crn,
+        gradeName,
+        gradeValue,
+        gradePercentage,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Failed to save grade:", errorData.message);
+      throw new Error(errorData.message || "Failed to save grade.");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error in saveGrade:", error.message);
+    throw error;
+  }
+}
+
+export async function fetchGrades(crn, gradeName) {
+  try {
+    const response = await fetch(`/api/get_grades?crn=${crn}&gradeName=${gradeName}`);
+    if (!response.ok) {
+      const error = await response.json();
+      console.error("Failed to fetch grades:", error.message);
+      throw new Error(error.message || "Failed to fetch grades");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error in fetchGrades:", error.message);
+    throw error;
+  }
+}
+
 export async function sendRequestGetAllSemesters() {
   const endpoint = endpoints.semestersAll;
   return await sendRequest(endpoint);
@@ -123,4 +271,4 @@ export async function sendRequestEnrollStudent(userId, crn) {
   });
 
   return await sendRequest(endpoint, options);
-}
+} 
