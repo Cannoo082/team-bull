@@ -30,7 +30,8 @@ jobs:
         echo "Current directory: $(pwd)
         git pull ${REPO_URL}
         echo ${REPO_URL}
-
+        
+        cd
         sudo chown -R $USER:$USER $REPO_DIR
         sudo chmod -R 755 $REPO_DIR
 
