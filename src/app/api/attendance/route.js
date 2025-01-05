@@ -39,6 +39,7 @@ export async function GET(request) {
         user u, 
         attendance a, 
         course_schedules cs, 
+        semester s, 
         course c 
       WHERE a.CRN=cs.CRN 
         AND cs.CourseID=c.CourseID 
